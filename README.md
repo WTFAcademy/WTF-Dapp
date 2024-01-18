@@ -16,14 +16,18 @@ Minimal tutorials to build Dapps.
 
 **第 6 讲：Next.js 部署**：【[教程](./06_NextJS/readme.md)】
 
+**第 7 讲：合约开发和测试**：【[教程](./07_ContractDev/readme.md)】
+
+**第 8 讲：合约部署**：【[教程](./08_ContractDeploy/readme.md)】
+
 ## 进阶
 
-**第 7 讲：EIP1193 和 EIP6963**：【[教程](./07_EIP1193/readme.md)】
+**第 9 讲：EIP1193 和 EIP6963**：【[教程](./09_EIP1193/readme.md)】
 
-**第 8 讲：通过 WalletConnect 连接移动端钱包**：【[教程](./08_WalletConnect/readme.md)】
+**第 10 讲：通过 WalletConnect 连接移动端钱包**：【[教程](./10_WalletConnect/readme.md)】
 
-**第 9 讲：支持多链**：【[教程](./09_MultipleChain/readme.md)】
+**第 11 讲：支持多链**：【[教程](./11_MultipleChain/readme.md)】
 
-**第 10 讲：签名和验签**：【[教程](./10_Signature/readme.md)】
+**第 12 讲：签名和验签**：【[教程](./12_Signature/readme.md)】
 
-**第 11 讲：转账和收款**：【[教程](./11_Payment/readme.md)】
+**第 13 讲：转账和收款**：【[教程](./13_Payment/readme.md)】
