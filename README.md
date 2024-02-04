@@ -4,11 +4,11 @@ Minimal tutorials to build Dapps.
 
 ## 基础
 
-**第 1 讲: 快速开始（三分钟展示 NFT）**：【[教程](./01_QuickStart/readme.md)】
+**第 1 讲：快速开始（三分钟展示 NFT）**：【[教程](./01_QuickStart/readme.md)】
 
 **第 2 讲：节点服务**：【[教程](./02_NodeService/readme.md)】
 
-**第 3 讲: 连接钱包**：【[教程](./03_ConnectWallet/readme.md)】
+**第 3 讲：连接钱包**：【[教程](./03_ConnectWallet/readme.md)】
 
 **第 4 讲：调用合约**：【[教程](./04_CallContract/readme.md)】
 
