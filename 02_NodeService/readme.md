@@ -25,11 +25,6 @@ const config = createConfig({
 -    [mainnet.id]: http(),
 +    [mainnet.id]: http('https://api.zan.top/node/v1/eth/mainnet/{YourZANApiKey}'),
   },
-  connectors: [
-    injected({
-      target: "metaMask",
-    }),
-  ],
 });
 ```
 
