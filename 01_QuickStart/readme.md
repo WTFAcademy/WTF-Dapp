@@ -144,14 +144,7 @@ import { Address } from "@ant-design/web3";
 export default function Web3() {
   return (
 +     <WagmiWeb3ConfigProvider config={config}>
-      <div
-        style={{
-          height: "100vh",
-          padding: 64,
-        }}
-      >
         <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
-      </div>
 +    </WagmiWeb3ConfigProvider>
   );
 };
@@ -179,15 +172,8 @@ const config = createConfig({
 export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider config={config}>
-      <div
-        style={{
-          height: "100vh",
-          padding: 64,
-        }}
-      >
-         <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
-+        <NFTCard address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" tokenId={641} />
-      </div>
+      <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
++     <NFTCard address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" tokenId={641} />
     </WagmiWeb3ConfigProvider>
   );
 };
