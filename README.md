@@ -24,7 +24,7 @@ DApp 开发极简入门
 
 **第 9 讲：EIP1193 和 EIP6963**：[教程](./09_EIP1193/readme.md) | [代码](./09_EIP1193/demo.js)
 
-**第 10 讲：通过 WalletConnect 连接移动端钱包**：[教程](./10_WalletConnect/readme.md)
+**第 10 讲：通过 WalletConnect 连接移动端钱包**：[教程](./10_WalletConnect/readme.md) | [代码](./10_WalletConnect/web3.tsx)
 
 **第 11 讲：支持多链**：[教程](./11_MultipleChain/readme.md)
 
