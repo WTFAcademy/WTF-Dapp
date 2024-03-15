@@ -12,7 +12,7 @@ DApp 开发极简入门
 
 **第 4 讲：调用合约**：[教程](./04_CallContract/readme.md) | [代码](./04_CallContract/web3.tsx)
 
-**第 5 讲：监听事件**：[教程](./05_Events/readme.md)
+**第 5 讲：监听事件**：[教程](./05_Events/readme.md) | [代码](./05_Events/web3.tsx)
 
 **第 6 讲：Next.js 部署**：[教程](./06_NextJS/readme.md)
 
