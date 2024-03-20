@@ -18,7 +18,7 @@ DApp 开发极简入门
 
 **第 7 讲：合约开发和测试**：[教程](./07_ContractDev/readme.md) | [代码](./07_ContractDev/MyToken.sol)
 
-**第 8 讲：合约部署**：[教程](./08_ContractDeploy/readme.md)
+**第 8 讲：合约部署**：[教程](./08_ContractDeploy/readme.md) | [代码](./08_ContractDeploy/demo/dapp.tsx)
 
 ## 进阶
 
