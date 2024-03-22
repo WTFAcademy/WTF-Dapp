@@ -1,16 +1,8 @@
 import React from 'react';
-import {
-  MetaMask,
-  OkxWallet,
-  TokenPocket,
-  WagmiWeb3ConfigProvider,
-  WalletConnect,
-} from '@ant-design/web3-wagmi';
+import { MetaMask, WagmiWeb3ConfigProvider } from '@ant-design/web3-wagmi';
 import { createConfig, http } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
-import { walletConnect } from 'wagmi/connectors';
 import DemoInner from './DemoInner';
-
 
 const config = createConfig({
   chains: [mainnet],
@@ -18,29 +10,14 @@ const config = createConfig({
     [mainnet.id]: http(),
   },
   connectors: [
-    walletConnect({
-      showQrModal: false,
-      projectId: YOUR_WALLET_CONNET_PROJECT_ID,
+    injected({
+      target: "metaMask",
     }),
   ],
 });
 const Demo:React.FC = () => {
   return (
-    <WagmiWeb3ConfigProvider
-      eip6963={{
-        autoAddInjectedWallets: true,
-      }}
-      ens
-      wallets={[
-        MetaMask(),
-        WalletConnect(),
-        TokenPocket({
-          group: 'Popular',
-        }),
-        OkxWallet(),
-      ]}
-      config={config}
-    >
+    <WagmiWeb3ConfigProvider config={config} wallets={[MetaMask()]}>
       <DemoInner />
     </WagmiWeb3ConfigProvider>
   );

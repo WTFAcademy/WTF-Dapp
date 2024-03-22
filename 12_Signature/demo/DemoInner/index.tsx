@@ -16,8 +16,6 @@ const DemoInner:React.FC = () => {
       const signature = await signMessageAsync({
         message: 'You are connecting your Ethereum address with zan.top',
       });
-      console.log('signature:', signature);
-      console.log('address:', addressRef.current);
       await runConnectEthAddress({
         chainAddress: addressRef.current,
         signature,
@@ -25,31 +23,32 @@ const DemoInner:React.FC = () => {
     } catch (error: any) {
       message.error(`Signature failed: ${error.message}`);
     }
-
     setSignLoading(false);
   };
 
   const runConnectEthAddress = async (params: { chainAddress?: string; signature: string }) => {
-    // do something
+    try {
+      const response = await fetch('/api/submitInfo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      })
+      const result = await response.json();
+      if (result.data) {
+        message.success('Signature success');
+      } else {
+        message.error('Signature failed');
+      }
+    } catch (error) {
+      message.error('An error occurred');
+    }
   }
   return (
     <div>
       <Connector
-+       onConnected={doSignature}
+        onConnected={doSignature}
         modalProps={{
           group: false,
-          footer: (
-            <>
-              Powered by{' '}
-              <a
-                href="https://web3.ant.design/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Ant Design Web3
-              </a>
-            </>
-          ),
         }}
       >
         <ConnectButton loading={signLoading} />

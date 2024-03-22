@@ -12,8 +12,6 @@
 
 然而只是连接上钱包是不可靠的，因为调用钱包获取到地址的接口可能会被客户端伪造。所以我们需要让用户通过签名来验证身份，用户通过他的私钥对某一条消息进行签名，DApp 的服务端通过公钥进行验证，这样才能确保用户的操作权限。
 
-### 作用
-
 签名的作用仅仅是验证你的身份。只知道地址并不能验证你真的是你，因为这是可以被冒充的。签名的过程只是通过私钥对一些信息进行加密，然后服务器去解密，对结果进行对比。
 
 ### 实现
@@ -28,21 +26,15 @@
 
 ![连接](./img/connect.png)
 
-在外层包 `WagmiWeb3ConfigProvider`
+把逻辑处理收进 `DemoInner` 统一处理：
 
-``` tsx
+``` diff
 import React from 'react';
-import {
-  MetaMask,
-  OkxWallet,
-  TokenPocket,
-  WagmiWeb3ConfigProvider,
-  WalletConnect,
-} from '@ant-design/web3-wagmi';
+- import { Address, ConnectButton, Connector, NFTCard } from "@ant-design/web3";
+import { MetaMask, WagmiWeb3ConfigProvider } from "@ant-design/web3-wagmi";
 import { createConfig, http } from 'wagmi';
 import { mainnet } from 'wagmi/chains';
-import { walletConnect } from 'wagmi/connectors';
-import DemoInner from './DemoInner';
++ import DemoInner from './DemoInner';
 
 
 const config = createConfig({
@@ -51,30 +43,23 @@ const config = createConfig({
     [mainnet.id]: http(),
   },
   connectors: [
-    walletConnect({
-      showQrModal: false,
-      projectId: YOUR_WALLET_CONNET_PROJECT_ID,
+    injected({
+      target: "metaMask",
     }),
   ],
 });
 const Demo:React.FC = () => {
   return (
-    <WagmiWeb3ConfigProvider
-      eip6963={{
-        autoAddInjectedWallets: true,
-      }}
-      ens
-      wallets={[
-        MetaMask(),
-        WalletConnect(),
-        TokenPocket({
-          group: 'Popular',
-        }),
-        OkxWallet(),
-      ]}
-      config={config}
-    >
-      <DemoInner />
+    <WagmiWeb3ConfigProvider config={config} wallets={[MetaMask()]}>
++       <DemoInner />
+-           <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
+-           <NFTCard
+-             address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
+-             tokenId={641}
+-           />
+-           <Connector>
+-         <ConnectButton />
+-      </Connector>
     </WagmiWeb3ConfigProvider>
   );
 }
@@ -88,10 +73,9 @@ export default Demo;
 import React from 'react';
 import { ConnectButton, Connector } from '@ant-design/web3';
 import { useAccount, useSignMessage } from 'wagmi';
-
-
 import { message } from 'antd';
 import { useLatest } from 'ahooks';
+
 const DemoInner:React.FC = () => {
   const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
@@ -104,8 +88,6 @@ const DemoInner:React.FC = () => {
       const signature = await signMessageAsync({
         message: 'You are connecting your Ethereum address with zan.top',
       });
-      console.log('signature:', signature);
-      console.log('address:', addressRef.current);
       await runConnectEthAddress({
         chainAddress: addressRef.current,
         signature,
@@ -113,31 +95,32 @@ const DemoInner:React.FC = () => {
     } catch (error: any) {
       message.error(`Signature failed: ${error.message}`);
     }
-
     setSignLoading(false);
   };
 
   const runConnectEthAddress = async (params: { chainAddress?: string; signature: string }) => {
-    // do something
+    try {
+      const response = await fetch('/api/submitInfo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      })
+      const result = await response.json();
+      if (result.data) {
+        message.success('Signature success');
+      } else {
+        message.error('Signature failed');
+      }
+    } catch (error) {
+      message.error('An error occurred');
+    }
   }
   return (
     <div>
       <Connector
-+       onConnected={doSignature}
+        onConnected={doSignature}
         modalProps={{
           group: false,
-          footer: (
-            <>
-              Powered by{' '}
-              <a
-                href="https://web3.ant.design/"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Ant Design Web3
-              </a>
-            </>
-          ),
         }}
       >
         <ConnectButton loading={signLoading} />
@@ -146,34 +129,38 @@ const DemoInner:React.FC = () => {
   );
 }
 export default DemoInner;
-
 ```
-并在 `Connector` 里写入 `onConnected` 当我们连接钱包成功之后就会调起 `doSignature` 方法，在这里我们用到了 `wagmi` 的 `useSignMessage` 的hooks。当执行 `signMessageAsync` 后可以得到已经签名过的固定的消息，`signature: 0xf7960a0d29b9771e67c3070dd371444f4c37e35e11395877a1f36f93a8065117512d57148b0f4d4d56ec17383818ddf70347c76df9e414b7aaab3ed81ab955111b` 和 地址信息 `address: 0xE21E97Ad8B527acb90F0b148EfaFbA46625382cE`.
+在 `Connector` 里写入 `onConnected` 当我们连接钱包成功之后就会调起 `doSignature` 方法，在这里我们用到了 `wagmi` 的 `useSignMessage` 的hooks。当执行 `signMessageAsync` 后可以得到已经签名过的固定的消息，`signature: 0xf7960a0d29b9771e67c3070dd371444f4c37e35e11395877a1f36f93a8065117512d57148b0f4d4d56ec17383818ddf70347c76df9e414b7aaab3ed81ab955111b` 和 地址信息 `address: 0xE21E97Ad8B527acb90F0b148EfaFbA46625382cE`.
 
 然后我们就把签名得到的结果和我们登录的地址一起通过接口在 `runConnectEthAddress` 方法里发给后端同学。
 
 ## 验签
-
 关于后端的验签，一般依赖 `wagmi` 或者 `ethers` 等库。
 
 如 `wagmi` 实现： 
-``` tsx
+``` ts
+// /app/api/submitInfo.ts
+import { NextRequest, NextResponse } from "next/server";
 import { verifyMessage } from '@wagmi/core'
 
-const result = await verifyMessage(config, {
-  address: '0xE21E97Ad8B527acb90F0b148EfaFbA46625382cE',
-  message: 'You are connecting your Ethereum address with zan.top',
-  signature:'0xf7960a0d29b9771e67c3070dd371444f4c37e35e11395877a1f36f93a8065117512d57148b0f4d4d56ec17383818ddf70347c76df9e414b7aaab3ed81ab955111b'
-})
-console.log('result', result);
-
+export async function POST(req: NextRequest, res: NextResponse) {
+  try {
+    const body = await req.json();
+    const result = await verifyMessage(config, {
+      address: body.chainAddress,
+      message: 'You are connecting your Ethereum address with zan.top',
+      signature: body.signature
+    })
+    return NextResponse.json({ data: result });
+  } catch (err) {
+    return NextResponse.error();
+  }
+}
 ```
-得到结果：`result true` 
-
-或者 `ethers` 实现：
+如果更擅长 `ethers` 可以换成以下代码实现：
 ``` tsx
-const verifyMessage = async (message, signerAddress, signature) => {
-  const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+const verifyMessage = async (signerAddress, signature) => {
+  const recoveredAddress = ethers.utils.verifyMessage('You are connecting your Ethereum address with zan.top', signature);
   return recoveredAddress === signerAddress;
 };
 ```
