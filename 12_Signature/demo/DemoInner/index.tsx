@@ -4,6 +4,7 @@ import { useAccount, useSignMessage } from 'wagmi';
 
 import { message } from 'antd';
 import { useLatest } from 'ahooks';
+
 const DemoInner:React.FC = () => {
   const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
