@@ -52,12 +52,12 @@ npm i
 接下来，我们安装 [Ant Design](https://ant.design/) 和 [Ant Design Web3](https://web3.ant.design/) 的基础组件以及其它依赖到项目中：
 
 ```bash
-npm i antd @ant-design/web3 @ant-design/web3-wagmi wagmi --save
+npm i antd @ant-design/web3 @ant-design/web3-wagmi wagmi @tanstack/react-query --save
 ```
 
 - `@ant-design/web3` 是一个 UI 组件库，它通过不同的[适配器](../guide/adapter.zh-CN.md)和不同的区块链连接。本课程中，我们主要基于的是[以太坊](https://ethereum.org/zh/)。对应的，我们也将使用[以太坊的适配器](../../packages/web3/src/wagmi/index.zh-CN.md)来实现课程的需求。
 
-- [wagmi](https://wagmi.sh/) 是一个开源的服务以太坊的 React Hooks 库，Ant Design Web3 的适配器 `@ant-design/web3-wagmi` 基于它实现，在本课程的后面部分，如果没有特殊说明，那提到的适配器就是指 `@ant-design/web3-wagmi`。
+- [wagmi](https://wagmi.sh/) 是一个开源的服务以太坊的 React Hooks 库，并依赖 `@tanstack/react-query`。Ant Design Web3 的适配器 `@ant-design/web3-wagmi` 基于它实现，在本课程的后面部分，如果没有特殊说明，那提到的适配器就是指 `@ant-design/web3-wagmi`。
 
 安装完成后，因为 Next.js 当前版本[已有的一个问题](https://github.com/ant-design/ant-design/issues/46053)，你需要在 `next.config.js` 中添加如下配置：
 
