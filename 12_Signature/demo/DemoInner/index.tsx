@@ -2,12 +2,10 @@ import React from 'react';
 import { ConnectButton, Connector } from '@ant-design/web3';
 import { useAccount, useSignMessage } from 'wagmi';
 import { message } from 'antd';
-import { useLatest } from 'ahooks';
 
 const DemoInner:React.FC = () => {
   const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
-  const addressRef = useLatest(address);
   const [signLoading, setSignLoading] = React.useState<boolean>(false);
 
   const doSignature = async () => {
@@ -17,7 +15,7 @@ const DemoInner:React.FC = () => {
         message: 'You are connecting your Ethereum address with zan.top',
       });
       await runConnectEthAddress({
-        chainAddress: addressRef.current,
+        chainAddress: address
         signature,
       });
     } catch (error: any) {
@@ -28,7 +26,7 @@ const DemoInner:React.FC = () => {
 
   const runConnectEthAddress = async (params: { chainAddress?: string; signature: string }) => {
     try {
-      const response = await fetch('/api/submitInfo', {
+      const response = await fetch('/api/signatureCheck', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params),
