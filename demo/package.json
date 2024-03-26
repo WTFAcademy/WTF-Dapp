@@ -1,0 +1,30 @@
+{
+  "name": "ant-design-web3-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ant-design/web3": "^1.4.3",
+    "@ant-design/web3-wagmi": "^2.2.2",
+    "@tanstack/react-query": "^5.28.4",
+    "antd": "^5.12.5",
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "viem": "^2.0.0",
+    "wagmi": "^2.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4",
+    "typescript": "^5"
+  }
+}
