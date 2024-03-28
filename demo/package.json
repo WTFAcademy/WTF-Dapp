@@ -26,5 +26,6 @@
     "eslint": "^8",
     "eslint-config-next": "14.0.4",
     "typescript": "^5"
-  }
+  },
+  "repository": "git@github.com:WTFAcademy/WTF-Dapp.git"
 }
