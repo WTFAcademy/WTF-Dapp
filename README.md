@@ -22,7 +22,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 ## 进阶
 
-**第 9 讲：EIP1193 和 EIP6963**：[教程](./09_EIP1193/readme.md) | [代码](./09_EIP1193/demo.js)
+**第 9 讲：EIP1193 和 EIP6963**：[教程](./09_EIP1193/readme.md) | [代码](./09_EIP1193/web3.tsx)
 
 **第 10 讲：通过 WalletConnect 连接移动端钱包**：[教程](./10_WalletConnect/readme.md) | [代码](./10_WalletConnect/web3.tsx)
 

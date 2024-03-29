@@ -54,6 +54,34 @@ EIP6963 不再通过 `window.ethereum` 对象来和钱包进行交互，而是�
 
 如果你使用了 [Ant Design Web3](https://web3.ant.design/zh-CN/components/wagmi#eip6963)，通过配置 `WagmiWeb3ConfigProvider` 的 `eip6963` 即可在 DApp 中使用 EIP6963。它的连接钱包的弹窗会自动添加检测到的钱包。
 
+下面是我们基于之前的课程例子的修改示例：
+
+```diff
+export default function Web3() {
+  return (
+    <WagmiWeb3ConfigProvider
+      config={config}
+      wallets={[MetaMask()]}
++     eip6963={{
++       autoAddInjectedWallets: true,
++     }}
+    >
+      <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
+      <NFTCard
+        address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
+        tokenId={641}
+      />
+      <Connector>
+        <ConnectButton />
+      </Connector>
+      <CallTest />
+    </WagmiWeb3ConfigProvider>
+  );
+}
+```
+
+其中配置了 `eip6963` 使得使用通过 EIP6963 协议连接钱包，避免了多个钱包之间可能出现的冲突。另外添加了 `autoAddInjectedWallets` 配置使得自动添加检测到的钱包到 Ant Design Web3 的 UI 中，提升用户体验，让用户可以自由选择他已经安装的钱包。
+
 ## 总结
 
 不管是 EIP1193 还是 EIP6963，它们都是通过浏览器的 JavaScript API 来和钱包进行交互的。它要求钱包可以向 DApp 的运行时注入对象或者发送事件，比如通过 Chrome 浏览器插件，或者你在钱包内置的浏览器中访问 DApp。
