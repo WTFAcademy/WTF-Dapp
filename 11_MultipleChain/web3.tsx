@@ -1,29 +1,22 @@
+import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
 import { mainnet, goerli, polygon } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
   Goerli,
-  Polygon,
-  WalletConnect,
+  Polygon
 } from "@ant-design/web3-wagmi";
 import {
   Address,
-  ConnectButton,
-  Connector,
   NFTCard,
+  Connector,
+  ConnectButton,
   useAccount,
   useProvider
 } from "@ant-design/web3";
+import { injected } from "wagmi/connectors";
 import { Button, message } from "antd";
 import { parseEther } from "viem";
-import {
-  createConfig,
-  http,
-  useReadContract,
-  useWriteContract,
-  useWatchContractEvent,
-} from "wagmi";
-import { injected, walletConnect } from "wagmi/connectors";
 
 const config = createConfig({
   chains: [mainnet, goerli, polygon],
@@ -35,10 +28,6 @@ const config = createConfig({
   connectors: [
     injected({
       target: "metaMask",
-    }),
-    walletConnect({
-      projectId: "c07c0051c2055890eade3556618e38a6",
-      showQrModal: false,
     }),
   ],
 });
@@ -77,35 +66,6 @@ const CallTest = () => {
     args: [account?.address as `0x${string}`],
   });
   const { writeContract } = useWriteContract();
-
-  useWatchContractEvent({
-    address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
-    abi: [
-      {
-        anonymous: false,
-        inputs: [
-          {
-            indexed: false,
-            internalType: "address",
-            name: "minter",
-            type: "address",
-          },
-          {
-            indexed: false,
-            internalType: "uint256",
-            name: "amount",
-            type: "uint256",
-          },
-        ],
-        name: "Minted",
-        type: "event",
-      },
-    ],
-    eventName: "Minted",
-    onLogs() {
-      message.success("new minted!");
-    },
-  });
 
   return (
     <div>
@@ -155,11 +115,8 @@ export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider
       config={config}
-      wallets={[MetaMask(), WalletConnect()]}
-      eip6963={{
-        autoAddInjectedWallets: true,
-      }}
       chains={[Goerli, Polygon]}
+      wallets={[MetaMask()]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard
