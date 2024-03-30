@@ -57,7 +57,7 @@ npm i antd @ant-design/web3 @ant-design/web3-wagmi wagmi @tanstack/react-query -
 
 - `@ant-design/web3` 是一个 UI 组件库，它通过不同的[适配器](../guide/adapter.zh-CN.md)和不同的区块链连接。本课程中，我们主要基于的是[以太坊](https://ethereum.org/zh/)。对应的，我们也将使用[以太坊的适配器](../../packages/web3/src/wagmi/index.zh-CN.md)来实现课程的需求。
 
-- [wagmi](https://wagmi.sh/) 是一个开源的服务以太坊的 React Hooks 库，并依赖 `@tanstack/react-query`。Ant Design Web3 的适配器 `@ant-design/web3-wagmi` 基于它实现，在本课程的后面部分，如果没有特殊说明，那提到的适配器就是指 `@ant-design/web3-wagmi`。
+- [wagmi](https://wagmi.sh/) 是一个开源的服务以太坊的 React Hooks 库，并依赖 `@tanstack/react-query`。Ant Design Web3 的适配器 `@ant-design/web3-wagmi` 就是基于它实现的，在本课程的后面部分，如果没有特殊说明，那提到的适配器就是指 `@ant-design/web3-wagmi`。
 
 安装完成后，因为 Next.js 当前版本[已有的一个问题](https://github.com/ant-design/ant-design/issues/46053)，你需要在 `next.config.js` 中添加如下配置：
 
@@ -122,7 +122,7 @@ export default function Web3() {
 其中引入的内容说明如下：
 
 - [createConfig](https://wagmi.sh/react/config)：wagmi 用来创建配置的方法。
-- [http]：wagmi 用来创建 [HTTP JSON RPC](https://wagmi.sh/core/api/transports/http) 连接的方法，通过它你可以通过 HTTP 请求访问区块链。
+- http：wagmi 用来创建 [HTTP JSON RPC](https://wagmi.sh/core/api/transports/http) 连接的方法，通过它你可以通过 HTTP 请求访问区块链。
 - [mainnet](https://wagmi.sh/react/chains)：代表以太坊主网，除了 `mainnet` 以外还会有类似 `goerli` 的测速网和类似 `bsc` 和 `base` 的 EVM 兼容的其它公链，有的是和以太坊一样的 L1 公链，有的是 L2 公链，这里先暂不展开。
 - [WagmiWeb3ConfigProvider](https://web3.ant.design/zh-CN/components/wagmi#wagmiweb3configproviderprops)：Ant Design Web3 用来接收 wagmi 配置的 Provider。
 
