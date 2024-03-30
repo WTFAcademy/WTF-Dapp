@@ -1,30 +1,39 @@
-import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
-import { mainnet, goerli } from "wagmi/chains";
-import {
-  WagmiWeb3ConfigProvider,
-  MetaMask,
-  Goerli,
-} from "@ant-design/web3-wagmi";
 import {
   Address,
-  NFTCard,
-  Connector,
   ConnectButton,
+  Connector,
+  NFTCard,
   useAccount,
 } from "@ant-design/web3";
-import { injected } from "wagmi/connectors";
+import {
+  MetaMask,
+  WagmiWeb3ConfigProvider,
+  WalletConnect,
+} from "@ant-design/web3-wagmi";
 import { Button, message } from "antd";
 import { parseEther } from "viem";
+import {
+  createConfig,
+  http,
+  useReadContract,
+  useWriteContract,
+  useWatchContractEvent,
+} from "wagmi";
+import { mainnet } from "wagmi/chains";
+import { injected, walletConnect } from "wagmi/connectors";
 
 const config = createConfig({
-  chains: [mainnet, goerli],
+  chains: [mainnet],
   transports: {
     [mainnet.id]: http(),
-    [goerli.id]: http(),
   },
   connectors: [
     injected({
       target: "metaMask",
+    }),
+    walletConnect({
+      projectId: "c07c0051c2055890eade3556618e38a6",
+      showQrModal: false,
     }),
   ],
 });
@@ -47,6 +56,35 @@ const CallTest = () => {
     args: [account?.address as `0x${string}`],
   });
   const { writeContract } = useWriteContract();
+
+  useWatchContractEvent({
+    address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
+    abi: [
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: false,
+            internalType: "address",
+            name: "minter",
+            type: "address",
+          },
+          {
+            indexed: false,
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+        ],
+        name: "Minted",
+        type: "event",
+      },
+    ],
+    eventName: "Minted",
+    onLogs() {
+      message.success("new minted!");
+    },
+  });
 
   return (
     <div>
@@ -96,8 +134,10 @@ export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider
       config={config}
-      chains={[Goerli]}
-      wallets={[MetaMask()]}
+      wallets={[MetaMask(), WalletConnect()]}
+      eip6963={{
+        autoAddInjectedWallets: true,
+      }}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard

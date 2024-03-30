@@ -70,7 +70,7 @@ const config = createConfig({
       target: "metaMask",
     }),
 +    walletConnect({
-+      projectId: 'c07c0051c2055890eade3556618e38a6'
++      projectId: 'c07c0051c2055890eade3556618e38a6',
 +      showQrModal: false,
 +    }),
   ],
