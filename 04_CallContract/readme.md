@@ -48,7 +48,7 @@ await getAccount(); // 你的账户地址
 
 通过前面的学习，我们了解到区块链是一个去中心化的网络，我们可以通过访问其中一个节点来获取数据。以太坊网络中有很多节点，我们可以通过 [ZAN](https://zan.top/)、[Infura](https://infura.io/) 等节点服务提供商来获取 RPC 接口。
 
-在 ZAN.top 提供的[文档](https://docs.zan.top/reference/eth-accounts)中，我们可以方便的测试 RPC，以及通过 RPC 调用智能合约的方法。
+在 zan.top 提供的[文档](https://docs.zan.top/reference/eth-accounts)中，我们可以方便的测试 RPC，以及通过 RPC 调用智能合约的方法。
 
 ![zan](./img/zan-api-doc.png)
 
@@ -57,8 +57,8 @@ await getAccount(); // 你的账户地址
 从 DApp 编码的角度来说，调用一个合约方法通常需要以下几个步骤：
 
 1. 构造交易数据
-1. 通过唤起钱包授权将交易数据添加签名
-1. 将签名后的交易数据通过节点服务发送到区块链网络
+2. 通过唤起钱包授权将交易数据添加签名
+3. 将签名后的交易数据通过节点服务发送到区块链网络
 
 > 注：对于调用只读接口调用时，因为不需要向区块链写入数据，所以也不需要对交易签名，可以直接通过节点服务读取到链上数据。
 
@@ -126,7 +126,9 @@ export default function Web3() {
 
 ```
 
-参考以上的代码添加调用合约的 `balanceOf` 方法，我们新建了一个 `CallTest` 组件，然后在 `WagmiWeb3ConfigProvider` 内添加了这个组件。因为 `useReadContract` 必须在 `WagmiWeb3ConfigProvider` 内部才能正常工作，所以我们不能在 `export default function Web3() {` 这一行代码下面直接使用 `useReadContract`。在实际的项目中 `WagmiWeb3ConfigProvider` 通常应该在你项目组件的最外层，这样确保你的项目所有组件中都可以正常使用相关的 Hooks。
+参考以上的代码添加调用合约的 `balanceOf` 方法，我们新建了一个 `CallTest` 组件，然后在 `WagmiWeb3ConfigProvider` 内添加了这个组件。
+因为 `useReadContract` 必须在 `WagmiWeb3ConfigProvider` 内部才能正常工作，所以我们不能在 `export default function Web3() {` 这一行代码下面直接使用 `useReadContract`。
+在实际的项目中 `WagmiWeb3ConfigProvider` 通常应该在你项目组件的最外层，这样确保你的项目所有组件中都可以正常使用相关的 Hooks。
 
 `balanceOf` 是用来获取某一个地址下有多少个这个合约 NFT 的方法。所以我们还需要用到 `@ant-design/web3` 提供的 `useAccount` Hook 来获取当前连接的账户地址。然后将账户地址作为 `balanceOf` 方法的参数传入，这样就可以获取到当前账户地址下有多少个 NFT 了。如果不出意外，你会得到 `0` 的结果。
 
