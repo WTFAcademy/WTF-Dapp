@@ -28,7 +28,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 ## TODO
 
-**第 11 讲：支持多链**：[教程](./11_MultipleChain/readme.md)
+**第 11 讲：支持多链**：[教程](./11_MultipleChain/readme.md) | [代码](./11_MultipleChain/web3.tsx)
 
 **第 12 讲：签名和验签**：[教程](./12_Signature/readme.md) | [代码](./08_ContractDeploy/demo/index.tsx)
 
