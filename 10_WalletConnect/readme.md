@@ -26,11 +26,11 @@ value         = STRING
 
 2.0 的参数如下：
 
-- symKey：用于通过中继加密消息的对称密钥
-- methods：支持的 jsonrpc 方法
-- relay-protocol：用于中继消息服务的传输协议
-- relay-data(可选)：用于中继消息协议的数据，可能是一些协议需要的配置信息
-- expiryTimestamp(可选)：配对过期时的时间，通常就是中继服务对称密钥的过期时间
+- `symKey`：用于通过中继加密消息的对称密钥
+- `methods`：支持的 jsonrpc 方法
+- `relay-protocol`：用于中继消息服务的传输协议
+- `relay-data(可选)`：用于中继消息协议的数据，可能是一些协议需要的配置信息
+- `expiryTimestamp(可选)`：配对过期时的时间，通常就是中继服务对称密钥的过期时间
 
 一个具体的样例如下：
 
@@ -79,7 +79,7 @@ const config = createConfig({
 
 上面代码中的 `projectId` 是 Ant Design Web3 提供的测试项目 ID，实际项目中你需要在 [https://cloud.walletconnect.com/](https://cloud.walletconnect.com/) 申请自己的 ID。`showQrModal` 配置是为了关闭 ConnectModal 的默认弹窗，避免出现重复的弹窗。
 
-添加了 `walletConnect` 之后其实就可以直接使用了，Ant Design Web3 会自动检测到钱包是否支持 WalletConnect，如果支持的话就会在未安装插件钱包的情况下再 ConnectModal 中显示二维码出来，供用户扫码连接。
+添加了 `walletConnect` 之后其实就可以直接使用了，Ant Design Web3 会自动检测到钱包是否支持 WalletConnect，如果支持的话就会在未安装插件钱包的情况下在 ConnectModal 中显示二维码出来，供用户扫码连接。
 
 ![walletqrcode](./img/walletqrcode.png)
 
