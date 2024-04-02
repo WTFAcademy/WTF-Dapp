@@ -3,7 +3,7 @@ import { ConnectButton, Connector, useAccount } from "@ant-design/web3";
 import { useSignMessage } from "wagmi";
 import { message, Space, Button } from "antd";
 
-const DemoInner: React.FC = () => {
+const SignDemo: React.FC = () => {
   const { signMessageAsync } = useSignMessage();
   const { account } = useAccount();
   const [signLoading, setSignLoading] = React.useState(false);
@@ -60,4 +60,4 @@ const DemoInner: React.FC = () => {
     </Space>
   );
 };
-export default DemoInner;
+export default SignDemo;

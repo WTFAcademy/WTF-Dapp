@@ -20,7 +20,7 @@
 
 我们先来实现前端部分逻辑，我们基于之前的课程先快速实现[连接钱包](../03_ConnectWallet/readme.md)。
 
-新建一个 `pages/sign/index.tsx` 文件，复制之前的代码，然后做下修改，新建一个 `DemoInner` 的组件：
+新建一个 `pages/sign/index.tsx` 文件，复制之前的代码，然后做下修改，新建一个 `compnents/SignDemo` 的组件：
 
 ```diff
 import React from 'react';
@@ -29,7 +29,7 @@ import { MetaMask, WagmiWeb3ConfigProvider } from "@ant-design/web3-wagmi";
 import { createConfig, http } from 'wagmi';
 import { injected } from "wagmi/connectors";
 import { mainnet } from 'wagmi/chains';
-+ import DemoInner from './DemoInner';
++ import SignDemo from '../../components/SignDemo';
 
 
 const config = createConfig({
@@ -46,7 +46,7 @@ const config = createConfig({
 const Demo:React.FC = () => {
   return (
     <WagmiWeb3ConfigProvider eip6963 config={config} wallets={[MetaMask()]}>
-+       <DemoInner />
++       <SignDemo />
 -           <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
 -           <NFTCard
 -             address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
@@ -62,20 +62,20 @@ export default Demo;
 
 ```
 
-然后在 `DemoInner` 组件内写一个基础的链接钱包按钮，代码如下：
+然后在 `SignDemo` 组件内写一个基础的链接钱包按钮，代码如下：
 
 ```tsx
 import React from "react";
 import { ConnectButton, Connector } from "@ant-design/web3";
 
-const DemoInner: React.FC = () => {
+const SignDemo: React.FC = () => {
   return (
     <Connector>
       <ConnectButton />
     </Connector>
   );
 };
-export default DemoInner;
+export default SignDemo;
 ```
 
 这样我们就实现了基本的连接接逻辑。
@@ -89,7 +89,7 @@ import React from "react";
 + import { useSignMessage } from "wagmi";
 + import { message } from "antd";
 
-const DemoInner: React.FC = () => {
+const SignDemo: React.FC = () => {
 +  const { signMessageAsync } = useSignMessage();
 +  const { account } = useAccount();
 
@@ -109,7 +109,7 @@ const DemoInner: React.FC = () => {
     </Connector>
   );
 };
-export default DemoInner;
+export default SignDemo;
 ```
 
 我们来添加一个按钮，点击按钮后调用 `doSignature` 方法，我们设置了 `disabled` 属性，只有当已经连接成功后才可以调用签名：
@@ -121,7 +121,7 @@ import { useSignMessage } from "wagmi";
 - import { message } from "antd";
 + import { message, Space, Button } from "antd";
 
-const DemoInner: React.FC = () => {
+const SignDemo: React.FC = () => {
 
 // ...
 
@@ -139,7 +139,7 @@ const DemoInner: React.FC = () => {
 +    </Space>
   );
 };
-export default DemoInner;
+export default SignDemo;
 ```
 
 这样我们就实现了前端签名的逻辑，但是正如签名所说，签名需要发送到服务端才验证，所以我们需要先实现服务端验签接口。
@@ -193,7 +193,7 @@ const verifyMessage = async (signerAddress, signature) => {
 
 ## 前端调用接口验签
 
-最后我们来补充前端调用接口的逻辑。你可以直接讲下面代码复制到 `DemoInner` 组件中：
+最后我们来补充前端调用接口的逻辑。你可以直接讲下面代码复制到 `SignDemo` 组件中：
 
 ```tsx
 const checkSignature = async (params: {
@@ -226,7 +226,7 @@ import { ConnectButton, Connector, useAccount } from "@ant-design/web3";
 import { useSignMessage } from "wagmi";
 import { message, Space, Button } from "antd";
 
-const DemoInner: React.FC = () => {
+const SignDemo: React.FC = () => {
   const { signMessageAsync } = useSignMessage();
   const { account } = useAccount();
 +  const [signLoading, setSignLoading] = React.useState(false);
@@ -264,7 +264,7 @@ const DemoInner: React.FC = () => {
     </Space>
   );
 };
-export default DemoInner;
+export default SignDemo;
 ```
 
 完整的代码你可以在 [sign 目录](../demo/pages/sign)中找到。
