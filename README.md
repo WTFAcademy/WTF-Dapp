@@ -26,10 +26,10 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 10 讲：通过 WalletConnect 连接移动端钱包**：[教程](./10_WalletConnect/readme.md) | [代码](./10_WalletConnect/web3.tsx)
 
-## TODO
-
 **第 11 讲：支持多链**：[教程](./11_MultipleChain/readme.md) | [代码](./11_MultipleChain/web3.tsx)
 
-**第 12 讲：签名和验签**：[教程](./12_Signature/readme.md) | [代码](./08_ContractDeploy/demo/index.tsx)
+**第 12 讲：签名和验签**：[教程](./12_Signature/readme.md) | [代码](./demo/pages/sign/index.tsx)
+
+## TODO
 
 **第 13 讲：转账和收款**：[教程](./13_Payment/readme.md)
