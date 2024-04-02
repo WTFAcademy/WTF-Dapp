@@ -184,7 +184,7 @@ export default async function handler(
 ```tsx
 const verifyMessage = async (signerAddress, signature) => {
   const recoveredAddress = ethers.utils.verifyMessage(
-    "You are connecting your Ethereum address with zan.top",
+    "test message for WTF-DApp demo",
     signature
   );
   return recoveredAddress === signerAddress;
