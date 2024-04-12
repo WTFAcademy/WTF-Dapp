@@ -44,7 +44,7 @@
   import { injected } from "wagmi/connectors";
   import { mainnet, sepolia } from "wagmi/chains";
   import { ConnectButton, Connector } from '@ant-design/web3';
-+ import { SendEth } from "./SendEth";
++ import { SendEth } from "../../components/SendEth";
 
 
   const config = createConfig({
@@ -151,10 +151,12 @@ export const SendEth:React.FC = () => {
 
 ```
 
-代码里，我们用了 `wagmi` 的 `hooks` ，发起了一个交易，并进行了状态的监听，输入 `to` 和 `value` 点击发起会出现如下图的效果：
+代码里，我们用了 [Ant Design](https://ant.design/components/form) 的 `Form` 组件 和 `wagmi` 的 `hooks` ，发起了一个交易，并进行了状态的监听，输入 `to` 和 `value` 点击发起会出现如下图的效果：
 
 
 ![发起](./img/send.png)
+
+至此，我们完成了一个简单的转账需求的实现。你可以访问 [https://wtf-dapp.vercel.app/transaction](https://wtf-dapp.vercel.app/transaction) 体验完整的 Demo。为了避免你的资金损失，请谨慎操作。
 
 ## 收款
 

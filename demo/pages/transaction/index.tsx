@@ -4,7 +4,7 @@ import { createConfig, http } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { mainnet, sepolia } from "wagmi/chains";
 import { ConnectButton, Connector } from '@ant-design/web3';
-import { SendEth } from "./SendEth";
+import { SendEth } from "../../components/SendEth";
 
 
 const config = createConfig({
