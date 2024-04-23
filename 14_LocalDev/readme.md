@@ -23,3 +23,46 @@ npx hardhat@2.22.3 init
 创建完成后你会得到如下的目录结构：
 
 ![initfiles](./img/initfiles.png)
+
+每一部分文件的作用如下：
+
+- `contracts`：存放 Solidity 合约代码。
+- `test`：存放测试代码。
+- `ignition`：合约部署脚本，比如定义合约部署的参数等。
+- `hardhat.config.ts`：Hardhat 配置文件。
+
+## 本地开发和调试
+
+初始化项目时会自动安装依赖，如果没有安装，可以执行 `npm i` 重试。安装完成后执行下面命令即可编译合约：
+
+```bash
+npx hardhat compile
+```
+
+执行下面命令可以执行测试样例：
+
+```bash
+npx hardhat test
+```
+
+然后执行下面命令在本地启动一个用于调试的测试网络：
+
+```bash
+npx hardhat node
+```
+
+启动之后你会看到会默认给你分配一些地址用于调试，接下来你可以将合约部署到本地节点上：
+
+```bash
+npx hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost
+```
+
+部署成功后你可以在本地的测试网络日志中看到相关交易信息：
+
+![node](./img/localnode.png)
+
+至此，我们本地的环境就搭建好了，接下来我们试试把之前写的 NFT 放到本地环境并调试。
+
+## 迁移合约
+
+TODO
