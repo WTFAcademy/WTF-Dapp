@@ -65,4 +65,159 @@ npx hardhat ignition deploy ./ignition/modules/Lock.ts --network localhost
 
 ## 迁移合约
 
-TODO
+我们将之前课程的合约代码 [MyToken.sol](../07_ContractDev/MyToken.sol) 复制过来，放到 `contracts` 目录下，删掉原有的 `Lock.sol` 示例代码。
+
+合约中依赖了 `@openzeppelin/contracts`，我们需要安装这个依赖：
+
+```bash
+npm install @openzeppelin/contracts --save
+```
+
+我们参考 `test/Lock.ts` 也写一个测试文件 `test/MyToken.ts`，内容如下：
+
+```ts
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import { expect } from "chai";
+import hre from "hardhat";
+
+describe("MyToken", function () {
+  async function deployFixture() {
+    const token = await hre.viem.deployContract("MyToken");
+    return {
+      token,
+    };
+  }
+
+  describe("ERC721", function () {
+    describe("name", function () {
+      it("Get NFT name", async function () {
+        const { token } = await loadFixture(deployFixture);
+        expect(await token.read.name()).to.equal("MyToken");
+      });
+    });
+  });
+});
+```
+
+该测试样例调用了合约的 `name` 方法获取 NFT 的名称。`name` 是在 ERC721 规范中定义的 NFT 合约的的方法。
+
+我们继续新增 `ignition/modules/MyToken.ts` 用于部署，内容如下：
+
+```ts
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+const MyTokenModule = buildModule("MyTokenModule", (m) => {
+  const lock = m.contract("MyToken");
+
+  return { lock };
+});
+
+export default MyTokenModule;
+```
+
+执行 `npx hardhat test` 测试合约，这个过程会自动执行合约编译。
+
+然后我们执行下面命令部署合约：
+
+```bash
+npx hardhat ignition deploy ./ignition/modules/MyToken.ts --network localhost
+```
+
+部署成功后我们尝试在之前的 NFT 项目中调用合约，请先参考之前的课程启动 NextJS 的前端项目。
+
+在代码中添加一个 `Hardhat` 网络：
+
+```diff
+- import { mainnet, goerli, polygon } from "wagmi/chains";
++ import { mainnet, goerli, polygon, hardhat } from "wagmi/chains";
+
+// ...
+
+const config = createConfig({
+-  chains: [mainnet, goerli, polygon],
++  chains: [mainnet, goerli, polygon, hardhat],
+  transports: {
+    [mainnet.id]: http(),
+    [goerli.id]: http(),
+    [polygon.id]: http(),
++    [hardhat.id]: http("http://127.0.0.1:8545/"),
+  },
+  connectors: [
+    injected({
+      target: "metaMask",
+    }),
+    walletConnect({
+      projectId: "c07c0051c2055890eade3556618e38a6",
+      showQrModal: false,
+    }),
+  ],
+});
+
+const contractInfo = [
+  {
+    id: 1,
+    name: "Ethereum",
+    contractAddress: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  },
+  {
+    id: 5,
+    name: "Goerli",
+    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
+  },
+  {
+    id: 137,
+    name: "Polygon",
+    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
+  },
++  {
++    id: hardhat.id,
++    name: "Hardhat",
++    contractAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3", // 这里需要替换为你本地部署后获得的地址
++  },
+];
+
+// ...
+
+export default function Web3() {
+  return (
+    <WagmiWeb3ConfigProvider
+      config={config}
+      wallets={[MetaMask(), WalletConnect()]}
+      eip6963={{
+        autoAddInjectedWallets: true,
+      }}
+      chains={[
+        Goerli,
+        Polygon,
++        {
++          ...Goerli,
++          name: "Hardhat",
++          id: hardhat.id,
++        },
+      ]}
+    >
+      <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
+      <NFTCard
+        address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
+        tokenId={641}
+      />
+      <Connector>
+        <ConnectButton />
+      </Connector>
+      <CallTest />
+    </WagmiWeb3ConfigProvider>
+  );
+}
+```
+
+对应的你需要在 MetaMask 中添加该网络：
+
+![addnetwork](./img/addnetwork.png)
+
+你可以用 `npx hardhat node` 启动时控制台显示的私钥导入测试账号到 MetaMask，感受一下拥有 10000ETH 的快乐。
+
+然后打开本地启动的前端页面 [http://localhost:3000/web3](http://localhost:3000/web3)，切换网络到 Hardhat，就可以愉快的 Mint NFT 了。
+
+![minttest](./img/minttest.png)
+
+需要注意的是，如果你重启了本地的 Hardhat 测试网络，可能会看到 MetaMask 连接本地 RPC 是出现类似 `Received invalid block tag 1. Latest block number is 0` 这样的错误，你需要在 MetaMask 的账号高级设置中点击 `清除活动和 nonce 数据` 来修复该问题。
