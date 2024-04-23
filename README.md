@@ -32,7 +32,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 13 讲：转账和收款**：[教程](./13_Payment/readme.md) | [代码](./demo/pages/transaction/index.tsx)
 
-**第 14 讲：合约本地开发和测试环境**：TODO
+**第 14 讲：合约本地开发和测试环境**：[教程](./14_LocalDev/readme.md) | [代码](./demo-contract)
 
 ## DEX 开发实战（开发中）
 
