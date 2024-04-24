@@ -1,4 +1,4 @@
-import { mainnet, goerli, polygon } from "wagmi/chains";
+import { mainnet, goerli, polygon, hardhat } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
@@ -12,7 +12,7 @@ import {
   Connector,
   NFTCard,
   useAccount,
-  useProvider
+  useProvider,
 } from "@ant-design/web3";
 import { Button, message } from "antd";
 import { parseEther } from "viem";
@@ -26,11 +26,12 @@ import {
 import { injected, walletConnect } from "wagmi/connectors";
 
 const config = createConfig({
-  chains: [mainnet, goerli, polygon],
+  chains: [mainnet, goerli, polygon, hardhat],
   transports: {
     [mainnet.id]: http(),
     [goerli.id]: http(),
     [polygon.id]: http(),
+    [hardhat.id]: http("http://127.0.0.1:8545/"),
   },
   connectors: [
     injected({
@@ -45,23 +46,30 @@ const config = createConfig({
 
 const contractInfo = [
   {
-    id:1,
+    id: 1,
     name: "Ethereum",
-    contractAddress: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
-  }, {
-    id:5,
+    contractAddress: "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+  },
+  {
+    id: 5,
     name: "Goerli",
-    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c"
-  }, {
-    id:137,
+    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
+  },
+  {
+    id: 137,
     name: "Polygon",
-    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c"
-  }
-]
+    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
+  },
+  {
+    id: hardhat.id,
+    name: "Hardhat",
+    contractAddress: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  },
+];
 
 const CallTest = () => {
   const { account } = useAccount();
-  const {chain} = useProvider();
+  const { chain } = useProvider();
   const result = useReadContract({
     abi: [
       {
@@ -72,7 +80,8 @@ const CallTest = () => {
         outputs: [{ type: "uint256" }],
       },
     ],
-    address: contractInfo.find((item) => item.id === chain?.id)?.contractAddress as `0x${string}`,
+    address: contractInfo.find((item) => item.id === chain?.id)
+      ?.contractAddress as `0x${string}`,
     functionName: "balanceOf",
     args: [account?.address as `0x${string}`],
   });
@@ -129,7 +138,8 @@ const CallTest = () => {
                   outputs: [],
                 },
               ],
-              address: contractInfo.find((item) => item.id === chain?.id)?.contractAddress as `0x${string}`,
+              address: contractInfo.find((item) => item.id === chain?.id)
+                ?.contractAddress as `0x${string}`,
               functionName: "mint",
               args: [1],
               value: parseEther("0.01"),
@@ -159,7 +169,15 @@ export default function Web3() {
       eip6963={{
         autoAddInjectedWallets: true,
       }}
-      chains={[Goerli, Polygon]}
+      chains={[
+        Goerli,
+        Polygon,
+        {
+          ...Goerli,
+          name: "Hardhat",
+          id: hardhat.id,
+        },
+      ]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard
