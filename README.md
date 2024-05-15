@@ -40,7 +40,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 P001 讲：什么是去中心化交易所（DEX）**：[教程](./P001_WhatIsDEX/readme.md)
 
-**第 P002 讲：Uniswap 代码解析**
+**第 P002 讲：Uniswap 代码解析**：[教程](./P002_WhatIsUniswap/readme.md)
 
 **第 P003 讲：Wtfswap 整体设计**
 
