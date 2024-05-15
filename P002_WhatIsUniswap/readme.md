@@ -12,7 +12,7 @@ Uniswap 是以太坊上最大的去中心化交易所（DEX），我们在上一
 
 $$x∗y=k$$
 
-流动性池是一个持有两种不同 token 的合约，$x$和 $y$ 分别代表 token0 的数目和 token1 的数目，$k$是它们的乘积，当swap发生时，token0 和 token1 的数量都会发生变化，但二者乘积保持不变，仍然为 $k$。
+流动性池是一个持有两种不同 token 的合约，$x$ 和 $y$ 分别代表 token0 的数目和 token1 的数目，$k$是它们的乘积，当 swap 发生时，token0 和 token1 的数量都会发生变化，但二者乘积保持不变，仍然为 $k$。
 
 另外，我们一般说的 token0 的价格是指在流动性池中相对于 token1 的价格，价格与数量互为倒数，因此公式为：
 
@@ -20,7 +20,7 @@ $$P = y/x$$
 
 就比如说我作为 LP 在池子中放了 1 个 ETH(token0) 和 3000 个 USDT(token1)，那么 k 就是 1*3000=3000，ETH 价格就是 3000/1 = 3000U。那你作为交易方就可以把大概 30 USDT 放进去，拿出来 0.01 个 ETH。然后池子里面就变成了 3030 个 USDT 和 0.99 个 ETH，价格变 3030/0.99≈3030U。ETH 涨价了，这样是不是就解决了定价的问题，有人要换 ETH，ETH 变得稀缺，所以涨价了，下次要换 ETH 就需要更多的 USDT，只要保证池子中的 ETH * USDT 等于一个常量，这样自然就会此消彼长，当 ETH 变少时，你要通过 USDT 换取 ETH 时候就需要消耗更多 USDT，反之亦然。
 
-当然上面的例子没有考虑的滑点、手续费、取整等细节，实际合约实现时也有很多细节需要考虑。这里只是为了让大家理解基础逻辑，具体的细节会在后面展开。
+当然上面的例子没有考虑滑点、手续费、取整等细节，实际合约实现时也有很多细节需要考虑。这里只是为了让大家理解基础逻辑，具体的细节会在后面展开。
 
 Uniswap 到目前已经迭代了好几个版本，下面是各个版本的发展历程：
 
@@ -41,11 +41,11 @@ Uniswap 到目前已经迭代了好几个版本，下面是各个版本的发展
 
 ![uniswap](./img/uniswapv3.jpg)
 
-* [Uniswap-v3-periphery](https://github.com/Uniswap/v3-periphery)：面向用户的接口代码，如头寸管理、swap路由等功能，Uniswap 的前端界面与 periphery 合约交互，主要包含三个合约：
+* [Uniswap v3-periphery](https://github.com/Uniswap/v3-periphery)：面向用户的接口代码，如头寸管理、swap 路由等功能，Uniswap 的前端界面与 periphery 合约交互，主要包含三个合约：
   * NonfungiblePositionManager.sol：对应头寸管理功能，包含交易池创建以及流动性的添加删除；
   * NonfungibleTokenPositionDescriptor.sol：对头寸的描述信息；
-  * SwapRouter.sol：对应swap路由的功能，包含单交易池 swap 和多交易池 swap。
-* [Uniswap-v3-core](https://github.com/Uniswap/v3-core)：Uniswap v3 的核心代码，实现了协议定义的所有功能，外部合约可直接与 core 合约交互，主要包含三个合约；
+  * SwapRouter.sol：对应 swap 路由的功能，包含单交易池 swap 和多交易池 swap。
+* [Uniswap v3-core](https://github.com/Uniswap/v3-core)：Uniswap v3 的核心代码，实现了协议定义的所有功能，外部合约可直接与 core 合约交互，主要包含三个合约；
   * UniswapV3Factory.sol：工厂合约，用来创建交易池，设置 Owner 和手续费等级；
   * UniswapV3PoolDeployer.sol：工厂合约的基类，封装了部署交易池合约的功能；
   * UniswapV3Pool.sol：交易池合约，持有实际的 Token，实现价格和流动性的管理，以及在当前交易池中swap的功能。
@@ -57,7 +57,7 @@ Uniswap 到目前已经迭代了好几个版本，下面是各个版本的发展
 
 ### 部署交易池
 
-部署交易池调用的是`NonfungiblePositionManager`合约的[createAndInitializePoolIfNecessary](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/PoolInitializer.sol#L13)，参数为：
+部署交易池调用的是 `NonfungiblePositionManager` 合约的 [createAndInitializePoolIfNecessary](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/PoolInitializer.sol#L13)，参数为：
 * token0：token0 的地址，需要小于 token1 的地址且不为零地址；
 * token1：token1 的地址；
 * fee：以 1,000,000 为基底的手续费费率，Uniswap v3 前端界面支持四种手续费费率（0.01%，0.05%、0.30%、1.00%），对于一般的交易对推荐 0.30%，fee 取值即 3000；
@@ -65,7 +65,7 @@ Uniswap 到目前已经迭代了好几个版本，下面是各个版本的发展
   
 代码为：
 
-```
+```solidity
 /// @inheritdoc IPoolInitializer
 function createAndInitializePoolIfNecessary(
     address token0,
@@ -88,20 +88,20 @@ function createAndInitializePoolIfNecessary(
 }
 ```
 
-逻辑非常直观，首先将 token0，token1 和 fee 作为三元组取出 pool 的地址，如果取出的是零地址则创建交易池然后初始化，否则继续判断是否初始化过（当前价格），未初始化过则初始化。
+逻辑非常直观，首先将 token0，token1 和 fee 作为三元组取出交易池的地址 pool，如果取出的是零地址则创建交易池然后初始化，否则继续判断是否初始化过（当前价格），未初始化过则初始化。
 
 我们分别看创建交易池的方法和初始化交易池的方法。
 
 #### 创建交易池
 
-创建交易池调用的是`UniswapV3Factory`合约的[createPool](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Factory.sol#L35)，参数为：
+创建交易池调用的是 `UniswapV3Factory` 合约的 [createPool](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Factory.sol#L35)，参数为：
 * tokenA：token0 的地址
 * tokenB 地址：token1 的地址；
 * fee：手续费费率。
 
 代码为：
 
-```
+```solidity
 /// @inheritdoc IUniswapV3Factory
 function createPool(
     address tokenA,
@@ -124,7 +124,7 @@ function createPool(
 
 通过 fee 获取对应的 tickSpacing，要解释 tickSpacing 必须先解释 tick。 
 
-```
+```solidity
 int24 tickSpacing = feeAmountTickSpacing[fee];
 ```
 
@@ -142,15 +142,15 @@ $$i = \log_{1.0001}(P(i))$$
 
 V3 规定只有被 tickSpacing 整除的 tick 才允许被初始化，tickSpacing 越大，每个 tick 流动性越多，tick 之间滑点越大，但会节省跨 tick 操作的 gas。
 
-随后确认对应的交易池合约尚未被创建，调用[deploy](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3PoolDeployer.sol#L27)，参数为工厂合约地址，token0 地址，token1 地址，fee，以及上面提到的 tickSpacing。
+随后确认对应的交易池合约尚未被创建，调用 [deploy](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3PoolDeployer.sol#L27)，参数为工厂合约地址，`token0` 地址，`token1` 地址，`fee`，以及上面提到的 `tickSpacing`。
 
-```
+```solidity
 pool = deploy(address(this), token0, token1, fee, tickSpacing);
 ```
 
-`deploy`的代码如下：
+`deploy` 的代码如下：
 
-```
+```solidity
 /// @dev Deploys a pool with the given parameters by transiently setting the parameters storage slot and then
 /// clearing it after deploying the pool.
 /// @param factory The contract address of the Uniswap V3 factory
@@ -171,11 +171,11 @@ function deploy(
 }
 ```
 
-`deploy`方法会先临时存储交易池合约初始化参数 parameters ，临时存储 parameters 的目的是为了让交易池合约的[构造方法](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L117)反向获取工厂合约的 parameters 变量从而完成参数的传递。
+`deploy` 方法会先临时存储交易池合约初始化参数 parameters ，临时存储 parameters 的目的是为了让交易池合约的[构造方法](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L117)反向获取工厂合约的 parameters 变量从而完成参数的传递。
 
 交易池合约的构造方法代码如下：
 
-```
+```solidity
 constructor() {
     int24 _tickSpacing;
     (factory, token0, token1, fee, _tickSpacing) = IUniswapV3PoolDeployer(msg.sender).parameters();
@@ -185,11 +185,11 @@ constructor() {
 }
 ```
 
-回到`deploy`，然后使用`new`方法中传递 salt 参数实现`CREATE2`操作码创建交易池合约，使用`CREATE2`的目的是确保相同 token0，token1 和 fee 能计算出相同且唯一的地址。
+回到 `deploy`，然后使用 `new` 方法中传递 salt 参数实现 `CREATE2` 操作码创建交易池合约，使用 `CREATE2` 的目的是确保相同 token0，token1 和 fee 能计算出相同且唯一的地址。
 
-最后，保存交易池合约地址到 getPool变量中：
+最后，保存交易池合约地址到 `getPool` 变量中：
 
-```
+```solidity
 getPool[token0][token1][fee] = pool;
 // populate mapping in the reverse direction, deliberate choice to avoid the cost of comparing addresses
 getPool[token1][token0][fee] = pool;
@@ -199,11 +199,11 @@ getPool[token1][token0][fee] = pool;
 
 #### 初始化交易池
 
-初始化交易池调用的是`UniswapV3Factory`合约的[initialize](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L271)，参数为当前价格 sqrtPriceX96，含义上面已经介绍过了。
+初始化交易池调用的是 `UniswapV3Factory` 合约的 [initialize](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L271)，参数为当前价格 sqrtPriceX96，含义上面已经介绍过了。
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc IUniswapV3PoolActions
 /// @dev not locked because it initializes unlocked
 function initialize(uint160 sqrtPriceX96) external override {
@@ -229,19 +229,19 @@ function initialize(uint160 sqrtPriceX96) external override {
 
 首先从 sqrtPriceX96 换算出 tick 的值。
 
-```
+```solidity
 int24 tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
 ```
 
-然后初始化预言机，cardinality 和 cardinalityNext 都是预言机中观测点数组相关的变量，这里不展开解释。
+然后初始化预言机，cardinality 表示当前预言机的观测点数组容量， cardinalityNext 表示预言机扩容后的观测点数组容量，这里不详细解释。
 
-```
+```solidity
 (uint16 cardinality, uint16 cardinalityNext) = observations.initialize(_blockTimestamp());
 ```
 
 最后初始化 slot0 变量，用于记录交易池的全局状态，这里主要就是记录价格和预言机的状态。
 
-```
+```solidity
 slot0 = Slot0({
     sqrtPriceX96: sqrtPriceX96,
     tick: tick,
@@ -255,7 +255,7 @@ slot0 = Slot0({
 
 [Slot0](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L56)结构如下，源码中已经有了详细的注释。
 
-```
+```solidity
 struct Slot0 {
     // the current price
     uint160 sqrtPriceX96;
@@ -279,13 +279,15 @@ struct Slot0 {
 
 ### 创建/添加/减少流动性
 
+创建/添加/减少流动性也就是对应 Uniswap 的 UI 中 https://app.uniswap.org/pool 这部分页面的操作内容，是提供给 LP 管理流动性的功能。
+
 #### 创建流动性
 
-创建流动性调用的是`NonfungiblePositionManager`合约的 [mint](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L128)。
+创建流动性调用的是 `NonfungiblePositionManager` 合约的 [mint](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L128)。
 
 参数如下：
 
-```
+```solidity
 struct MintParams {
     address token0; // token0 地址
     address token1; // token1 地址
@@ -303,7 +305,7 @@ struct MintParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc INonfungiblePositionManager
 function mint(MintParams calldata params)
     external
@@ -362,11 +364,11 @@ function mint(MintParams calldata params)
 }
 ```
 
-梳理下整体逻辑，首先是 addLiquidity 添加流动性，然后调用_mint 发送凭证（NFT）给头寸接受者，接着计算一个自增的 poolId，跟交易池地址互相索引，最后将所有信息记录到头寸的结构体中。
+梳理下整体逻辑，首先是 `addLiquidity` 添加流动性，然后调用 `_mint` 发送凭证（NFT）给头寸接受者，接着计算一个自增的 poolId，跟交易池地址互相索引，最后将所有信息记录到头寸的结构体中。
 
-addLiquidity 方法定义在[这里](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/LiquidityManagement.sol#L51)，核心是计算出 liquidity 然后调用交易池合约mint方法。
+`addLiquidity` 方法定义在[这里](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/LiquidityManagement.sol#L51)，核心是计算出 liquidity 然后调用交易池合约 `mint` 方法。
 
-```
+```solidity
 (amount0, amount1) = pool.mint(
     params.recipient,
     params.tickLower,
@@ -429,7 +431,7 @@ $$L = \Delta{x}\sqrt{Pb*Pa}/(\sqrt{Pb}-\sqrt{Pa})$$
 
 代码为：
 
-```
+```solidity
 /// @inheritdoc IUniswapV3PoolActions
 /// @dev noDelegateCall is applied indirectly via _modifyPosition
 function mint(
@@ -465,17 +467,17 @@ function mint(
 }
 ```
 
-首先调用`_modifyPosition`方法修改当前价格区间的流动性，这个方法相对复杂，放到后面专门讲。其返回的 amount0Int 和 amount1Int 表示 amount 流动性对应的 token0 和 token1 的代币数量。
+首先调用 `_modifyPosition` 方法修改当前价格区间的流动性，这个方法相对复杂，放到后面专门讲。其返回的 amount0Int 和 amount1Int 表示 amount 流动性对应的 token0 和 token1 的代币数量。
 
-调用`mint`方法的合约需要实现`IUniswapV3MintCallback`接口完成代币的转入操作：
+调用 `mint` 方法的合约需要实现 `IUniswapV3MintCallback` 接口完成代币的转入操作：
 
-```
+```solidity
 IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0, amount1, data);
 ```
 
 `IUniswapV3MintCallback` 的实现在 periphery 仓库的 LiquidityManagement.sol 中。目的是通知调用方向交易池合约转入 amount0 个 token0 和 amount1 个 token2。
 
-```
+```solidity
 /// @inheritdoc IUniswapV3MintCallback
     function uniswapV3MintCallback(
         uint256 amount0Owed,
@@ -492,7 +494,7 @@ IUniswapV3MintCallback(msg.sender).uniswapV3MintCallback(amount0, amount1, data)
 
 回调完成后会检查交易池合约的对应余额是否发生变化，并且增量应该大于 amount0 和 amount1：这意味着调用方确实转入了所需的资产。
 
-```
+```solidity
 if (amount0 > 0) require(balance0Before.add(amount0) <= balance0(), 'M0');
 if (amount1 > 0) require(balance1Before.add(amount1) <= balance1(), 'M1');
 ```
@@ -501,11 +503,11 @@ if (amount1 > 0) require(balance1Before.add(amount1) <= balance1(), 'M1');
 
 #### 添加流动性
 
-添加流动性调用的是`NonfungiblePositionManager`合约的 [increaseLiquidity](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L198)。
+添加流动性调用的是 `NonfungiblePositionManager` 合约的 [increaseLiquidity](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L198)。
 
 参数如下：
 
-```
+```solidity
 struct IncreaseLiquidityParams {
     uint256 tokenId; // 头寸 id
     uint256 amount0Desired; // 添加流动性中 token0 数量
@@ -518,7 +520,7 @@ struct IncreaseLiquidityParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc INonfungiblePositionManager
 function increaseLiquidity(IncreaseLiquidityParams calldata params)
     external
@@ -579,15 +581,15 @@ function increaseLiquidity(IncreaseLiquidityParams calldata params)
 }
 ```
 
-整体逻辑跟`mint`类似，先从 tokeinId 拿到头寸，然后`addLiquidity`添加流动性，返回添加成功的流动性liquidity，所消耗的 amount0 和 amount1，以及交易池合约 pool。根据 pool 对象里的最新头寸信息，更新头寸状态。
+整体逻辑跟 `mint` 类似，先从 tokeinId 拿到头寸，然后 `addLiquidity` 添加流动性，返回添加成功的流动性 liquidity，所消耗的 amount0 和 amount1，以及交易池合约 pool。根据 pool 对象里的最新头寸信息，更新头寸状态。
 
 #### 减少流动性
 
-减少流动性调用的是`NonfungiblePositionManager`合约的 [decreaseLiquidity](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L257)。
+减少流动性调用的是 `NonfungiblePositionManager` 合约的 [decreaseLiquidity](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L257)。
 
 参数如下：
 
-```
+```solidity
 struct DecreaseLiquidityParams {
     uint256 tokenId; // 头寸 id
     uint128 liquidity; // 减少流动性数量
@@ -599,7 +601,7 @@ struct DecreaseLiquidityParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc INonfungiblePositionManager
 function decreaseLiquidity(DecreaseLiquidityParams calldata params)
     external
@@ -653,15 +655,15 @@ function decreaseLiquidity(DecreaseLiquidityParams calldata params)
 }
 ```
 
-跟`increaseLiquidity`是反向操作，核心逻辑是调用交易池合约的`burn`方法。
+跟 `increaseLiquidity` 是反向操作，核心逻辑是调用交易池合约的 `burn` 方法。
 
-```
+```solidity
 (amount0, amount1) = pool.burn(position.tickLower, position.tickUpper, params.liquidity);
 ```
 
-[burn](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L517)的参数为流动性区间下界 tickLower，流动性区间上界 tickUpper和流动性数量 amount，代码如下：
+[burn](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L517) 的参数为流动性区间下界 tickLower，流动性区间上界 tickUpper 和流动性数量 amount，代码如下：
 
-```
+```solidity
 /// @inheritdoc IUniswapV3PoolActions
 /// @dev noDelegateCall is applied indirectly via _modifyPosition
 function burn(
@@ -693,9 +695,9 @@ function burn(
 }
 ```
 
-也是调用`_modifyPosition`方法修改当前价格区间的流动性，返回的 amount0Int 和 amount1Int 表示 amount 流动性对应的 token0 和 token1 的代币数量，position 表示用户的头寸信息，在这里主要作用是用来记录待取回代币数量。
+也是调用 `_modifyPosition` 方法修改当前价格区间的流动性，返回的 amount0Int 和 amount1Int 表示 amount 流动性对应的 token0 和 token1 的代币数量，position 表示用户的头寸信息，在这里主要作用是用来记录待取回代币数量。
 
-```
+```solidity
 if (amount0 > 0 || amount1 > 0) {
     (position.tokensOwed0, position.tokensOwed1) = (
         position.tokensOwed0 + uint128(amount0),
@@ -704,16 +706,16 @@ if (amount0 > 0 || amount1 > 0) {
 }
 ```
 
-用户可以通过主动调用`collect`方法取出自己头寸信息记录的 tokensOwed0 数量的 token0 和 tokensOwed1
-数量对应的 token1。`collect`方法在下一节展开。
+用户可以通过主动调用 `collect` 方法取出自己头寸信息记录的 tokensOwed0 数量的 token0 和 tokensOwed1
+数量对应的 token1。`collect` 方法在下一节展开。
 
 #### `collect`
 
-取出待领取代币调用的是`NonfungiblePositionManager`合约的[collect](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L309)。
+取出待领取代币调用的是 `NonfungiblePositionManager` 合约的 [collect](https://github.com/Uniswap/v3-periphery/blob/main/contracts/NonfungiblePositionManager.sol#L309)。
 
 参数如下：
 
-```
+```solidity
 struct CollectParams {
     uint256 tokenId; // 头寸 id
     address recipient; // 接收者地址
@@ -724,7 +726,7 @@ struct CollectParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc INonfungiblePositionManager
 function collect(CollectParams calldata params)
     external
@@ -794,9 +796,9 @@ function collect(CollectParams calldata params)
 }
 ```
 
-首先获取待取回代币数量，如果该头寸含有流动性，则触发一次头寸状态的更新，这里调用了交易池合约的`burn`方法，但是传入的流动性参数为 0。这是因为 V3 只在`mint` 和 `burn` 时才更新头寸状态，而 `collect` 方法可能在 `swap` 之后被调用，可能会导致头寸状态不是最新的。最后调用了交易池合约的`collect`方法取回代币。
+首先获取待取回代币数量，如果该头寸含有流动性，则触发一次头寸状态的更新，这里调用了交易池合约的`burn`方法，但是传入的流动性参数为 0。这是因为 V3 只在 `mint` 和 `burn` 时才更新头寸状态，而 `collect` 方法可能在 `swap` 之后被调用，可能会导致头寸状态不是最新的。最后调用了交易池合约的 `collect` 方法取回代币。
 
-```
+```solidity
 // the actual amounts collected are returned
 (amount0, amount1) = pool.collect(
     recipient,
@@ -807,15 +809,15 @@ function collect(CollectParams calldata params)
 );
 ```
 
-交易池合约的[collect](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L490)的逻辑比较简单，这里就不展开了，参数 amount0Requested 为请求取回 token0 的数量，amount1Requested 即请求取回 token1 的数量。如果 amount0Requested 大于 position.tokensOwed0，则取回所有的 token0，token1 也同理。
+交易池合约的 [collect](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L490) 的逻辑比较简单，这里就不展开了，参数 amount0Requested 为请求取回 token0 的数量，amount1Requested 即请求取回 token1 的数量。如果 amount0Requested 大于 position.tokensOwed0，则取回所有的 token0，取回 token1 也同理。
 
 #### `_modifyPosition`
 
-[_modifyPosition](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L306)方法是`mint`和`burn`的核心方法。
+[_modifyPosition](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L306) 方法是 `mint` 和 `burn` 的核心方法。
 
 参数如下：
 
-```
+```solidity
 struct ModifyPositionParams {
     // the address that owns the position
     address owner;
@@ -829,7 +831,7 @@ struct ModifyPositionParams {
 
 代码如下：
 
-```
+```solidity
 /// @dev Effect some changes to a position
 /// @param params the position details and the change to the position's liquidity to effect
 /// @return position a storage pointer referencing the position with the given owner and tick range
@@ -904,11 +906,11 @@ function _modifyPosition(ModifyPositionParams memory params)
 }
 ```
 
-先通过`_updatePosition`更新头寸信息，接着分别计算出 liquidityDelta 流动性需要提供的 token0 数量 amount0 和 token1 数量 amount1，流动性的计算公式在创建流动性时已经介绍了。
+先通过 `_updatePosition` 更新头寸信息，接着分别计算出 liquidityDelta 流动性需要提供的 token0 数量 amount0 和 token1 数量 amount1，流动性的计算公式在创建流动性时已经介绍了。
 
-[_updatePosition](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379)方法代码如下：
+[_updatePosition](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L379) 方法代码如下：
 
-```
+```solidity
 /// @dev Gets and updates a position with the given liquidity delta
 /// @param owner the owner of the position
 /// @param tickLower the lower tick of the position's tick range
@@ -993,7 +995,7 @@ function _updatePosition(
 
 ticktickCumulative 和 secondsPerLiquidityCumulativeX128 是预言机观察点相关的两个变量，这里不详细解释。
 
-```
+```solidity
 (int56 tickCumulative, uint160 secondsPerLiquidityCumulativeX128) =
     observations.observeSingle(
         time,
@@ -1005,9 +1007,9 @@ ticktickCumulative 和 secondsPerLiquidityCumulativeX128 是预言机观察点�
     );
 ```
 
-接着使用`ticks.update`分别更新价格区间低点和价格区间高点的状态。如果对应 tick 的流动性从从无到有，或从有到无，则表示该 tick 需要被翻转。
+接着使用 `ticks.update` 分别更新价格区间低点和价格区间高点的状态。如果对应 tick 的流动性从从无到有，或从有到无，则表示该 tick 需要被翻转。
 
-```
+```solidity
 flippedLower = ticks.update(
     tickLower,
     tick,
@@ -1036,14 +1038,14 @@ flippedUpper = ticks.update(
 
 随后计算该价格区间的累积的流动性手续费。
 
-```
+```solidity
 (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) =
     ticks.getFeeGrowthInside(tickLower, tickUpper, tick, _feeGrowthGlobal0X128, _feeGrowthGlobal1X128);
 ```
 
-最后更新头寸信息，并判断是否 tick 被翻转，如果 tick 被翻转则调用`ticks.clear`清空 tick 状态。
+最后更新头寸信息，并判断是否 tick 被翻转，如果 tick 被翻转则调用 `ticks.clear` 清空 tick 状态。
 
-```
+```solidity
 position.update(liquidityDelta, feeGrowthInside0X128, feeGrowthInside1X128);
 // clear any tick data that is no longer needed
 if (liquidityDelta < 0) {
@@ -1060,21 +1062,23 @@ if (liquidityDelta < 0) {
 
 ### swap
 
-`SwapRouter`合约包含了以下四个交换代币的方法：
-* `exactInput`：多池交换，指定输入代币数量，尽可能多地获得输出代币
-* `exactInputSingle`：单池交换，指定输入代币数量，尽可能多地获得输出代币
-* `exactOutput`：多池交换，指定输出代币数量，尽可能少地提供输入代币
-* `exactOutputSingle`：单池交换，指定输出代币数量，尽可能少地提供输入代币
+swap 也就指交易，是 Uniswap 中最常用的也是最核心的功能。对应 https://app.uniswap.org/swap 中的相关操作，接下来让我们看看 Uniswap 的合约是如何实现 swap 的。
+
+`SwapRouter` 合约包含了以下四个交换代币的方法：
+* `exactInput`：多池交换，用户指定输入代币数量，尽可能多地获得输出代币；
+* `exactInputSingle`：单池交换，用户指定输入代币数量，尽可能多地获得输出代币；
+* `exactOutput`：多池交换，用户指定输出代币数量，尽可能少地提供输入代币；
+* `exactOutputSingle`：单池交换，用户指定输出代币数量，尽可能少地提供输入代币。
   
 这里分成"指定输入代币数量"和"指定输出代币数量"分别介绍。
 
 #### 指定输入代币数量
 
-[exactInput](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L132)方法负责多池交换，指定`swap`路径以及输入代币数量，尽可能多地获得输出代币。
+[exactInput](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L132) 方法负责多池交换，指定 swap 路径以及输入代币数量，尽可能多地获得输出代币。
 
 参数如下：
 
-```
+```solidity
 struct ExactInputParams {
     bytes path; // swap 路径，可以解析成一个或多个交易池
     address recipient; // 接收者地址
@@ -1086,7 +1090,7 @@ struct ExactInputParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc ISwapRouter
 function exactInput(ExactInputParams memory params)
     external
@@ -1125,13 +1129,13 @@ function exactInput(ExactInputParams memory params)
 }
 ```
 
-在多池 swap 中，会按照 swap 路径，拆成多个单池 swap，循环进行，直到路径结束。如果是第一步 swap。payer 为合约调用方，否则 payer 为当前`SwapRouter`合约。
+在多池 swap 中，会按照 swap 路径，拆成多个单池 swap，循环进行，直到路径结束。如果是第一步 swap。payer 为合约调用方，否则 payer 为当前 `SwapRouter` 合约。
 
 [exactInputSingle](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L115)方法负责单池交换，指定输入代币数量，尽可能多地获得输出代币。
 
 参数如下，指定了输入代币地址和输出代币地址：
 
-```
+```solidity
 struct ExactInputSingleParams {
     address tokenIn; // 输入代币地址
     address tokenOut; // 输出代币地址
@@ -1146,7 +1150,7 @@ struct ExactInputSingleParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc ISwapRouter
 function exactInputSingle(ExactInputSingleParams calldata params)
     external
@@ -1165,9 +1169,9 @@ function exactInputSingle(ExactInputSingleParams calldata params)
 }
 ```
 
-实际调用[exactInputInternal](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L87)，代码如下：
+实际调用 [exactInputInternal](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L87)，代码如下：
 
-```
+```solidity
 /// @dev Performs a single exact input swap
 function exactInputInternal(
     uint256 amountIn,
@@ -1197,29 +1201,29 @@ function exactInputInternal(
 }
 ```
 
-如果没有指定接收者地址，则默认为当前`SwapRouter`合约地址。这个目的是在多池交易中，将中间代币保存在`SwapRouter`合约中。
+如果没有指定接收者地址，则默认为当前 `SwapRouter` 合约地址。这个目的是在多池交易中，将中间代币保存在 `SwapRouter` 合约中。
 
-```
+```solidity
 if (recipient == address(0)) recipient = address(this);
 ```
 
 接着解析出交易路由信息 tokenIn，tokenOut 和 fee。并比较 tokenIn 和 tokenOut 的地址得到 zeroForOne，表示在当前交易池是否是 token0 交换 token1。
 
-```
+```solidity
 (address tokenIn, address tokenOut, uint24 fee) = data.path.decodeFirstPool();
 
 bool zeroForOne = tokenIn < tokenOut;
 ```
 
-最后调用交易池合约的`swap`方法，获取完成本次交换所需的 amount0 和 amount1，再根据 zeroForOne 返回 amountOut，进一步判断 amountOut 满足最少输出代币数量的要求，完成 swap。`swap`方法相对复杂，放到后面专门讲。
+最后调用交易池合约的 `swap` 方法，获取完成本次交换所需的 amount0 和 amount1，再根据 zeroForOne 返回 amountOut，进一步判断 amountOut 满足最少输出代币数量的要求，完成 swap。`swap` 方法相对复杂，放到后面专门讲。
 
 #### 指定输出代币数量
 
-[exactOutput](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L224)方法负责多池交换，指定 swap 路径以及输出代币数量，尽可能少地提供输入代币。
+[exactOutput](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L224) 方法负责多池交换，指定 swap 路径以及输出代币数量，尽可能少地提供输入代币。
 
 参数如下：
 
-```
+```solidity
 struct ExactOutputParams {
     bytes path; // swap 路径，可以解析成一个或多个交易池
     address recipient; // 接收者地址
@@ -1231,7 +1235,7 @@ struct ExactOutputParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc ISwapRouter
 function exactOutput(ExactOutputParams calldata params)
     external
@@ -1255,13 +1259,13 @@ function exactOutput(ExactOutputParams calldata params)
 }
 ```
 
-在多池 swap 中，会按照 swap 路径，拆成多个单池 swap，循环进行，直到路径结束。如果是第一步 swap。payer 为合约调用方，否则 payer 为当前SwapRouter合约。
+在多池 swap 中，会按照 swap 路径，拆成多个单池 swap，循环进行，直到路径结束。如果是第一步 swap。payer 为合约调用方，否则 payer 为当前 `SwapRouter` 合约。
 
 [exactOutputSingle](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L203)方法负责单池交换，指定输出代币数量，尽可能少地提供输入代币。
 
 参数如下，指定了输入代币地址和输出代币地址：
 
-```
+```solidity
 struct ExactOutputSingleParams {
     address tokenIn; // 输入代币地址
     address tokenOut; // 输出代币地址
@@ -1276,7 +1280,7 @@ struct ExactOutputSingleParams {
 
 代码如下：
 
-```
+```solidity
 /// @inheritdoc ISwapRouter
 function exactOutputSingle(ExactOutputSingleParams calldata params)
     external
@@ -1299,9 +1303,9 @@ function exactOutputSingle(ExactOutputSingleParams calldata params)
 }
 ```
 
-实际调用[exactOutputInternal](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L169)，代码如下：
+实际调用 [exactOutputInternal](https://github.com/Uniswap/v3-periphery/blob/main/contracts/SwapRouter.sol#L169)，代码如下：
 
-```
+```solidity
 /// @dev Performs a single exact output swap
 function exactOutputInternal(
     uint256 amountOut,
@@ -1337,9 +1341,9 @@ function exactOutputInternal(
 }
 ```
 
-跟`exactInputInternal`的逻辑几乎完全一致，除了因为指定输出代币数量，调用交易池合约swap方法使用 `-amountOut.toInt256()` 作为参数。
+跟 `exactInputInternal` 的逻辑几乎完全一致，除了因为指定输出代币数量，调用交易池合约 `swap` 方法使用 -amountOut.toInt256() 作为参数。
 
-```
+```solidity
 (int256 amount0Delta, int256 amount1Delta) =
     getPool(tokenIn, tokenOut, fee).swap(
         recipient,
@@ -1356,8 +1360,7 @@ function exactOutputInternal(
 
 #### `swap`
 
-在解析代码之前先讲解 swap 理论。一个通常的 V3 交易池存在很多互相重叠的价格区间的头寸，如下图所示：
-
+一个通常的 V3 交易池存在很多互相重叠的价格区间的头寸，如下图所示：
 
 ![poolv3](./img/poolv3.png)
 
@@ -1375,7 +1378,7 @@ $P_{current}$是 swap 前的价格， $P_{target}$是 swap 后的价格，$L$是
 
 如果是跨 tick 交易则需要拆解成多个 tick 内的交易：如果当前 tick 的流动性不能满足要求，价格会移动到当前区间的边界处。此时，使离开的区间休眠，并激活下一个区间。并且会开始下一个循环并且寻找下一个有流动性的 tick，直到用户需求的数量被满足。
 
-讲完理论，回到代码。swap[https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L596]方法是交易对 swap 最核心的方法，也是最复杂的方法。
+讲完理论，回到代码。swap[https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L596] 方法是交易对 swap 最核心的方法，也是最复杂的方法。
 
 参数为：
 * recipient：接收者的地址；
@@ -1386,7 +1389,7 @@ $P_{current}$是 swap 前的价格， $P_{target}$是 swap 后的价格，$L$是
 
 代码为：
 
-```
+```solidity
 /// @inheritdoc IUniswapV3PoolActions
 function swap(
     address recipient,
@@ -1583,15 +1586,15 @@ function swap(
 }
 ```
 
-整体逻辑由一个while循环组成，将 swap 过程分解成多个小步骤，一点点的调整当前的 tick，直到满足用户所需的交易量或者价格触及限定价格（此时会部分成交）。
+整体逻辑由一个 while 循环组成，将 swap 过程分解成多个小步骤，一点点的调整当前的 tick，直到满足用户所需的交易量或者价格触及限定价格（此时会部分成交）。
 
-```
+```solidity
 while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLimitX96) {
 ```
 
 使用 `tickBitmap.nextInitializedTickWithinOneWord`` 来找到下一个已初始化的 tick
 
-```
+```solidity
 (step.tickNext, step.initialized) = tickBitmap.nextInitializedTickWithinOneWord(
     state.tick,
     tickSpacing,
@@ -1599,9 +1602,9 @@ while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLim
 );
 ```
 
-使用 `SwapMath.computeSwapStep`` 进行 tick 内的 swap。这个方法会计算出当前区间可以满足的输入数量 amountIn，如果它比 amountRemaining 要小，我们会说现在的区间不能满足整个交易，因此下一个sqrtPriceX96就是当前区间的上界/下界，也就是说，我们消耗完了整个区间的流动性。如果 amountIn 大于 amountRemaining，我们计算的 sqrtPriceX96仍然在现在区间内。
+使用 `SwapMath.computeSwapStep` 进行 tick 内的 swap。这个方法会计算出当前区间可以满足的输入数量 amountIn，如果它比 amountRemaining 要小，我们会说现在的区间不能满足整个交易，因此下一个 sqrtPriceX96 就是当前区间的上界/下界，也就是说，我们消耗完了整个区间的流动性。如果 amountIn 大于 amountRemaining，我们计算的 sqrtPriceX96 仍然在现在区间内。
 
-```
+```solidity
 // compute values to swap to the target tick, price limit, or point where input/output amount is exhausted
 (state.sqrtPriceX96, step.amountIn, step.amountOut, step.feeAmount) = SwapMath.computeSwapStep(
     state.sqrtPriceX96,
@@ -1615,10 +1618,10 @@ while (state.amountSpecifiedRemaining != 0 && state.sqrtPriceX96 != sqrtPriceLim
 ```
 
 保存本次交易的 amountIn 和 amountOut：
-* 如果是指定输入代币数量。amountSpecifiedRemaining表示剩余可用输入代币数量,amountCalculated表示已输出代币数量（以负数表示）；
-* 如果是指定输出代币数量。amountSpecifiedRemaining表示剩余需要输出的代币数量（初始为负值，因此每次交换后需要加上 step.amountOut，直到为0），amountCalculated表示已使用的输入代币数量。
+* 如果是指定输入代币数量。amountSpecifiedRemaining 表示剩余可用输入代币数量，amountCalculated表示已输出代币数量（以负数表示）；
+* 如果是指定输出代币数量。amountSpecifiedRemaining 表示剩余需要输出的代币数量（初始为负值，因此每次交换后需要加上 step.amountOut，直到为0），amountCalculated 表示已使用的输入代币数量。
 
-```
+```solidity
 if (exactInput) {
     state.amountSpecifiedRemaining -= (step.amountIn + step.feeAmount).toInt256();
     state.amountCalculated = state.amountCalculated.sub(step.amountOut.toInt256());
@@ -1628,11 +1631,11 @@ if (exactInput) {
 }
 ```
 
-如果本次 swap 后的价格达到目标价格，如果该 tick 已经初始化，则通过ticks.cross方法穿越该 tick，返回新增的净流动性liquidityNet 更新可用流动性state.liquidity，移动当前tick到下一个tick。
+如果本次 swap 后的价格达到目标价格，如果该 tick 已经初始化，则通过 `ticks.cross` 方法穿越该 tick，返回新增的净流动性 liquidityNet 更新可用流动性state.liquidity，移动当前 tick 到下一个 tick。
 
 如果本次 swap 后的价格达到目标价格，但是又不等于初始价格，即表示此时 swap 结束，使用 swap 后的价格计算最新的 tick 值。
 
-```
+```solidity
 if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
     // if the tick is initialized, run the tick transition
     if (step.initialized) {
@@ -1676,7 +1679,7 @@ if (state.sqrtPriceX96 == step.sqrtPriceNextX96) {
 
 完成 swap 后，更新 slot0 的状态和全局流动性。
 
-```
+```solidity
 // update tick and write an oracle entry if the tick change
 if (state.tick != slot0Start.tick) {
     (uint16 observationIndex, uint16 observationCardinality) =
@@ -1703,9 +1706,9 @@ if (state.tick != slot0Start.tick) {
 if (cache.liquidityStart != state.liquidity) liquidity = state.liquidity;
 ```
 
-最后，计算本次 swap 需要的具体amount0和amount1，调用 IUniswapV3SwapCallback 接口。在回调之前已经把输出的 token 发送给了 recipient。
+最后，计算本次 swap 需要的具体 amount0 和 amount1，调用 `IUniswapV3SwapCallback` 接口。在回调之前已经把输出的 token 发送给了 recipient。
 
-```
+```solidity
 // do the transfers and collect payment
 if (zeroForOne) {
     if (amount1 < 0) TransferHelper.safeTransfer(token1, recipient, uint256(-amount1));
@@ -1722,9 +1725,9 @@ if (zeroForOne) {
 }
 ```
 
-IUniswapV3SwapCallback 的实现在 periphery 仓库的 SwapRouter.sol 中，负责支付输入的 token。
+`IUniswapV3SwapCallback` 的实现在 periphery 仓库的 SwapRouter.sol 中，负责支付输入的 token。
 
-```
+```solidity
 /// @inheritdoc IUniswapV3SwapCallback
 function uniswapV3SwapCallback(
     int256 amount0Delta,
