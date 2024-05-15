@@ -42,20 +42,26 @@ Uniswap 到目前已经迭代了好几个版本，下面是各个版本的发展
 ![uniswap](./img/uniswapv3.jpg)
 
 * [Uniswap v3-periphery](https://github.com/Uniswap/v3-periphery)：面向用户的接口代码，如头寸管理、swap 路由等功能，Uniswap 的前端界面与 periphery 合约交互，主要包含三个合约：
-  * NonfungiblePositionManager.sol：对应头寸管理功能，包含交易池创建以及流动性的添加删除；
+  * NonfungiblePositionManager.sol：对应头寸管理功能，包含交易池（又称为流动性池或池子，后文统一用交易池表示）创建以及流动性的添加删除；
   * NonfungibleTokenPositionDescriptor.sol：对头寸的描述信息；
   * SwapRouter.sol：对应 swap 路由的功能，包含单交易池 swap 和多交易池 swap。
 * [Uniswap v3-core](https://github.com/Uniswap/v3-core)：Uniswap v3 的核心代码，实现了协议定义的所有功能，外部合约可直接与 core 合约交互，主要包含三个合约；
   * UniswapV3Factory.sol：工厂合约，用来创建交易池，设置 Owner 和手续费等级；
   * UniswapV3PoolDeployer.sol：工厂合约的基类，封装了部署交易池合约的功能；
-  * UniswapV3Pool.sol：交易池合约，持有实际的 Token，实现价格和流动性的管理，以及在当前交易池中swap的功能。
+  * UniswapV3Pool.sol：交易池合约，持有实际的 Token，实现价格和流动性的管理，以及在当前交易池中 swap 的功能。
 
 我们主要解析核心流程，包括以下：
 1. 部署交易池；
 2. 创建/添加/减少流动性；
 3. swap。
 
+其中 1 和 2 都是合约提供给 LP 操作的功能，通过部署交易池和管理流动性来提供和管理流动性。而 3 者是提供给普通用户使用 Uniswap 的核心功能（甚至可以说是唯一的功能）swap，也就是交易。接下来我们讲依次讲解 Uniswap 中的相关代码。
+
 ### 部署交易池
+
+在 Uniswap V3 中，通过合约 [UniswapV3Pool](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L30) 来定义一个交易池子，Uniswap 最核心的交易功能在最底层就是调用了该合约的 [swap]([https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L596](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L596]%E6%96%B9%E6%B3%95%E6%98%AF%E4%BA%A4%E6%98%93%E5%AF%B9)) 方法。
+
+而不同的交易对，以及不同的费率和价格区间（后面会具体讲到 tickSpacing）都会部署不同的 `UniswapV3Pool` 合约实例来负责交易。部署交易池则是针对某一对 token 以及指定费率的和价格区间来部署一个对应的交易池，当部署完成后再次出现同样条件下的交易池则不再需要重复部署了。
 
 部署交易池调用的是 `NonfungiblePositionManager` 合约的 [createAndInitializePoolIfNecessary](https://github.com/Uniswap/v3-periphery/blob/main/contracts/base/PoolInitializer.sol#L13)，参数为：
 * token0：token0 的地址，需要小于 token1 的地址且不为零地址；
@@ -132,7 +138,7 @@ tick 是 V3 中价格的表示，如下图所示：
 
 ![tick](./img/tick.webp)
 
-在 V3，整个价格区间由离散的、均匀分布的 ticks 进行标定。每个 tick 有一个 index 和对应的价格：
+在 V3，整个价格区间由离散的、均匀分布的 ticks 进行标定。因为在 Uniswap V3 中 LP 添加流动性时时都会提供一个价格的范围（为了 LP 可以更好的管理头寸），要让不同价格范围的流动性可以更好的管理和利用，需要 ticks 来讲价格划分为一个一个的区间，每个 tick 有一个 index 和对应的价格：
 
 $$P(i) = 1.0001^i$$
 
@@ -706,8 +712,9 @@ if (amount0 > 0 || amount1 > 0) {
 }
 ```
 
-用户可以通过主动调用 `collect` 方法取出自己头寸信息记录的 tokensOwed0 数量的 token0 和 tokensOwed1
-数量对应的 token1。`collect` 方法在下一节展开。
+用户可以通过主动调用 `collect` 方法取出自己头寸信息记录的 tokensOwed0 数量的 token0 和 tokensOwed1 数量对应的 token1。
+
+`collect` 方法在下一节展开。
 
 #### `collect`
 
