@@ -130,6 +130,14 @@ npx hardhat ignition deploy ./ignition/modules/MyToken.ts --network localhost
 ```diff
 - import { mainnet, goerli, polygon } from "wagmi/chains";
 + import { mainnet, goerli, polygon, hardhat } from "wagmi/chains";
+import {
+  WagmiWeb3ConfigProvider,
+  MetaMask,
+  Goerli,
+  Polygon,
++  Hardhat,
+  WalletConnect,
+} from "@ant-design/web3-wagmi";
 
 // ...
 
@@ -189,11 +197,7 @@ export default function Web3() {
       chains={[
         Goerli,
         Polygon,
-+        {
-+          ...Goerli,
-+          name: "Hardhat",
-+          id: hardhat.id,
-+        },
++       Hardhat,
       ]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
