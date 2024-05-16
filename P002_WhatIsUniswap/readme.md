@@ -386,7 +386,7 @@ function mint(MintParams calldata params)
 
 liquidity ，即流动性，跟 tick 一样，也是 V3 中的重要概念。
 
-在 V2 中，如果我们设定乘积 $k = L^2$，`L` 就是我们常说的流动性，得出如下公式：
+在 V2 中，如果我们设定乘积 $k = L^2$， $L$ 就是我们常说的流动性，得出如下公式：
 
 $$L = \sqrt{x*y}$$
 
