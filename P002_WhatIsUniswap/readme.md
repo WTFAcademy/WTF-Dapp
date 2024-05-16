@@ -13,7 +13,7 @@ Uniswap 是以太坊上最大的去中心化交易所（DEX），我们在上一
 
 $$x∗y=k$$
 
-流动性池是一个持有两种不同 token 的合约，$x$ 和 $y$ 分别代表 token0 的数目和 token1 的数目，$k$是它们的乘积，当 swap 发生时，token0 和 token1 的数量都会发生变化，但二者乘积保持不变，仍然为 $k$。
+流动性池是一个持有两种不同 token 的合约， $x$ 和 $y$ 分别代表 token0 的数目和 token1 的数目， $k$ 是它们的乘积，当 swap 发生时，token0 和 token1 的数量都会发生变化，但二者乘积保持不变，仍然为 $k$ 。
 
 另外，我们一般说的 token0 的价格是指在流动性池中相对于 token1 的价格，价格与数量互为倒数，因此公式为：
 
@@ -389,7 +389,7 @@ function mint(MintParams calldata params)
 
 liquidity ，即流动性，跟 tick 一样，也是 V3 中的重要概念。
 
-在 V2 中，如果我们设定乘积 $k = L^2$，$L$ 就是我们常说的流动性，得出如下公式：
+在 V2 中，如果我们设定乘积 $k = L^2$， $L$ 就是我们常说的流动性，得出如下公式：
 
 $$L = \sqrt{x*y}$$
 
@@ -407,21 +407,21 @@ $$(x + {L / \sqrt{Pb}}) * (y + {L * \sqrt{Pa}}) = L ^ 2$$
 
 我们将图中的曲线分为两部分：起始点左边和起始点右边。在`swap`过程中，当前价格会朝着某个方向移动：升高或降低。对于价格的移动，仅有一种 token 会起作用：当前价格升高时，`swap`仅需要 token0；当前价格降低时，`swap`仅需要 token1。
 
-当流动性提供者提供了 $\Delta{x}$个 token0 时，意味着向起始点左边添加了如下流动性：
+当流动性提供者提供了 $\Delta{x}$ 个 token0 时，意味着向起始点左边添加了如下流动性：
 
 $$L = \Delta{x}\sqrt{Pb*Pc}/(\sqrt{Pb}-\sqrt{Pc})$$
 
-当流动性提供者提供了 $\Delta{y}$个 token1 时，意味着向起始点右边添加了如下流动性：
+当流动性提供者提供了 $\Delta{y}$ 个 token1 时，意味着向起始点右边添加了如下流动性：
 
 $$L = \Delta{y}/(\sqrt{Pc}-\sqrt{Pa})$$
 
 如果当前价格超过价格区间属于只能添加单边流动性的情况。
 
-当前价格小于下界 b 时，只有$\Delta{y}$个 个 token1 起作用，意味着向 b 点右边添加了如下流动性：
+当前价格小于下界 b 时，只有 $\Delta{y}$ 个 token1 起作用，意味着向 b 点右边添加了如下流动性：
 
 $$L = \Delta{y}/(\sqrt{Pb}-\sqrt{Pa})$$
 
-当前价格大于上界 a 时，只有$\Delta{x}$个 个 token0 起作用，，意味着向 a 点左边添加了如下流动性：
+当前价格大于上界 a 时，只有 $\Delta{x}$ 个 token0 起作用，，意味着向 a 点左边添加了如下流动性：
 
 $$L = \Delta{x}\sqrt{Pb*Pa}/(\sqrt{Pb}-\sqrt{Pa})$$
 
@@ -1385,7 +1385,7 @@ $$\sqrt{P_{target}}-\sqrt{P_{current}}=\Delta{y}/L$$
 
 $$\sqrt{1/P_{target}}-\sqrt{1/P_{current}}=\Delta{x}/L$$
 
-$P_{current}$是 swap 前的价格， $P_{target}$是 swap 后的价格，$L$是 tick 内的流动性。
+$P_{current}$是 swap 前的价格， $P_{target}$是 swap 后的价格，$L$ 是 tick 内的流动性。
 
 从上面公式，可以通过输入 token1 的数量 $\Delta{y}$推导出目标价格 $P_{target}$，进而推导出输出 token0 的数量 $\Delta{x}$；或者通过输入 token0 的数量 $\Delta{x}$推导出目标价格 $P_{target}$，进而推导出输出 token1 的数量 $\Delta{y}$。
 
