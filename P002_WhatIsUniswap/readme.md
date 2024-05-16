@@ -408,7 +408,7 @@ $$(x + {L / \sqrt{Pb}}) * (y + {L * \sqrt{Pa}}) = L ^ 2$$
 
 $$L = \Delta{x}\sqrt{Pb*Pc}/(\sqrt{Pb}-\sqrt{Pc})$$
 
-当流动性提供者提供了 `△y`个 token1 时，意味着向起始点右边添加了如下流动性：
+当流动性提供者提供了 $\Delta{y}$ 个 token1 时，意味着向起始点右边添加了如下流动性：
 
 $$L = \Delta{y}/(\sqrt{Pc}-\sqrt{Pa})$$
 
