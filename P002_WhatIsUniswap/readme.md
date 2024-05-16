@@ -1379,7 +1379,7 @@ $$\sqrt{P_{target}}-\sqrt{P_{current}}=\Delta{y}/L$$
 
 $$\sqrt{1/P_{target}}-\sqrt{1/P_{current}}=\Delta{x}/L$$
 
-$P_{current}$是 swap 前的价格， $P_{target}$是 swap 后的价格，`L`是 tick 内的流动性。
+$P_{current}$是 swap 前的价格， $P_{target}$是 swap 后的价格，$L$ 是 tick 内的流动性。
 
 从上面公式，可以通过输入 token1 的数量 $\Delta{y}$推导出目标价格 $P_{target}$，进而推导出输出 token0 的数量 $\Delta{x}$；或者通过输入 token0 的数量 $\Delta{x}$推导出目标价格 $P_{target}$，进而推导出输出 token1 的数量 $\Delta{y}$。
 
