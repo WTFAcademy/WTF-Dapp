@@ -58,7 +58,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 
-**第 P202 讲：头部 UI 开发**
+**第 P202 讲：头部 UI 开发**：[教程](./P202_HeadUI/readme.md) | [代码](./P202_HeadUI/code/)
 
 **第 P203 讲：支持连接链**
 
