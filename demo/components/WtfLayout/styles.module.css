@@ -1,0 +1,29 @@
+.header {
+  height: 56px;
+  line-height: 56px;
+  padding-inline: 24px;
+  background-color: #e8f1ff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.nav {
+  display: flex;
+  gap: 64px;
+}
+
+.nav a {
+  font-size: 14px;
+  opacity: 0.65;
+}
+
+.nav a.active {
+  font-weight: bold;
+  opacity: 1;
+}
