@@ -97,7 +97,7 @@ export default function WtfswapPool() {
 除了 UI 的开发，我们还需要考虑到 Wtfswap 的业务逻辑，这里我们简单列出一些关键的业务逻辑并做简单的技术分析：
 
 1. **连接钱包**：用户需要连接钱包才能进行交易，在课程中我们使用 [Ant Design Web3 的以太坊适配器](https://web3.ant.design/components/ethereum-cn) 来连接钱包和链。我们需要在 `WtfLayout` 中引入 `WagmiWeb3ConfigProvider` 给所有的组件提供连接钱包和链的能力。另外需要在 `WtfHeader` 中使用 [ConnectorModal](https://web3.ant.design/components/connect-modal-cn) 等组件来实现连接钱包的 UI，支持多种形式的连接钱包和切换链。
-1. **Swap 页面**：Swap 页面是 Wtfswap 的核心页面，该页面讲基于 [Ant Design](https://ant.design/components/overview-cn/) 和 [Ant Design Web3](https://web3.ant.design/components/icons-cn) 的基础组件大家，并使用 [wagmi](https://wagmi.sh/) 的 Hooks 来和链交互。
+1. **Swap 页面**：Swap 页面是 Wtfswap 的核心页面，该页面讲基于 [Ant Design](https://ant.design/components/overview-cn/) 和 [Ant Design Web3](https://web3.ant.design/components/icons-cn) 的基础组件搭建，并使用 [wagmi](https://wagmi.sh/) 的 Hooks 来和链交互。
 1. **Pool 页面**：Pool 页面需要展示 LP 资金池的信息，并支持提取资金池的操作，UI 主要基于 Ant Design 的 [Table](https://ant.design/components/table-cn) 组件开发。数据也同样是使用 [wagmi](https://wagmi.sh/) 直接从链上获取。
 1. **创建资金池**：创建资金池是 Wtfswap 的核心功能之一，我们需要在 `WtfCreatePoolModal` 组件中实现创建资金池的 UI，并使用 wagmi 的 Hooks 来和链交互。`WtfCreatePoolModal` 组件将会被 `pages/wtfswap/pool.tsx` 引用，基于 Ant Design 的 [Modal](https://ant.design/components/modal-cn) 组件实现。
 
