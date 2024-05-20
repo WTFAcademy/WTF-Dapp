@@ -60,7 +60,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 P202 讲：头部 UI 开发**：[教程](./P202_HeadUI/readme.md) | [代码](./P202_HeadUI/code/)
 
-**第 P203 讲：支持连接链**
+**第 P203 讲：支持连接链**：[教程](./P203_Connect/) | [代码](./P203_Connect/code/)
 
 **第 P204 讲：Swap 页面 UI 开发**
 
