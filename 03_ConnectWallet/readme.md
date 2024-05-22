@@ -8,7 +8,7 @@
 - 通过在钱包 App 中访问 DApp 建立连接。
 - 通过 WalletConnect 协议建立连接。
 
-其中前面两种对于 DApp 来说都是通过钱包注入到浏览器运行环境中的接口来实现的，而 WalletConnect 则是通过服务端中转的方式来实现的。而钱包注入接口也有两种方式，一种是通过 [EIP-1193](https://eips.ethereum.org/EIPS/eip-1193) 来实现的，另一种是通过 [EIP-6963](https://eips.ethereum.org/EIPS/eip-696) 来实现的。EIP-1193 是一个早期的协议，也比较简单，接下来我们先尝试用这种方式来和钱包建立连接。
+其中前面两种对于 DApp 来说都是通过钱包注入到浏览器运行环境中的接口来实现的，而 WalletConnect 则是通过服务端中转的方式来实现的。而钱包注入接口也有两种方式，一种是通过 [EIP-1193](https://eips.ethereum.org/EIPS/eip-1193) 来实现的，另一种是通过 [EIP-6963](https://eips.ethereum.org/EIPS/eip-6963) 来实现的。EIP-1193 是一个早期的协议，也比较简单，接下来我们先尝试用这种方式来和钱包建立连接。
 
 ## 配置钱包
 
