@@ -27,10 +27,11 @@ export default function Wtfswap() {
   - components
     - WtfLayout/index.tsx # Wtfswap 的整体布局
     - WtfLayout/Header.tsx # Wtfswap 整体布局的头部
-    - WtfCreatePoolModal/index.tsx # 创建资金池的弹窗
+    - WtfAddPositionModal/index.tsx # 创建流动性的弹窗
   - wtfswap
     - index.tsx # Wtfswap 首页，也就是 Swap 页面
     - pool.tsx # Pool 页面
+    - positions.tsx # Positions 页面
 ```
 
 我们先来创建 `WtfLayout` 组件，这个组件是 Wtfswap 的整体布局，包含了头部。在 `pages/components` 目录下新建 `WtfLayout/Header.tsx` 文件，并初始化如下内容：
@@ -78,17 +79,32 @@ export default function Wtfswap() {
 
 ![initlayout](./img/initlayout.jpeg)
 
-同理，我们继续创建 `wtfswap/pool.tsx` 文件，并初始化如下内容：
+同理，我们继续创建 `wtfswap/positions.tsx` 和 `wtfswap/pool.tsx` 文件，并初始化如下内容，使得从 Pool 页面可以跳转到 Positions 页面：
 
 ```tsx
+// wtfswap/positions.tsx
 import WtfLayout from "@/components/WtfLayout";
 
-export default function WtfswapPool() {
-  return <WtfLayout>WtfswapPool</WtfLayout>;
+export default function WtfswapPositions() {
+  return <WtfLayout>WtfswapPositions</WtfLayout>;
 }
 ```
 
-访问 [http://localhost:3000/wtfswap/pool](http://localhost:3000/wtfswap/pool) 可以看到结果。
+```tsx
+// wtfswap/pool.tsx
+import WtfLayout from "@/components/WtfLayout";
+import Link from "next/link";
+
+export default function WtfswapPool() {
+  return (
+    <WtfLayout>
+      WtfswapPool <Link href="/wtfswap/positions">My Positions</Link>
+    </WtfLayout>
+  );
+}
+```
+
+访问 [http://localhost:3000/wtfswap/pool](http://localhost:3000/wtfswap/pool) 和 [http://localhost:3000/wtfswap/positions](http://localhost:3000/wtfswap/positions) 可以看到结果。
 
 ## 技术分析和后续研发计划
 
@@ -98,7 +114,8 @@ export default function WtfswapPool() {
 
 1. **连接钱包**：用户需要连接钱包才能进行交易，在课程中我们使用 [Ant Design Web3 的以太坊适配器](https://web3.ant.design/components/ethereum-cn) 来连接钱包和链。我们需要在 `WtfLayout` 中引入 `WagmiWeb3ConfigProvider` 给所有的组件提供连接钱包和链的能力。另外需要在 `WtfHeader` 中使用 [ConnectorModal](https://web3.ant.design/components/connect-modal-cn) 等组件来实现连接钱包的 UI，支持多种形式的连接钱包和切换链。
 1. **Swap 页面**：Swap 页面是 Wtfswap 的核心页面，该页面讲基于 [Ant Design](https://ant.design/components/overview-cn/) 和 [Ant Design Web3](https://web3.ant.design/components/icons-cn) 的基础组件搭建，并使用 [wagmi](https://wagmi.sh/) 的 Hooks 来和链交互。
-1. **Pool 页面**：Pool 页面需要展示 LP 资金池的信息，并支持提取资金池的操作，UI 主要基于 Ant Design 的 [Table](https://ant.design/components/table-cn) 组件开发。数据也同样是使用 [wagmi](https://wagmi.sh/) 直接从链上获取。
-1. **创建资金池**：创建资金池是 Wtfswap 的核心功能之一，我们需要在 `WtfCreatePoolModal` 组件中实现创建资金池的 UI，并使用 wagmi 的 Hooks 来和链交互。`WtfCreatePoolModal` 组件将会被 `pages/wtfswap/pool.tsx` 引用，基于 Ant Design 的 [Modal](https://ant.design/components/modal-cn) 组件实现。
+1. **Pool 页面**：Pool 页面需要展示当前已经有的交易池，UI 主要基于 Ant Design 的 [Table](https://ant.design/components/table-cn) 组件开发。数据也同样是使用 [wagmi](https://wagmi.sh/) 直接从链上获取。
+1. **Positions 页面**：Positions 页面需要展示 LP 资金池的信息，并支持提取资金池的操作，UI 主要基于 Ant Design 的 [Table](https://ant.design/components/table-cn) 组件开发。数据也同样是使用 [wagmi](https://wagmi.sh/) 直接从链上获取。
+1. **添加流动性（Position）**：添加流动性是 Wtfswap 的核心功能之一，我们需要在 `WtfAddPositionModal` 组件中实现创建资金池的 UI，并使用 wagmi 的 Hooks 来和链交互。`WtfAddPositionModal` 组件将会被 `pages/wtfswap/positions.tsx` 引用，基于 Ant Design 的 [Modal](https://ant.design/components/modal-cn) 组件实现。
 
 接下来，就让我们进入后面的研发环节，逐步实现 Wtfswap 的功能。

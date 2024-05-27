@@ -32,11 +32,15 @@ Swap 页面，用于交易代币：
 
 ![swap](./img/swap.png)
 
-Pool 页面，用于查看和移除流动性：
+Pool 页面，用于查看当前已经有的交易池：
 
 ![pool](./img/pool.png)
 
-Pool 页面创建流动性弹窗，用于创建新的流动性：
+Positions 页面，用于查看和和移除流动性：
+
+![pool](./img/positions.png)
+
+Positions 页面创建流动性弹窗，用于创建新的流动性（如果没有对应的交易池，会先创建交易池）：
 
 ![add](./img/add.png)
 
