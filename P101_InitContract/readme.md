@@ -21,7 +21,8 @@ wtfswap 设计 token 在一个合理范围内，当脱离范围时会触发单�
 - `PoolManager.sol`: 顶层合约，对应 Pool 页面，负责 Pool 的创建和管理；
 - `PositionManager.sol`: 顶层合约，对应 Position 页面，负责 LP 头寸和流动性的管理；
 - `SwapRouter.sol`: 顶层合约，对应 Swap 页面，负责预估价格和交易；
-- `Pool.sol`: 底层合约，对应一个交易池，记录了当前价格、头寸、流动性等信息。                       
+- `Factory.sol`: 底层合约，Pool 的工厂合约；
+- `Pool.sol`: 最底层合约，对应一个交易池，记录了当前价格、头寸、流动性等信息。                       
 
 ## 合约接口设计
 
@@ -304,6 +305,177 @@ function exactOutput(ExactOutputParams calldata params)
 
 完整的接口在 ./code/interfaces/ISwapRouter.sol 中。
 
+#### Factory
+
+`Factory.sol` 是 Pool 的工厂合约，比较简单，定义了 `getPool` 和 `createPool` 的方法，以及 `PoolCreated` 事件。
+
+接口定义如下：
+
+```solidity
+event PoolCreated(
+    address indexed token0,
+    address indexed token1,
+    uint24 indexed fee,
+    address pool
+);
+
+function getPool(
+    address tokenA,
+    address tokenB,
+    uint24 fee
+) external view returns (address pool);
+
+function createPool(
+    address tokenA,
+    address tokenB,
+    uint24 fee
+) external returns (address pool);
+```
+
+特别的，参照 Uniswap，工厂合约也设计成临时存储交易池合约初始化参数 parameters ，从而完成参数的传递。新增如下方法定义：
+
+```solidity
+function parameters()
+    external
+    view
+    returns (
+        address factory,
+        address token0,
+        address token1,
+        uint24 fee
+    );
+```
+
+完整的接口在 ./code/interfaces/IFactory.sol 中。
+
 #### Pool
 
 `Pool.sol` 是最底层的合约，实现了 `WTFSwap` 的核心逻辑。
+
+首先是一些不可变量的读方法，如下：
+
+```solidity
+function factory() external view returns (address);
+
+function token0() external view returns (address);
+
+function token1() external view returns (address);
+
+function fee() external view returns (uint24);
+
+function tickLower() external view returns (int24); 
+    
+function tickUpper() external view returns (int24);
+
+```
+
+然后是当前状态变量的读方法，即当前价格、tick、流动性，以及不同头寸位置的流动性和代币数量，如下：
+
+```solidity
+function sqrtPriceX96() external view returns (uint160);
+
+function tick() external view returns (int24);
+
+function liquidity() external view returns (uint128);
+
+function positions(int8 positionType)
+    external
+    view
+    returns (
+        uint128 _liquidity,
+        uint128 tokensOwed0,
+        uint128 tokensOwed1
+    );
+```
+
+我们还要定义初始化方法，相比于 Uniswap，我们初始化时指定了价格范围，如下：
+
+```solidity
+function initialize(uint160 sqrtPriceX96, int24 tickLower, int24 tickUpper) external;
+```
+
+最后是上层合约的底层实现，分别是 `mint`、`collect`、 `burn`、 `swap` 方法以及事件。
+
+接口定义如下：
+
+``` solidity
+event Mint(
+    address sender,
+    address indexed owner,
+    int8 indexed positionType,
+    uint128 amount,
+    uint256 amount0,
+    uint256 amount1
+);
+
+function mint(
+    address recipient,
+    int8 positionType,
+    uint128 amount,
+    bytes calldata data
+) external returns (uint256 amount0, uint256 amount1);
+
+event Collect(
+    address indexed owner,
+    address recipient,
+    int8 indexed positionType,
+    uint128 amount0,
+    uint128 amount1
+);
+
+function collect(address recipient, int8 positionType) 
+    external 
+    returns (uint128 amount0, uint128 amount1);
+
+event Burn(
+    address indexed owner,
+    int8 indexed positionType,
+    uint128 amount,
+    uint256 amount0,
+    uint256 amount1
+);
+
+function burn(int8 positionType) 
+    external 
+    returns (uint256 amount0, uint256 amount1);
+
+event Swap(
+    address indexed sender,
+    address indexed recipient,
+    int256 amount0,
+    int256 amount1,
+    uint160 sqrtPriceX96,
+    uint128 liquidity,
+    int24 tick
+);
+
+function swap(
+    address recipient,
+    bool zeroForOne,
+    int256 amountSpecified,
+    uint160 sqrtPriceLimitX96,
+    bytes calldata data
+) external returns (int256 amount0, int256 amount1);
+```
+
+特别的，还需要定义两个回调接口，分别用于 pool 合约 `mint` 和 `swap` 的回调。接口定义如下：
+
+```solidity
+interface IMintCallback {
+    function mintCallback(
+        uint256 amount0Owed,
+        uint256 amount1Owed,
+        bytes calldata data
+    ) external;
+}
+
+interface ISwapCallback {
+    function swapCallback(
+        int256 amount0Delta,
+        int256 amount1Delta,
+        bytes calldata data
+    ) external;
+}
+```
+
+完整的接口在 ./code/interfaces/IPool.sol 中。
