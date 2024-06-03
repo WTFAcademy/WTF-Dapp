@@ -5,13 +5,14 @@
 ## 合约需求描述
 
 wtfswap 设计 token 价格在一个合理范围内，当脱离范围时会触发单向费率机制，把价格拉回合理范围
+
 1. 任何人都可以创建池子，创建池子可以指定当前价格、价格范围： [a, b] 和 费率 f；相同交易对和费率的池子不能重复创建；不能删除和修改池子；
 2. 任何人都可以添加流动性，添加流动性可以选择三个范围： （0，a)、 [a, b] 和 (b, +∞)；
 3. 流动性提供者可以减少全部添加的流动性，并提取减少流动性对应的两种代币；
 4. 流动性提供者可以在任何人 swap 过程收取手续费，规则如下：
-	a. 当价格在 [a, b]，买卖手续费都是 f，按流动性贡献加权平分给 [a, b] 流动性提供者；
-	b. 当价格在 （0，a)，买手续费 0.5f，卖手续费 2f，按流动性贡献加权平分给 (0，a) 流动性提供者；
-	c. 当价格在  (b, +∞)，买手续费 2f，卖手续费 0.5f，按流动性贡献加权平分给  (b, +∞) 流动性提供者。
+   a. 当价格在 [a, b]，买卖手续费都是 f，按流动性贡献加权平分给 [a, b] 流动性提供者；
+   b. 当价格在 （0，a)，买手续费 0.5f，卖手续费 2f，按流动性贡献加权平分给 (0，a) 流动性提供者；
+   c. 当价格在 (b, +∞)，买手续费 2f，卖手续费 0.5f，按流动性贡献加权平分给 (b, +∞) 流动性提供者。
 5. 任何人都可以 swap，swap 需要指定某个池子，swap 可以指定输入（最大化输出）或者指定输出（最小化输入）。
 
 以上手续费的收取方式和 Uniswap 有所差异，做了简化，会在后续手续费实现的章节继续展开说明。
@@ -24,7 +25,7 @@ wtfswap 设计 token 价格在一个合理范围内，当脱离范围时会触�
 - `PositionManager.sol`: 顶层合约，对应 Position 页面，负责 LP 头寸和流动性的管理；
 - `SwapRouter.sol`: 顶层合约，对应 Swap 页面，负责预估价格和交易；
 - `Factory.sol`: 底层合约，Pool 的工厂合约；
-- `Pool.sol`: 最底层合约，对应一个交易池，记录了当前价格、头寸、流动性等信息。                       
+- `Pool.sol`: 最底层合约，对应一个交易池，记录了当前价格、头寸、流动性等信息。
 
 ## 合约接口设计
 
@@ -56,7 +57,7 @@ function getPools() external view returns (PoolKey[] memory pools);
 - 费率；
 - 价格范围；
 - 当前价格；
-- 三个区间的总流动性（TODO: 图中没有）。
+- 三个区间的总流动性。
 
 我们可以根据以上信息定义出 `PoolInfo`，以及获取 `PoolInfo` 的方法 `getPoolInfo`，接口定义如下：
 
@@ -81,9 +82,7 @@ function getPoolInfo(
 ) external view returns (PoolInfo memory poolInfo);
 ```
 
-此外还有一个添加池子的操作（TODO: 池子不能 remove），点击弹出以下页面：
-
-![add](../P003_OverallDesign/img/add.png)
+此外还有一个添加池子的操作，当添加头寸时如果发现还没有对应的池子，需要先创建一个池子。
 
 参数包括：
 
@@ -120,7 +119,7 @@ function createAndInitializePoolIfNecessary(
 
 首先是展示当前地址创建的头寸，对应前端页面如下：
 
-TODO: 图片
+![positions](../P003_OverallDesign/img/positions.png)
 
 可以通过用户地址返回所有其创建的头寸，定义 `getPositions` 方法，接口定义如下：
 
@@ -161,7 +160,7 @@ function getPositionInfo(
 
 右上角有一个添加头寸的操作，点击弹出以下页面：
 
-TODO: 图片
+![add](../P003_OverallDesign/img/add.png)
 
 跟添加池子非常类似，只是不能填价格范围和当前价格，参数包括：
 
@@ -239,6 +238,7 @@ function collect(
 首先选定 token0 和 token1 也是两个下拉框，实现和 添加头寸 页面一致，只是不会展示费率，因此用户选择完交易对后可能从合约中获取一个或多个池子。
 
 然后就是估算逻辑了，有以下两种方法：
+
 - `quoteExactInput`：用户输入框输入 token0 的数量，输出框自动展示 token1 的数量；
 - `quoteExactOutput`:用户输出框输入 token1 的数量，输入框自动展示 token0 的数量；
 
@@ -393,7 +393,7 @@ function initialize(
 
 接口定义如下：
 
-``` solidity
+```solidity
 event Mint(
     address sender,
     address indexed owner,
