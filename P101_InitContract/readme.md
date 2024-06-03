@@ -4,15 +4,17 @@
 
 ## 合约需求描述
 
-wtfswap 设计 token 在一个合理范围内，当脱离范围时会触发单向费率机制，把价格拉会合理范围
+wtfswap 设计 token 价格在一个合理范围内，当脱离范围时会触发单向费率机制，把价格拉回合理范围
 1. 任何人都可以创建池子，创建池子可以指定当前价格、价格范围： [a, b] 和 费率 f；相同交易对和费率的池子不能重复创建；不能删除和修改池子；
 2. 任何人都可以添加流动性，添加流动性可以选择三个范围： （0，a)、 [a, b] 和 (b, +∞)；
-3. 流动性提供者可以燃烧添加的流动性，燃烧后可以提取流动性对应的两种代币；
+3. 流动性提供者可以减少全部添加的流动性，并提取减少流动性对应的两种代币；
 4. 流动性提供者可以在任何人 swap 过程收取手续费，规则如下：
 	a. 当价格在 [a, b]，买卖手续费都是 f，按流动性贡献加权平分给 [a, b] 流动性提供者；
 	b. 当价格在 （0，a)，买手续费 0.5f，卖手续费 2f，按流动性贡献加权平分给 (0，a) 流动性提供者；
 	c. 当价格在  (b, +∞)，买手续费 2f，卖手续费 0.5f，按流动性贡献加权平分给  (b, +∞) 流动性提供者。
 5. 任何人都可以 swap，swap 需要指定某个池子，swap 可以指定输入（最大化输出）或者指定输出（最小化输入）。
+
+以上手续费的收取方式和 Uniswap 有所差异，做了简化，会在后续手续费实现的章节继续展开说明。
 
 ## 合约结构
 
@@ -67,15 +69,16 @@ struct PoolInfo {
     int24 tickLower;
     int24 tickUpper;
     // the current tick
-    int24 tick; 
+    int24 tick;
     // the current price
     uint160 sqrtPriceX96;
 }
 
-function getPoolInfo(address token0, address token1, uint24 fee) 
-    external 
-    view 
-    returns (PoolInfo memory poolInfo);
+function getPoolInfo(
+    address token0,
+    address token1,
+    uint24 fee
+) external view returns (PoolInfo memory poolInfo);
 ```
 
 此外还有一个添加池子的操作（TODO: 池子不能 remove），点击弹出以下页面：
@@ -104,13 +107,12 @@ struct CreateAndInitializeParams {
     uint160 sqrtPriceX96;
 }
 
-function createAndInitializePoolIfNecessary(CreateAndInitializeParams calldata params) 
-    external 
-    payable 
-    returns (address pool);
+function createAndInitializePoolIfNecessary(
+    CreateAndInitializeParams calldata params
+) external payable returns (address pool);
 ```
 
-完整的接口在 ./code/interfaces/IPoolManager.sol 中。
+完整的接口在 [IPoolManager](./code/interfaces/IPoolManager.sol) 中。
 
 #### PositionManager
 
@@ -123,10 +125,9 @@ TODO: 图片
 可以通过用户地址返回所有其创建的头寸，定义 `getPositions` 方法，接口定义如下：
 
 ```solidity
-function getPositions(address owner) 
-    external 
-    view 
-    returns (uint256[] memory positionIds);
+function getPositions(
+    address owner
+) external view returns (uint256[] memory positionIds);
 ```
 
 每个头寸的信息包括：
@@ -153,10 +154,9 @@ struct PositionInfo {
     uint256 tokensOwed1;
 }
 
-function getPositionInfo(uint256 positionId) 
-    external 
-    view 
-    returns (PositionInfo memory positionInfo);
+function getPositionInfo(
+    uint256 positionId
+) external view returns (PositionInfo memory positionInfo);
 ```
 
 右上角有一个添加头寸的操作，点击弹出以下页面：
@@ -183,9 +183,11 @@ struct MintParams {
     uint256 deadline;
 }
 
-function mint(MintParams calldata params)
-    external 
-    payable 
+function mint(
+    MintParams calldata params
+)
+    external
+    payable
     returns (
         uint256 positionId,
         uint128 liquidity,
@@ -202,9 +204,11 @@ function mint(MintParams calldata params)
 接口定义如下：
 
 ```solidity
-function getTokens() external view returns (address[] memory token0);
+function getTokens() external view returns (address[] memory tokens);
 
-function getTokenPools(address token) external view returns (PoolKey[] memory pools);
+function getTokenPools(
+    address token
+) external view returns (PoolKey[] memory pools);
 ```
 
 每行头寸的信息还有两个按钮，分别是 `burn` 和 `collect`，分别代表销毁头寸的流动性，以及提取全部手续费。
@@ -212,16 +216,17 @@ function getTokenPools(address token) external view returns (PoolKey[] memory po
 接口定义如下：
 
 ```solidity
-function burn(uint256 positionId) 
-    external 
-    returns (uint256 amount0, uint256 amount1);
+function burn(
+    uint256 positionId
+) external returns (uint256 amount0, uint256 amount1);
 
-function collect(uint256 positionId, address recipient) 
-    external 
-    returns (uint256 amount0, uint256 amount1);
+function collect(
+    uint256 positionId,
+    address recipient
+) external returns (uint256 amount0, uint256 amount1);
 ```
 
-完整的接口在 ./code/interfaces/IPositionManager.sol 中。
+完整的接口在 [IPositionManager](./code/interfaces/IPositionManager.sol) 中。
 
 #### SwapRouter
 
@@ -244,25 +249,23 @@ struct QuoteExactInputParams {
     address tokenIn;
     address tokenOut;
     uint256 amountIn;
-    uint24 fee;
     uint160 sqrtPriceLimitX96;
 }
 
-function quoteExactInput(QuoteExactInputParams memory params)
-    external
-    returns (uint256 amountOut);
+function quoteExactInput(
+    QuoteExactInputParams memory params
+) external returns (uint256 amountOut);
 
 struct QuoteExactOutputParams {
     address tokenIn;
     address tokenOut;
     uint256 amount;
-    uint24 fee;
     uint160 sqrtPriceLimitX96;
 }
 
-function quoteExactOutput(QuoteExactOutputParams memory params)
-    external
-    returns (uint256 amountIn);
+function quoteExactOutput(
+    QuoteExactOutputParams memory params
+) external returns (uint256 amountIn);
 ```
 
 最后，当用户点击 Swap 按钮，有两种估算逻辑对应的方法 `exactInput` 和 `exactOutput`。
@@ -273,7 +276,6 @@ function quoteExactOutput(QuoteExactOutputParams memory params)
 struct ExactInputParams {
     address tokenIn;
     address tokenOut;
-    uint24 fee;
     address recipient;
     uint256 deadline;
     uint256 amountIn;
@@ -281,15 +283,13 @@ struct ExactInputParams {
     uint160 sqrtPriceLimitX96;
 }
 
-function exactInput(ExactInputParams calldata params) 
-    external 
-    payable 
-    returns (uint256 amountOut);
+function exactInput(
+    ExactInputParams calldata params
+) external payable returns (uint256 amountOut);
 
 struct ExactOutputParams {
     address tokenIn;
     address tokenOut;
-    uint24 fee;
     address recipient;
     uint256 deadline;
     uint256 amountOut;
@@ -297,13 +297,12 @@ struct ExactOutputParams {
     uint160 sqrtPriceLimitX96;
 }
 
-function exactOutput(ExactOutputParams calldata params) 
-    external 
-    payable 
-    returns (uint256 amountIn);
+function exactOutput(
+    ExactOutputParams calldata params
+) external payable returns (uint256 amountIn);
 ```
 
-完整的接口在 ./code/interfaces/ISwapRouter.sol 中。
+完整的接口在 [ISwapRouter](./code/interfaces/ISwapRouter.sol) 中。
 
 #### Factory
 
@@ -338,15 +337,10 @@ function createPool(
 function parameters()
     external
     view
-    returns (
-        address factory,
-        address token0,
-        address token1,
-        uint24 fee
-    );
+    returns (address factory, address token0, address token1, uint24 fee);
 ```
 
-完整的接口在 ./code/interfaces/IFactory.sol 中。
+完整的接口在 [IFactory](./code/interfaces/IFactory.sol) 中。
 
 #### Pool
 
@@ -363,10 +357,9 @@ function token1() external view returns (address);
 
 function fee() external view returns (uint24);
 
-function tickLower() external view returns (int24); 
-    
-function tickUpper() external view returns (int24);
+function tickLower() external view returns (int24);
 
+function tickUpper() external view returns (int24);
 ```
 
 然后是当前状态变量的读方法，即当前价格、tick、流动性，以及不同头寸位置的流动性和代币数量，如下：
@@ -378,20 +371,22 @@ function tick() external view returns (int24);
 
 function liquidity() external view returns (uint128);
 
-function positions(int8 positionType)
+function positions(
+    int8 positionType
+)
     external
     view
-    returns (
-        uint128 _liquidity,
-        uint128 tokensOwed0,
-        uint128 tokensOwed1
-    );
+    returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1);
 ```
 
 我们还要定义初始化方法，相比于 Uniswap，我们初始化时指定了价格范围，如下：
 
 ```solidity
-function initialize(uint160 sqrtPriceX96, int24 tickLower, int24 tickUpper) external;
+function initialize(
+    uint160 sqrtPriceX96,
+    int24 tickLower,
+    int24 tickUpper
+) external;
 ```
 
 最后是上层合约的底层实现，分别是 `mint`、`collect`、 `burn`、 `swap` 方法以及事件。
@@ -423,9 +418,10 @@ event Collect(
     uint128 amount1
 );
 
-function collect(address recipient, int8 positionType) 
-    external 
-    returns (uint128 amount0, uint128 amount1);
+function collect(
+    address recipient,
+    int8 positionType
+) external returns (uint128 amount0, uint128 amount1);
 
 event Burn(
     address indexed owner,
@@ -435,9 +431,9 @@ event Burn(
     uint256 amount1
 );
 
-function burn(int8 positionType) 
-    external 
-    returns (uint256 amount0, uint256 amount1);
+function burn(
+    int8 positionType
+) external returns (uint256 amount0, uint256 amount1);
 
 event Swap(
     address indexed sender,
