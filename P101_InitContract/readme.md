@@ -478,4 +478,4 @@ interface ISwapCallback {
 }
 ```
 
-完整的接口在 ./code/interfaces/IPool.sol 中。
+完整的接口在 [IPool.sol](./code/interfaces/IPool.sol) 中。
