@@ -111,7 +111,7 @@ function createAndInitializePoolIfNecessary(
 ) external payable returns (address pool);
 ```
 
-完整的接口在 [IPoolManager](./code/interfaces/IPoolManager.sol) 中。
+完整的接口在 [IPoolManager](./code/IPoolManager.sol) 中。
 
 #### PositionManager
 
@@ -225,7 +225,7 @@ function collect(
 ) external returns (uint256 amount0, uint256 amount1);
 ```
 
-完整的接口在 [IPositionManager](./code/interfaces/IPositionManager.sol) 中。
+完整的接口在 [IPositionManager](./code/IPositionManager.sol) 中。
 
 #### SwapRouter
 
@@ -302,7 +302,7 @@ function exactOutput(
 ) external payable returns (uint256 amountIn);
 ```
 
-完整的接口在 [ISwapRouter](./code/interfaces/ISwapRouter.sol) 中。
+完整的接口在 [ISwapRouter](./code/ISwapRouter.sol) 中。
 
 #### Factory
 
@@ -340,7 +340,7 @@ function parameters()
     returns (address factory, address token0, address token1, uint24 fee);
 ```
 
-完整的接口在 [IFactory](./code/interfaces/IFactory.sol) 中。
+完整的接口在 [IFactory](./code/IFactory.sol) 中。
 
 #### Pool
 
@@ -474,4 +474,4 @@ interface ISwapCallback {
 }
 ```
 
-完整的接口在 [IPool.sol](./code/interfaces/IPool.sol) 中。
+完整的接口在 [IPool.sol](./code/IPool.sol) 中。
