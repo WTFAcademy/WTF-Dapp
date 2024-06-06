@@ -44,19 +44,21 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 P003 讲：Wtfswap 整体设计**：[教程](./P003_OverallDesign/readme.md)
 
-**第 P101 讲：Wtfswap 合约设计**：[教程](./P101_InitContract/readme.md) | [代码](./P101_InitContract/code/)
+**第 P101 讲：Wtfswap 合约设计**：[教程](./P101_ContractsDesign/readme.md) | [代码](./P101_ContractsDesign/code/)
 
-**第 P102 讲：Pool 合约 LP 相关接口开发**
+**第 P102 讲：初始化合约和开发环境**：[教程](./P102_InitContracts/readme.md) | [代码](./P102_InitContracts/code/)
 
-**第 P103 讲：Factory 合约开发**
+**第 P103 讲：Pool 合约 LP 相关接口开发**
 
-**第 P104 讲：PoolManager 合约开发**
+**第 P104 讲：Factory 合约开发**
 
-**第 P105 讲：PositionManager 合约开发**
+**第 P105 讲：PoolManager 合约开发**
 
-**第 P106 讲：Pool 合约 swap 接口开发**
+**第 P106 讲：PositionManager 合约开发**
 
-**第 P107 讲：SwapRouter 合约开发**
+**第 P107 讲：Pool 合约 swap 接口开发**
+
+**第 P108 讲：SwapRouter 合约开发**
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 

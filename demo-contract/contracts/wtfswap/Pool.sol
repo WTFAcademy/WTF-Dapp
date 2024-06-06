@@ -32,9 +32,9 @@ contract Pool is IPool {
     {}
 
     function initialize(
-        uint160 sqrtPriceX96,
-        int24 tickLower,
-        int24 tickUpper
+        uint160 sqrtPriceX96_,
+        int24 tickLower_,
+        int24 tickUpper_
     ) external override {}
 
     function mint(
