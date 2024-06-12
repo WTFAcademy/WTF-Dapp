@@ -67,7 +67,7 @@ const CallTest = () => {
               ],
               address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
               functionName: "mint",
-              args: [1],
+              args: [parseEther("1")],
               value: parseEther("0.01"),
             },
             {
