@@ -8,7 +8,7 @@
 
 如果你还没有创建项目，可以参考 [01_QuickStart](../01_QuickStart/readme.md) 中的内容完成初始化。在 Wtfswap 的开发课程中，我们不会覆盖原有的代码，而是新建 `pages/wtfswap/index.tsx` 文件，作为 Wtfswap 的入口文件。
 
-请新建改文件并初始化如下内容：
+请新建文件并初始化如下内容：
 
 ```tsx
 export default function Wtfswap() {
