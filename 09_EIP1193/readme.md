@@ -48,7 +48,7 @@ EIP6963 不再通过 `window.ethereum` 对象来和钱包进行交互，而是�
 
 另外钱包也可以通过发送事件的方式主动告知 DApp 它的存在，这样 DApp 就可以知道用户安装了哪些钱包，然后根据用户的选择来和钱包进行交互。
 
-技术上来讲其实就是通过浏览器的 `window.addEventListener` 来监听消息，通过 `window.dispatchEvent` 来发送消息。所有的消息的 `type` 都有 `eip6963:` 前缀，具体的消息内容定义可以参考规范文档。
+技术上来讲其实就是通过浏览器的 `window.addEventListener` 来监听消息，通过 `window.dispatchEvent` 来发送消息。所有消息的 `type` 都有 `eip6963:` 前缀，具体的消息内容定义可以参考规范文档。
 
 对于开发者来说，和 EIP1193 一样，你使用一些社区的库即可，这样可以免去对细节的关注。比如你如果使用 wagmi，那么通过配置 [multiInjectedProviderDiscovery](https://wagmi.sh/core/api/createConfig#multiinjectedproviderdiscovery) 即可接入 EIP6963。
 
