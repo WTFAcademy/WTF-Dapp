@@ -88,7 +88,7 @@ export default WtfLayout;
 
 ## 配置 ConnectButton
 
-配置好 Provider 之后我们还需要在配置 `ConnectButton`，接下来请修改我们在上一讲课程中已经完成了样式的 `components/WtfLayout/Header.tsx` 文件：
+配置好 Provider 之后我们还需要配置 `ConnectButton`，接下来请修改我们在上一讲课程中已经完成了样式的 `components/WtfLayout/Header.tsx` 文件：
 
 ```diff
 import Link from "next/link";
