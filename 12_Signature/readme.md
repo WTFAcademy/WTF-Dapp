@@ -20,7 +20,7 @@
 
 我们先来实现前端部分逻辑，我们基于之前的课程先快速实现[连接钱包](../03_ConnectWallet/readme.md)。
 
-新建一个 `pages/sign/index.tsx` 文件，复制之前的代码，然后做下修改，新建一个 `compnents/SignDemo` 的组件：
+新建一个 `pages/sign/index.tsx` 文件，复制之前的代码，然后做下修改，新建一个 `components/SignDemo` 的组件：
 
 ```diff
 import React from 'react';
@@ -78,7 +78,7 @@ const SignDemo: React.FC = () => {
 export default SignDemo;
 ```
 
-这样我们就实现了基本的连接接逻辑。
+这样我们就实现了基本的连接逻辑。
 
 然后补充签名部分逻辑，首先引入 `wagmi` 的 `useSignMessage` 和 Ant Design Web3 的 `useAccount` hooks，实现 `doSignature`：
 
@@ -142,11 +142,11 @@ const SignDemo: React.FC = () => {
 export default SignDemo;
 ```
 
-这样我们就实现了前端签名的逻辑，但是正如签名所说，签名需要发送到服务端才验证，所以我们需要先实现服务端验签接口。
+这样我们就实现了前端签名的逻辑，但是正如前面所说，签名需要发送到服务端才验证，所以我们需要先实现服务端验签接口。
 
 ## 实现服务端验签
 
-关于后端的验签，一般依赖 `viem` 或者 `ethers` 等库。你可以直接新建 `/pages/api/signatureCheck.ts` 文件，在 NextJS 会自动将 `/api` 下的文件作为后端运行的 [Vercel Function](https://vercel.com/docs/functions/quickstart) 处理。
+关于后端的验签，一般依赖 `viem` 或者 `ethers` 等库。你可以直接新建 `/pages/api/signatureCheck.ts` 文件，Next.js 会自动将 `/api` 下的文件作为后端运行的 [Vercel Function](https://vercel.com/docs/functions/quickstart) 处理。
 
 我们基于 `viem` 实现：
 
@@ -193,7 +193,7 @@ const verifyMessage = async (signerAddress, signature) => {
 
 ## 前端调用接口验签
 
-最后我们来补充前端调用接口的逻辑。你可以直接讲下面代码复制到 `SignDemo` 组件中：
+最后我们来补充前端调用接口的逻辑。你可以直接将下面代码复制到 `SignDemo` 组件中：
 
 ```tsx
 const checkSignature = async (params: {
