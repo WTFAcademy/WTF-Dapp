@@ -6,7 +6,7 @@
 
 ![headui](./img/ui.png)
 
-样式比较简单，右侧我们可以使用 Ant Design Web3 的 [ConnectButton](https://web3.ant.design/components/connect-button) 组件，其它部分可以直接用写样式，样式我们基于 [CSSModules](https://nextjs.org/docs/app/building-your-application/styling/css-modules#css-modules) 来写，NextJS 默认支持，而且更好理解，比较适合课程中使用。当然实际项目中你也可以按照你的需求使用[其它方案](https://nextjs.org/docs/app/building-your-application/styling)。
+样式比较简单，右侧我们可以使用 Ant Design Web3 的 [ConnectButton](https://web3.ant.design/components/connect-button) 组件，其它部分可以直接用些样式，样式我们基于 [CSSModules](https://nextjs.org/docs/app/building-your-application/styling/css-modules#css-modules) 来写，NextJS 默认支持，而且更好理解，比较适合课程中使用。当然实际项目中你也可以按照你的需求使用[其它方案](https://nextjs.org/docs/app/building-your-application/styling)。
 
 我们新建 `components/WtfLayout/styles.module.css`，并初始化部分内容：
 
