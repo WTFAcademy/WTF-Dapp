@@ -14,7 +14,7 @@ cd demo-contract
 npx hardhat@2.22.3 init
 ```
 
-和[第一章](../01_QuickStart/readme.md)初始化 NextJS 项目类似，`npx` 是安装完成 NodeJS 后自带的命令，如上命令会自动下载 [hardhat npm 包](https://www.npmjs.com/package/hardhat) 并执行 `init` 命令。使用 `2.22.3` 版本是因为它是本课程编写时的最新版本，这样可以保证你的环境和本课程一致。当然你也可以去掉版本号使用最新版。
+和[第一章](../01_QuickStart/readme.md)初始化 Next.js 项目类似，`npx` 是安装完成 Node.js 后自带的命令，如上命令会自动下载 [hardhat npm 包](https://www.npmjs.com/package/hardhat) 并执行 `init` 命令。使用 `2.22.3` 版本是因为它是本课程编写时的最新版本，这样可以保证你的环境和本课程一致。当然你也可以去掉版本号使用最新版。
 
 我们选择第三项，使用 Typescript + viem，和我们之前课程的技术栈保持一致。
 
@@ -123,7 +123,7 @@ export default MyTokenModule;
 npx hardhat ignition deploy ./ignition/modules/MyToken.ts --network localhost
 ```
 
-部署成功后我们尝试在之前的 NFT 项目中调用合约，请先参考之前的课程启动 NextJS 的前端项目。
+部署成功后我们尝试在之前的 NFT 项目中调用合约，请先参考之前的课程启动 Next.js 的前端项目。
 
 在代码中添加一个 `Hardhat` 网络：
 
