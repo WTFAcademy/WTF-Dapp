@@ -36,9 +36,6 @@ contract Pool {
     using Position for mapping(bytes32 => Position.Info);
     using Position for Position.Info;
 
-    int24 internal constant MIN_TICK = -887272;
-    int24 internal constant MAX_TICK = -MIN_TICK;
-
     // 池子代币（ immutable ）
     address public immutable token0;
     address public immutable token1;
@@ -49,6 +46,7 @@ contract Pool {
         uint160 sqrtPriceX96;
         // 当前 tick
         int24 tick;
+        bool unlocked;
     }
     Slot0 public slot0;
 
@@ -63,20 +61,33 @@ contract Pool {
     ...
 ```
 
-接下来，我们在 constructor 中初始化其中一些变量：不可变的 token 地址、当前的价格和对应的 tick。
+接下来，初始化其中一些变量：不可变的 token 地址、当前的价格和对应的 tick。
 
 ```solidity
-    constructor(
-        address token0_,
-        address token1_,
-        uint160 sqrtPriceX96,
-        int24 tick
-    ) {
-        token0 = token0_;
-        token1 = token1_;
+constructor(
+    address _token0,
+    address _token1,
+    uint24 _fee,
+    int24 _tickSpacing
+) {
+    require(_token0 != address(0), "token 0 = zero address");
+    require(_token0 < _token1, "token 0 >= token 1");
 
-        slot0 = Slot0({sqrtPriceX96: sqrtPriceX96, tick: tick});
-    }
+    token0 = _token0;
+    token1 = _token1;
+    fee = _fee;
+    tickSpacing = _tickSpacing;
+    maxLiquidityPerTick = Tick.tickSpacingToMaxLiquidityPerTick(
+        _tickSpacing
+    );
+}
+
+
+function initialize(uint160 sqrtPriceX96) external {
+    require(slot0.sqrtPriceX96 == 0, "already initialized");
+    int24 tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
+    // 初始化零插槽
+    slot0 = Slot0({sqrtPriceX96: sqrtPriceX96, tick: tick, unlocked: true});
 }
 ```
 
@@ -91,7 +102,7 @@ contract Pool {
 在 Pool 合约中，tick 索引存储为一个状态变量：
 
 ```solidity
-contract Pool {
+contract Pool is Pool{
     using TickBitmap for mapping(int16 => uint256);
     mapping(int16 => uint256) public tickBitmap;
     ...
@@ -253,33 +264,51 @@ mint 函数主要包括：
 - 合约计算出用户需要提供的 token 数量；
 - 合约从用户处获得 token，并且验证数量是否正确。
 
-检查 tick, 并且确保流动性的数量不为零：
+检查 tick：
 
 ```solidity
-if (
-    lowerTick >= upperTick ||
-    lowerTick < MIN_TICK ||
-    upperTick > MAX_TICK
-) revert InvalidTickRange();
+
+function checkTicks(int24 tickLower, int24 tickUpper) pure {
+    require(tickLower < tickUpper);
+    require(tickLower >= TickMath.MIN_TICK);
+    require(tickUpper <= TickMath.MAX_TICK);
+}
 ```
 
-```solidity
-if (amount == 0) revert ZeroLiquidity();
-
-```
-
-接下来，gen 更新 tick 和 position 的信息：
+接下来，更新 tick 和 position 的信息：
 
 ```solidity
-ticks.update(lowerTick, amount);
-ticks.update(upperTick, amount);
+flippedLower = ticks.update(
+    tickLower,
+    tick,
+    liquidityDelta,
+    _feeGrowthGlobal0X128,
+    _feeGrowthGlobal1X128,
+    false,
+    maxLiquidityPerTick
+);
+
+flippedUpper = ticks.update(
+    tickUpper,
+    tick,
+    liquidityDelta,
+    _feeGrowthGlobal0X128,
+    _feeGrowthGlobal1X128,
+    true,
+    maxLiquidityPerTick
+);
 
 Position.Info storage position = positions.get(
     owner,
     lowerTick,
     upperTick
 );
-position.update(amount);
+
+position.update(
+    liquidityDelta,
+    feeGrowthInside0X128,
+    feeGrowthInside1X128
+);
 
 ```
 
@@ -288,21 +317,30 @@ ticks.update 函数如下所示：
 ```solidity
 // src/lib/Tick.sol
 function update(
-    mapping(int24 => Tick.Info) storage self,
+    mapping(int24 => Info) storage self,
     int24 tick,
     uint128 liquidityDelta
 ) internal returns (bool flipped) {
-    Tick.Info storage tickInfo = self[tick];
-    uint128 liquidityBefore = tickInfo.liquidity;
-    uint128 liquidityAfter = liquidityBefore + liquidityDelta;
+    Info storage info = self[tick];
 
-    flipped = (liquidityAfter == 0) != (liquidityBefore == 0);
+    uint128 liquidityGrossBefore = info.liquidityGross;
+    uint128 liquidityGrossAfter = liquidityDelta < 0
+        ? liquidityGrossBefore - uint128(-liquidityDelta)
+        : liquidityGrossBefore + uint128(liquidityDelta);
 
-    if (liquidityBefore == 0) {
-        tickInfo.initialized = true;
+    require(liquidityGrossAfter <= maxLiquidity, "liquidity > max");
+
+    flipped = (liquidityGrossAfter == 0) != (liquidityGrossBefore == 0);
+
+    if (liquidityGrossBefore == 0) {
+        // 4.2 update
+        // f_{out,i} = f_g - f_{out, i}
+        if (tick <= tickCurrent) {
+            info.feeGrowthOutside0X128 = feeGrowthGlobalOX128;
+            info.feeGrowthOutside1X128 = feeGrowthGlobal1X128;
+        }
+        info.initialized = true;
     }
-
-    tickInfo.liquidity = liquidityAfter;
 }
 
 现在，它会返回一个 flipped flag，当流动性被添加到一个空的 tick 或整个 tick 的流动性被耗尽时为 true。
@@ -330,11 +368,11 @@ Position 合约的 get 函数如下：
 function get(
     mapping(bytes32 => Info) storage self,
     address owner,
-    int24 lowerTick,
-    int24 upperTick
-) internal view returns (Position.Info storage position) {
+    int24 tickLower,
+    int24 tickUpper
+) internal view returns (Info storage position) {
     position = self[
-        keccak256(abi.encodePacked(owner, lowerTick, upperTick))
+        keccak256(abi.encodePacked(owner, tickLower, tickUpper))
     ];
 }
 ...
@@ -348,15 +386,13 @@ function get(
 ```solidity
 // src/Pool.sol
 ...
-bool flippedLower = ticks.update(lowerTick, amount);
-bool flippedUpper = ticks.update(upperTick, amount);
 
 if (flippedLower) {
-    tickBitmap.flipTick(lowerTick, tickSpacing);
+    tickBitmap.flipTick(tickLower, tickSpacing);
 }
 
 if (flippedUpper) {
-    tickBitmap.flipTick(upperTick, tickSpacint);
+    tickBitmap.flipTick(tickUpper, tickSpacing);
 }
 ...
 
@@ -392,35 +428,30 @@ function mint(...) {
 
 ```solidity
 function burn(
-int24 lowerTick,
-int24 upperTick,
-uint128 amount
-) public returns (uint256 amount0, uint256 amount1) {
-(
-Position.Info storage position,
-int256 amount0Int,
-int256 amount1Int
-) = _modifyPosition(
-ModifyPositionParams({
-owner: msg.sender,
-lowerTick: lowerTick,
-upperTick: upperTick,
-liquidityDelta: -(int128(amount)) // 移除流动性需转为负数
-})
-);
+    int24 tickLower,
+    int24 tickUpper,
+    uint128 amount
+) external lock returns (uint256 amount0, uint256 amount1) {
+    (Position.Info storage position, int256 amount0Int, int256 amount1Int) = _modifyPosition(
+        ModifyPositionParams({
+            owner: msg.sender,
+            tickLower: tickLower,
+            tickUpper: tickUpper,
+            // 使用 SafeCast 进行的转化(移除流动性， 所以是负数)
+            liquidityDelta: -int256(uint256(amount)).toInt128()
+        })
+    );
 
     amount0 = uint256(-amount0Int);
     amount1 = uint256(-amount1Int);
 
     if (amount0 > 0 || amount1 > 0) {
+        // 更新的代币 0 和 1 的仓位（collect函数要使用的， 转账后再减去相应的添加的 amount0, amount1）
         (position.tokensOwed0, position.tokensOwed1) = (
             position.tokensOwed0 + uint128(amount0),
             position.tokensOwed1 + uint128(amount1)
         );
     }
-
-    emit Burn(msg.sender, lowerTick, upperTick, amount, amount0, amount1);
-
 }
 ```
 
@@ -432,21 +463,22 @@ UniswapV3 的处理方式并不是移除流动性时直接把两种 token 资产
 
 ```solidity
 function collect(
-address recipient,
-int24 lowerTick,
-int24 upperTick,
-uint128 amount0Requested,
-uint128 amount1Requested
-) public returns (uint128 amount0, uint128 amount1) {
-Position.Info memory position = positions.get(
-msg.sender,
-lowerTick,
-upperTick
-);
-
+    address recipient,
+    int24 tickLower,
+    int24 tickUpper,
+    uint128 amount0Requested,
+    uint128 amount1Requested
+) external lock returns (uint128 amount0, uint128 amount1) {
+    // amount0 和 amount1 是返回 requested 和 owed 中较小的
+    Position.Info storage position = positions.get(
+        msg.sender,
+        tickLower,
+        tickUpper
+    );
     amount0 = amount0Requested > position.tokensOwed0
         ? position.tokensOwed0
         : amount0Requested;
+
     amount1 = amount1Requested > position.tokensOwed1
         ? position.tokensOwed1
         : amount1Requested;
@@ -460,16 +492,6 @@ upperTick
         position.tokensOwed1 -= amount1;
         IERC20(token1).transfer(recipient, amount1);
     }
-
-    emit Collect(
-        msg.sender,
-        recipient,
-        lowerTick,
-        upperTick,
-        amount0,
-        amount1
-    );
-
 }
 
 ```
@@ -490,17 +512,17 @@ upperTick
 function swap(
     address recipient,
     bool zeroForOne,
-    uint256 amountSpecified,
-    bytes calldata data
-) public returns (int256 amount0, int256 amount1) {
+    int256 amountSpecified,
+    uint160 sqrtPriceLimitX96
+) external lock returns (int256 amount0, int256 amount1) {
     ...
 ```
 
 定义两个新的结构体：
 
-- SwapState 维护了当前 swap 的状态。amoutSpecifiedRemaining 跟踪了还需要从池子中获取的 token 数量：当这个数量为 0 时，这笔订单就被填满了。amountCalculated 是由合约计算出的输出数量。sqrtPriceX96 和 tick 是交易结束后的价格和 tick。
+- SwapState 当前 swap 的状态。amoutSpecifiedRemaining 跟踪了还需要从池子中获取的 token 数量：当这个数量为 0 时，这笔订单就被填满了。amountCalculated 是由合约计算出的输出数量。sqrtPriceX96 和 tick 是交易结束后的价格和 tick。
 
-- StepState 维护了当前交易“一步”的状态。这个结构体跟踪“填满订单”过程中一个循环的状态。sqrtPriceStartX96 跟踪循环开始时的价格。nextTick 是能够为交易提供流动性的下一个已初始化的 tick，sqrtPriceNextX96 是下一个 tick 的价格。amountIn 和 amountOut 是当前循环中流动性能够提供的数量。
+- StepComputations 计算当前交易“下一步”的状态。这个结构体跟踪“填满订单”过程中一个循环的状态。sqrtPriceStartX96 跟踪循环开始时的价格。tickNext 是能够为交易提供流动性的下一个已初始化的 tick，sqrtPriceNextX96 是下一个 tick 的价格。amountIn 和 amountOut 是当前循环中流动性能够提供的数量。
 
 ```solidity
 
@@ -511,12 +533,14 @@ struct SwapState {
     int24 tick;
 }
 
-struct StepState {
+struct StepComputations {
     uint160 sqrtPriceStartX96;
-    int24 nextTick;
+    int24 tickNext;
+    bool initialized;
     uint160 sqrtPriceNextX96;
     uint256 amountIn;
     uint256 amountOut;
+    uint256 feeAmount;
 }
 
 ```
@@ -536,7 +560,7 @@ function swap(...) {
     ...
 ```
 
-在填满一个订单之前，我们首先初始化 SwapState 的实例。循环直到 amoutSpecified 变成 0，也即池子拥有足够的流动性来买用户的 amountSpecified 数量的 token。
+在填满一个订单之前，我们首先初始化 SwapState 的实例。循环直到 amoutSpecifiedRemaining 变成 0，也即池子拥有足够的流动性来买用户的 amountSpecified 数量的 token。
 
 ```solidity
 ...
@@ -586,9 +610,16 @@ while (
 接下来，计算当前价格区间能够提供的流动性的数量，以及交易达到的目标价格。
 
 ```solidity
-    state.amountSpecifiedRemaining -= step.amountIn;
-    state.amountCalculated += step.amountOut;
-    state.tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
+if (exactInput) {
+    // 减少到 0
+    state.amountSpecifiedRemaining -= (step.amountIn +
+        step.feeAmount).toInt256();
+    state.amountCalculated -= step.amountOut.toInt256();
+} else {
+    // 增加到 0
+    state.amountSpecifiedRemaining += step.amountOut.toInt256();
+    state.amountCalculated += (step.amountIn + step.feeAmount)
+        .toInt256();
 }
 
 ```
@@ -605,14 +636,16 @@ function computeSwapStep(
     uint160 sqrtPriceCurrentX96,
     uint160 sqrtPriceTargetX96,
     uint128 liquidity,
-    uint256 amountRemaining
+    uint256 amountRemaining,
+    uint24 feePips
 )
     internal
     pure
     returns (
         uint160 sqrtPriceNextX96,
         uint256 amountIn,
-        uint256 amountOut
+        uint256 amountOut,
+        uint256 feeAmount
     )
 {
     ...
@@ -711,7 +744,7 @@ if (zeroForOne) {
 
 ```
 
-**跨 tick 交易** ✅
+**跨 tick 交易**
 
 swap 函数会沿着已初始化的 tick（有流动性的 tick）循环，直到用户需求的数量被满足。在每次循环中，都会：
 
@@ -1042,11 +1075,12 @@ if (zeroForOne) {
 function update(
 mapping(int24 => Tick.Info) storage self,
 int24 tick,
-int24 currentTick,
+int24 tickCurrent,
 int128 liquidityDelta,
 uint256 feeGrowthGlobal0X128,
 uint256 feeGrowthGlobal1X128,
-bool upper
+bool upper，
+uint128 maxLiquidity
 ) internal returns (bool flipped) {
 ...
 if (liquidityGrossBefore == 0) {
@@ -1083,7 +1117,6 @@ function getFeeGrowthInside(
     Info storage lower = self[tickLower];
     Info storage upper = self[tickUpper];
 
-    // 4.1 fg - fb- fa
     // 计算费用增长（uniswapV3 里 fee 增长可以是负数， 所以处理 uint256 时可以溢出或下溢）
     unchecked {
         uint256 feeGrowthBelow0X128;
@@ -1202,7 +1235,7 @@ uint256 _feeGrowthGlobal1X128 = feeGrowthGlobal1X128;
         _feeGrowthGlobal0X128,
         _feeGrowthGlobal1X128
     );
-// pass fee growth inside
+
 position.update(
     liquidityDelta,
     feeGrowthInside0X128,
