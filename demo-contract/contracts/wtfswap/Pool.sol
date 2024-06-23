@@ -90,11 +90,11 @@ contract Pool is IPool {
         return fee;
     }
 
-    function tickLower() external view returns (int24) {
+    function getTickLower() external view returns (int24) {
         return slot0.tick - tickSpacing;
     }
 
-    function tickUpper() external view returns (int24) {
+    function getTickUpper() external view returns (int24) {
         return slot0.tick + tickSpacing;
     }
 

@@ -26,9 +26,9 @@ interface IPool {
 
     function getFee() external view returns (uint24);
 
-    function tickLower() external view returns (int24);
+    function getTickLower() external view returns (int24);
 
-    function tickUpper() external view returns (int24);
+    function getTickUpper() external view returns (int24);
 
     function getSqrtPriceX96() external view returns (uint160);
 
