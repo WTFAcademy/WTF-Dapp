@@ -142,7 +142,7 @@ const CallTest = () => {
               address: contractInfo.find((item) => item.id === chain?.id)
                 ?.contractAddress as `0x${string}`,
               functionName: "mint",
-              args: [1],
+              args: [BigInt(1)],
               value: parseEther("0.01"),
             },
             {
