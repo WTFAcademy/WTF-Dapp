@@ -11,18 +11,21 @@ interface IFactory {
         address indexed token0,
         address indexed token1,
         uint24 indexed fee,
+        uint8 bump,
         address pool
     );
 
     function getPool(
         address tokenA,
         address tokenB,
-        uint24 fee
+        uint24 fee,
+        uint8 bump
     ) external view returns (address pool);
 
     function createPool(
         address tokenA,
         address tokenB,
-        uint24 fee
+        uint24 fee,
+        uint8 bump
     ) external returns (address pool);
 }
