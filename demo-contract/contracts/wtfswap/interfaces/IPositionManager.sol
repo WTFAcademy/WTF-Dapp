@@ -12,7 +12,6 @@ interface IPositionManager {
         address token0;
         address token1;
         uint24 fee;
-        uint8 bump;
         int128 liquidity;
         // tick range
         int24 tickLower;
@@ -28,8 +27,7 @@ interface IPositionManager {
     struct MintParams {
         address token0;
         address token1;
-        uint24 fee;
-        uint8 bump;
+        uint32 index;
         uint256 amount0Desired;
         uint256 amount1Desired;
         address recipient;

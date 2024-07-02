@@ -36,14 +36,13 @@ wtfswap 设计每个池子都有一个价格范围，swap 只能在此价格范�
 
 ![pool](../P003_OverallDesign/img/pool.png)
 
-注意，由于相同交易对和费率的池子可以重复创建，我们可以先定义一个 `PoolKey` 的结构，并新增一个扰动参数 `bump`，池子的地址可以由 `PoolKey` 唯一计算出来，因此，相同交易对和费率的池子需要定义不同的 `bump` 的值。定义出返回所有 pool 的方法 `getPools`，接口定义如下：
+注意，由于相同交易对和费率的池子可以重复创建，因此我们定义一个 `PoolKey` 的结构，参数包含 `token0`、`token1` 和 `index`，`index` 表示相同交易对池子的序号，从 0 开始递增，池子的地址可以由 `PoolKey` 唯一计算出来。定义出返回所有 pool 的方法 `getPools`，接口定义如下：
 
 ```solidity
 struct PoolKey {
     address token0;
     address token1;
-    uint24 fee;
-    uint8 bump;
+    uint32 index;
 }
 
 function getPools() external view returns (PoolKey[] memory pools);
@@ -52,7 +51,7 @@ function getPools() external view returns (PoolKey[] memory pools);
 每个 pool 的信息包括：
 
 - token 对的符号以及数量；
-- 费率和 bump；
+- 费率;
 - 价格范围；
 - 当前价格；
 - 三个区间的总流动性。
@@ -76,8 +75,7 @@ struct PoolInfo {
 function getPoolInfo(
     address token0,
     address token1,
-    uint24 fee,
-    uint8 bump
+    uint32 index
 ) external view returns (PoolInfo memory poolInfo);
 ```
 
@@ -107,7 +105,7 @@ struct CreateAndInitializeParams {
 
 function createAndInitializePoolIfNecessary(
     CreateAndInitializeParams calldata params
-) external payable returns (address pool, uint8 bump);
+) external payable returns (address pool, uint32 index);
 ```
 
 完整的接口在 [IPoolManager](./code/IPoolManager.sol) 中。
@@ -131,7 +129,7 @@ function getPositions(
 每个头寸的信息包括：
 
 - token 对的符号以及数量（这里的数量是头寸拥有的两种代币数量）；
-- 费率和 bump；
+- 费率；
 - 价格范围；
 - 添加的流动性；
 - 收取的两种代币的手续费。
@@ -144,7 +142,6 @@ struct PositionInfo {
     address token0;
     address token1;
     uint24 fee;
-    uint8 bump;
     int128 liquidity;
     // tick range
     int24 tickLower;
@@ -174,8 +171,7 @@ function getPositionInfo(
 struct MintParams {
     address token0;
     address token1;
-    uint24 fee;
-    uint8 bump;
+    uint32 index;
     uint256 amount0Desired;
     uint256 amount1Desired;
     address recipient;
@@ -236,7 +232,13 @@ function collect(
 
 ![swap](../P003_OverallDesign/img/swap.png)
 
-首先选定 token0 和 token1 也是两个下拉框，实现和 添加头寸 页面一致，只是不会展示费率，因此用户选择完交易对后可能从合约中获取一个或多个池子。
+首先选定 token0 和 token1 也是两个下拉框，实现和 添加头寸 页面一致，只是不会展示费率，因此用户选择完交易对后会有多个池子。
+
+DApp 需要分析出最优的 Swap 路径，这里用 `indexPath` 和 `sqrtPriceLimitX96` 两个参数。`indexPath` 的类型为 `uint32[]`，表示选取的池子的序号；`sqrtPriceLimitX96` 的类型为 `uint160`，表示每个池子交易的限价。逻辑如下：
+
+- 先从 `indexPath` 中取出一个 `index` 确认池子；
+- 在池子中进行 Swap，如果满足用户要求（即没有剩余的 `amount`）则结束；
+- 如果触及 `sqrtPriceLimitX96` 限价，并且 Swap 还未满足用户要求（即剩余 `amount`），则扣除成交的 `amount`，回到第一步。如果已经是最后一个池子则以部分成交结束。
 
 然后就是估算逻辑了，有以下两种方法：
 
@@ -249,6 +251,7 @@ function collect(
 struct QuoteExactInputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     uint256 amountIn;
     uint160 sqrtPriceLimitX96;
 }
@@ -260,6 +263,7 @@ function quoteExactInput(
 struct QuoteExactOutputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     uint256 amount;
     uint160 sqrtPriceLimitX96;
 }
@@ -277,6 +281,7 @@ function quoteExactOutput(
 struct ExactInputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     address recipient;
     uint256 deadline;
     uint256 amountIn;
@@ -291,6 +296,7 @@ function exactInput(
 struct ExactOutputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     address recipient;
     uint256 deadline;
     uint256 amountOut;
@@ -315,8 +321,7 @@ function exactOutput(
 event PoolCreated(
     address indexed token0,
     address indexed token1,
-    uint24 fee,
-    uint8 bump,
+    uint32 indexed index,
     address pool
 );
 
@@ -330,8 +335,8 @@ function getPool(
 function createPool(
     address tokenA,
     address tokenB,
-    uint24 fee,
-    uint8 bump
+    uint32 index,
+    uint24 fee
 ) external returns (address pool);
 ```
 
