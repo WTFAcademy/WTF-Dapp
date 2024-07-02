@@ -4,16 +4,13 @@
 
 ## 合约需求描述
 
-wtfswap 设计 token 价格在一个合理范围内，当脱离范围时会触发单向费率机制，把价格拉回合理范围
+wtfswap 设计每个池子都有一个价格范围，swap 只能在此价格范围内成交
 
-1. 任何人都可以创建池子，创建池子可以指定当前价格、价格范围： [a, b] 和 费率 f；相同交易对和费率的池子不能重复创建；不能删除和修改池子；
-2. 任何人都可以添加流动性，添加流动性可以选择三个范围： （0，a)、 [a, b] 和 (b, +∞)；
-3. 流动性提供者可以减少全部添加的流动性，并提取减少流动性对应的两种代币；
-4. 流动性提供者可以在任何人 swap 过程收取手续费，规则如下：
-   a. 当价格在 [a, b]，买卖手续费都是 f，按流动性贡献加权平分给 [a, b] 流动性提供者；
-   b. 当价格在 （0，a)，买手续费 0.5f，卖手续费 2f，按流动性贡献加权平分给 (0，a) 流动性提供者；
-   c. 当价格在 (b, +∞)，买手续费 2f，卖手续费 0.5f，按流动性贡献加权平分给 (b, +∞) 流动性提供者。
-5. 任何人都可以 swap，swap 需要指定某个池子，swap 可以指定输入（最大化输出）或者指定输出（最小化输入）。
+1. 任何人都可以创建池子，创建池子可以指定当前价格、价格范围： [a, b] 和 费率 f；相同交易对和费率可以有多个池子；不能删除和修改池子；
+2. 任何人都可以添加流动性，添加流动性只能在指定价格范围 [a, b]；
+3. 流动性提供者可以减少添加的流动性，并提取减少流动性对应的两种代币；
+4. 流动性提供者可以在任何人 swap 过程收取手续费，手续费为 f，按流动性贡献加权平分给流动性提供者；
+5. 任何人都可以 swap，swap 需要指定某个池子，swap 可以指定输入（最大化输出）或者指定输出（最小化输入），如果指定的池子的流动性不足，则只会部分成交。
 
 以上手续费的收取方式和 Uniswap 有所差异，做了简化，会在后续手续费实现的章节继续展开说明。
 
@@ -39,13 +36,13 @@ wtfswap 设计 token 价格在一个合理范围内，当脱离范围时会触�
 
 ![pool](../P003_OverallDesign/img/pool.png)
 
-由于相同交易对和费率的池子不能重复创建，我们可以先定义一个 `PoolKey` 的结构，并定义出返回所有 pool 的方法 `getPools`，接口定义如下：
+注意，由于相同交易对和费率的池子可以重复创建，因此我们定义一个 `PoolKey` 的结构，参数包含 `token0`、`token1` 和 `index`，`index` 表示相同交易对池子的序号，从 0 开始递增，池子的地址可以由 `PoolKey` 唯一计算出来。定义出返回所有 pool 的方法 `getPools`，接口定义如下：
 
 ```solidity
 struct PoolKey {
     address token0;
     address token1;
-    uint24 fee;
+    uint32 index;
 }
 
 function getPools() external view returns (PoolKey[] memory pools);
@@ -54,7 +51,7 @@ function getPools() external view returns (PoolKey[] memory pools);
 每个 pool 的信息包括：
 
 - token 对的符号以及数量；
-- 费率；
+- 费率;
 - 价格范围；
 - 当前价格；
 - 三个区间的总流动性。
@@ -78,7 +75,7 @@ struct PoolInfo {
 function getPoolInfo(
     address token0,
     address token1,
-    uint24 fee
+    uint32 index
 ) external view returns (PoolInfo memory poolInfo);
 ```
 
@@ -108,7 +105,7 @@ struct CreateAndInitializeParams {
 
 function createAndInitializePoolIfNecessary(
     CreateAndInitializeParams calldata params
-) external payable returns (address pool);
+) external payable returns (address pool, uint32 index);
 ```
 
 完整的接口在 [IPoolManager](./code/IPoolManager.sol) 中。
@@ -174,8 +171,7 @@ function getPositionInfo(
 struct MintParams {
     address token0;
     address token1;
-    uint24 fee;
-    int8 positionType; // lower:-1; medium:0; upper:1
+    uint32 index;
     uint256 amount0Desired;
     uint256 amount1Desired;
     address recipient;
@@ -216,7 +212,8 @@ function getTokenPools(
 
 ```solidity
 function burn(
-    uint256 positionId
+    uint256 positionId,
+    uint128 amount
 ) external returns (uint256 amount0, uint256 amount1);
 
 function collect(
@@ -235,7 +232,13 @@ function collect(
 
 ![swap](../P003_OverallDesign/img/swap.png)
 
-首先选定 token0 和 token1 也是两个下拉框，实现和 添加头寸 页面一致，只是不会展示费率，因此用户选择完交易对后可能从合约中获取一个或多个池子。
+首先选定 token0 和 token1 也是两个下拉框，实现和 添加头寸 页面一致，只是不会展示费率，因此用户选择完交易对后会有多个池子。
+
+DApp 需要分析出最优的 Swap 路径，这里用 `indexPath` 和 `sqrtPriceLimitX96` 两个参数。`indexPath` 的类型为 `uint32[]`，表示选取的池子的序号；`sqrtPriceLimitX96` 的类型为 `uint160`，表示每个池子交易的限价。逻辑如下：
+
+- 先从 `indexPath` 中取出一个 `index` 确认池子；
+- 在池子中进行 Swap，如果满足用户要求（即没有剩余的 `amount`）则结束；
+- 如果触及 `sqrtPriceLimitX96` 限价，并且 Swap 还未满足用户要求（即剩余 `amount`），则扣除成交的 `amount`，回到第一步。如果已经是最后一个池子则以部分成交结束。
 
 然后就是估算逻辑了，有以下两种方法：
 
@@ -248,6 +251,7 @@ function collect(
 struct QuoteExactInputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     uint256 amountIn;
     uint160 sqrtPriceLimitX96;
 }
@@ -259,6 +263,7 @@ function quoteExactInput(
 struct QuoteExactOutputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     uint256 amount;
     uint160 sqrtPriceLimitX96;
 }
@@ -276,6 +281,7 @@ function quoteExactOutput(
 struct ExactInputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     address recipient;
     uint256 deadline;
     uint256 amountIn;
@@ -290,6 +296,7 @@ function exactInput(
 struct ExactOutputParams {
     address tokenIn;
     address tokenOut;
+    uint32[] indexPath;
     address recipient;
     uint256 deadline;
     uint256 amountOut;
@@ -314,19 +321,21 @@ function exactOutput(
 event PoolCreated(
     address indexed token0,
     address indexed token1,
-    uint24 indexed fee,
+    uint32 indexed index,
     address pool
 );
 
 function getPool(
     address tokenA,
     address tokenB,
-    uint24 fee
+    uint24 fee,
+    uint8 bump
 ) external view returns (address pool);
 
 function createPool(
     address tokenA,
     address tokenB,
+    uint32 index,
     uint24 fee
 ) external returns (address pool);
 ```
@@ -370,13 +379,6 @@ function sqrtPriceX96() external view returns (uint160);
 function tick() external view returns (int24);
 
 function liquidity() external view returns (uint128);
-
-function positions(
-    int8 positionType
-)
-    external
-    view
-    returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1);
 ```
 
 我们还要定义初始化方法，相比于 Uniswap，我们初始化时指定了价格范围，如下：
@@ -397,7 +399,6 @@ function initialize(
 event Mint(
     address sender,
     address indexed owner,
-    int8 indexed positionType,
     uint128 amount,
     uint256 amount0,
     uint256 amount1
@@ -405,7 +406,6 @@ event Mint(
 
 function mint(
     address recipient,
-    int8 positionType,
     uint128 amount,
     bytes calldata data
 ) external returns (uint256 amount0, uint256 amount1);
@@ -413,26 +413,23 @@ function mint(
 event Collect(
     address indexed owner,
     address recipient,
-    int8 indexed positionType,
     uint128 amount0,
     uint128 amount1
 );
 
 function collect(
-    address recipient,
-    int8 positionType
+    address recipient
 ) external returns (uint128 amount0, uint128 amount1);
 
 event Burn(
     address indexed owner,
-    int8 indexed positionType,
     uint128 amount,
     uint256 amount0,
     uint256 amount1
 );
 
 function burn(
-    int8 positionType
+    uint128 amount
 ) external returns (uint256 amount0, uint256 amount1);
 
 event Swap(

@@ -27,8 +27,7 @@ interface IPositionManager {
     struct MintParams {
         address token0;
         address token1;
-        uint24 fee;
-        int8 positionType; // lower:-1; medium:0; upper:1
+        uint32 index;
         uint256 amount0Desired;
         uint256 amount1Desired;
         address recipient;
@@ -48,7 +47,8 @@ interface IPositionManager {
         );
 
     function burn(
-        uint256 positionId
+        uint256 positionId,
+        uint128 amount
     ) external returns (uint256 amount0, uint256 amount1);
 
     function collect(

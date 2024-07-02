@@ -6,7 +6,7 @@ interface IPoolManager {
     struct PoolKey {
         address token0;
         address token1;
-        uint24 fee;
+        uint32 index;
     }
 
     function getPools() external view returns (PoolKey[] memory pools);
@@ -33,7 +33,7 @@ interface IPoolManager {
     function getPoolInfo(
         address token0,
         address token1,
-        uint24 fee
+        uint32 index
     ) external view returns (PoolInfo memory poolInfo);
 
     struct CreateAndInitializeParams {
@@ -47,5 +47,5 @@ interface IPoolManager {
 
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
-    ) external payable returns (address pool);
+    ) external payable returns (address pool, uint32 index);
 }
