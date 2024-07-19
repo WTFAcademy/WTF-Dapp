@@ -49,7 +49,7 @@ contract PoolManager is IPoolManager {
         address token
     ) external view override returns (PoolKey[] memory pools) {
         //通过代币 index 和 poolKey index 找出代币关联的所有池子
-        uint32[] storage indexes = tokenPoolIndexes[token];
+        uint32[] memory indexes = tokenPoolIndexes[token];
         PoolKey[] memory result = new PoolKey[](indexes.length);
         for (uint256 i = 0; i < indexes.length; i++) {
             result[i] = poolKeys[indexes[i]];
