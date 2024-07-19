@@ -30,57 +30,92 @@ Wtfswap 的合约开发我们继续基于之前在[《合约本地开发和测�
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity ^0.8.24;
 
-import "./interfaces/IPool.sol";
+interface IMintCallback {
+    function mintCallback(
+        uint256 amount0Owed,
+        uint256 amount1Owed,
+        bytes calldata data
+    ) external;
+}
 
-contract Pool is IPool {
-    function factory() external view override returns (address) {}
+interface ISwapCallback {
+    function swapCallback(
+        int256 amount0Delta,
+        int256 amount1Delta,
+        bytes calldata data
+    ) external;
+}
 
-    function token0() external view override returns (address) {}
+interface IPool {
+    function factory() external view returns (address);
 
-    function token1() external view override returns (address) {}
+    function token0() external view returns (address);
 
-    function fee() external view override returns (uint24) {}
+    function token1() external view returns (address);
 
-    function tickLower() external view override returns (int24) {}
+    function fee() external view returns (uint24);
 
-    function tickUpper() external view override returns (int24) {}
+    function tickLower() external view returns (int24);
 
-    function sqrtPriceX96() external view override returns (uint160) {}
+    function tickUpper() external view returns (int24);
 
-    function tick() external view override returns (int24) {}
+    function sqrtPriceX96() external view returns (uint160);
 
-    function liquidity() external view override returns (uint128) {}
+    function tick() external view returns (int24);
 
-    function positions(
-        int8 positionType
-    )
-        external
-        view
-        override
-        returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1)
-    {}
+    function liquidity() external view returns (uint128);
 
     function initialize(
-        uint160 sqrtPriceX96_,
-        int24 tickLower_,
-        int24 tickUpper_
-    ) external override {}
+        uint160 sqrtPriceX96,
+        int24 tickLower,
+        int24 tickUpper
+    ) external;
+
+    event Mint(
+        address sender,
+        address indexed owner,
+        uint128 amount,
+        uint256 amount0,
+        uint256 amount1
+    );
 
     function mint(
         address recipient,
-        int8 positionType,
         uint128 amount,
         bytes calldata data
-    ) external override returns (uint256 amount0, uint256 amount1) {}
+    ) external returns (uint256 amount0, uint256 amount1);
+
+    event Collect(
+        address indexed owner,
+        address recipient,
+        uint128 amount0,
+        uint128 amount1
+    );
 
     function collect(
-        address recipient,
-        int8 positionType
-    ) external override returns (uint128 amount0, uint128 amount1) {}
+        address recipient
+    ) external returns (uint128 amount0, uint128 amount1);
+
+    event Burn(
+        address indexed owner,
+        uint128 amount,
+        uint256 amount0,
+        uint256 amount1
+    );
 
     function burn(
-        int8 positionType
-    ) external override returns (uint256 amount0, uint256 amount1) {}
+        uint128 amount
+    ) external returns (uint256 amount0, uint256 amount1);
+
+    event Swap(
+        address indexed sender,
+        address indexed recipient,
+        int256 amount0,
+        int256 amount1,
+        uint160 sqrtPriceX96,
+        uint128 liquidity,
+        int24 tick
+    );
 
     function swap(
         address recipient,
@@ -88,8 +123,9 @@ contract Pool is IPool {
         int256 amountSpecified,
         uint160 sqrtPriceLimitX96,
         bytes calldata data
-    ) external override returns (int256 amount0, int256 amount1) {}
+    ) external returns (int256 amount0, int256 amount1);
 }
+
 ```
 
 其它合约对应的代码可以参考 [code](./code/) 查看。

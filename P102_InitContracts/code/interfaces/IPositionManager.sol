@@ -28,7 +28,6 @@ interface IPositionManager {
         address token0;
         address token1;
         uint24 fee;
-        int8 positionType; // lower:-1; medium:0; upper:1
         uint256 amount0Desired;
         uint256 amount1Desired;
         address recipient;
