@@ -143,9 +143,14 @@ contract Pool is IPool {
      *    - Sqrt 转 tick: TickMath.getTickAtSqrtRatio(sqrtPriceX96); tick 转 Sqrt TickMath.getSqrtRatioAtTick(tick)
      */
 
-    function initialize(uint160 sqrtPriceX96) external {
-        require(slot0.sqrtPriceX96 == 0, "already initialized");
+    function initialize(
+        uint160 sqrtPriceX96_,
+        int24 tickLower_,
+        int24 tickUpper_
+    ) external {
+        require(slot0.sqrtPriceX96_ == 0, "already initialized");
         int24 tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
+        require(tick > tickLower_ && tick < tickUpper_, "Tick out of range");
         // 初始化零插槽
         slot0 = Slot0({sqrtPriceX96: sqrtPriceX96, tick: tick, unlocked: true});
     }
