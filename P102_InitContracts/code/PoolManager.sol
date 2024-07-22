@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
+// Author: Eli Lee
+
 pragma solidity ^0.8.24;
 pragma abicoder v2;
 
@@ -75,10 +77,12 @@ contract PoolManager is IPoolManager {
     ) external payable override returns (address pool) {
         pool = IFactory(factory).getPool(params.token0, params.token1, params.fee);
 
+        // 检查 pool 是否已存在
         if (pool != address(0)) {
             return pool;
         }
 
+        // 创建 pool
         pool = IFactory(factory).createPool(params.token0, params.token1, params.fee);
 
         IPool(pool).initialize(params.sqrtPriceX96, params.tickLower, params.tickUpper);
