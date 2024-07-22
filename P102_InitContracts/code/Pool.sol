@@ -22,15 +22,6 @@ contract Pool is IPool {
 
     function liquidity() external view override returns (uint128) {}
 
-    function positions(
-        int8 positionType
-    )
-        external
-        view
-        override
-        returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1)
-    {}
-
     function initialize(
         uint160 sqrtPriceX96_,
         int24 tickLower_,
@@ -39,18 +30,16 @@ contract Pool is IPool {
 
     function mint(
         address recipient,
-        int8 positionType,
         uint128 amount,
         bytes calldata data
     ) external override returns (uint256 amount0, uint256 amount1) {}
 
     function collect(
-        address recipient,
-        int8 positionType
+        address recipient
     ) external override returns (uint128 amount0, uint128 amount1) {}
 
     function burn(
-        int8 positionType
+        uint128 amount
     ) external override returns (uint256 amount0, uint256 amount1) {}
 
     function swap(

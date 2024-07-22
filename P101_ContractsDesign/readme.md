@@ -165,7 +165,7 @@ function getPositionInfo(
 - token1 的地址和数量；
 - 费率（百分比）。
 
-定义 `mint` 方法，由于添加流动性只能选择低于价格范围下限、在价格范围内、超出价格范围上限三种情况，我们用 int8 类型的参数 `positionType`，分别取 -1, 0, 1 来表示上面三种情况。接口定义如下：
+定义 `mint` 方法，接口定义如下：
 
 ```solidity
 struct MintParams {
