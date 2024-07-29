@@ -148,11 +148,15 @@ contract Pool is IPool {
         int24 tickLower_,
         int24 tickUpper_
     ) external {
-        require(slot0.sqrtPriceX96_ == 0, "already initialized");
-        int24 tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96);
+        require(slot0.sqrtPriceX96 == 0, "already initialized");
+        int24 tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96_);
         require(tick > tickLower_ && tick < tickUpper_, "Tick out of range");
         // 初始化零插槽
-        slot0 = Slot0({sqrtPriceX96: sqrtPriceX96, tick: tick, unlocked: true});
+        slot0 = Slot0({
+            sqrtPriceX96: sqrtPriceX96_,
+            tick: tick,
+            unlocked: true
+        });
     }
 
     /**
@@ -304,17 +308,16 @@ contract Pool is IPool {
 
     function mint(
         address recipient,
-        int24 tickLower,
-        int24 tickUpper,
-        uint128 amount
+        uint128 amount,
+        bytes calldata data
     ) external lock returns (uint256 amount0, uint256 amount1) {
         require(amount > 0, "amount = 0");
 
         (, int256 amount0Int, int256 amount1Int) = _modifyPosition(
             ModifyPositionParams({
                 owner: recipient,
-                tickLower: tickLower,
-                tickUpper: tickUpper,
+                tickLower: this.getTickLower(),
+                tickUpper: this.getTickUpper(),
                 // 使用 SafeCast 进行的转化
                 liquidityDelta: int256(uint256(amount)).toInt128()
             })
@@ -332,47 +335,39 @@ contract Pool is IPool {
     }
 
     function collect(
-        address recipient,
-        int24 tickLower,
-        int24 tickUpper,
-        uint128 amount0Requested,
-        uint128 amount1Requested
+        address recipient
     ) external lock returns (uint128 amount0, uint128 amount1) {
+        // TODO
         // amount0 和 amount1 是返回 requested 和 owed 中较小的
-        Position.Info storage position = positions.get(
-            msg.sender,
-            tickLower,
-            tickUpper
-        );
-        amount0 = amount0Requested > position.tokensOwed0
-            ? position.tokensOwed0
-            : amount0Requested;
-
-        amount1 = amount1Requested > position.tokensOwed1
-            ? position.tokensOwed1
-            : amount1Requested;
-
-        if (amount0 > 0) {
-            position.tokensOwed0 -= amount0;
-            IERC20(token0).transfer(recipient, amount0);
-        }
-
-        if (amount1 > 0) {
-            position.tokensOwed1 -= amount1;
-            IERC20(token1).transfer(recipient, amount1);
-        }
+        // Position.Info storage position = positions.get(
+        //     msg.sender,
+        //     tickLower,
+        //     tickUpper
+        // );
+        // amount0 = amount0Requested > position.tokensOwed0
+        //     ? position.tokensOwed0
+        //     : amount0Requested;
+        // amount1 = amount1Requested > position.tokensOwed1
+        //     ? position.tokensOwed1
+        //     : amount1Requested;
+        // if (amount0 > 0) {
+        //     position.tokensOwed0 -= amount0;
+        //     IERC20(token0).transfer(recipient, amount0);
+        // }
+        // if (amount1 > 0) {
+        //     position.tokensOwed1 -= amount1;
+        //     IERC20(token1).transfer(recipient, amount1);
+        // }
     }
 
     function burn(
-        int24 tickLower,
-        int24 tickUpper,
         uint128 amount
     ) external lock returns (uint256 amount0, uint256 amount1) {
         (Position.Info storage position, int256 amount0Int, int256 amount1Int) = _modifyPosition(
             ModifyPositionParams({
                 owner: msg.sender,
-                tickLower: tickLower,
-                tickUpper: tickUpper,
+                tickLower: this.getTickLower(),
+                tickUpper: this.getTickUpper(),
                 // 使用 SafeCast 进行的转化(移除流动性， 所以是负数)
                 liquidityDelta: -int256(uint256(amount)).toInt128()
             })

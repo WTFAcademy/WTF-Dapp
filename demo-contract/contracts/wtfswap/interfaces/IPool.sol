@@ -45,12 +45,15 @@ interface IPool {
         view
         returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1);
 
-    function initialize(uint160 sqrtPriceX96) external;
+    function initialize(
+        uint160 sqrtPriceX96,
+        int24 tickLower,
+        int24 tickUpper
+    ) external;
 
     event Mint(
         address sender,
         address indexed owner,
-        int8 indexed positionType,
         uint128 amount,
         uint256 amount0,
         uint256 amount1
@@ -58,38 +61,29 @@ interface IPool {
 
     function mint(
         address recipient,
-        int24 tickLower,
-        int24 tickUpper,
-        uint128 amount
+        uint128 amount,
+        bytes calldata data
     ) external returns (uint256 amount0, uint256 amount1);
 
     event Collect(
         address indexed owner,
         address recipient,
-        int8 indexed positionType,
         uint128 amount0,
         uint128 amount1
     );
 
     function collect(
-        address recipient,
-        int24 tickLower,
-        int24 tickUpper,
-        uint128 amount0Requested,
-        uint128 amount1Requested
+        address recipient
     ) external returns (uint128 amount0, uint128 amount1);
 
     event Burn(
         address indexed owner,
-        int8 indexed positionType,
         uint128 amount,
         uint256 amount0,
         uint256 amount1
     );
 
     function burn(
-        int24 tickLower,
-        int24 tickUpper,
         uint128 amount
     ) external returns (uint256 amount0, uint256 amount1);
 

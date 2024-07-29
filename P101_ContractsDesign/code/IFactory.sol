@@ -10,19 +10,20 @@ interface IFactory {
     event PoolCreated(
         address indexed token0,
         address indexed token1,
-        uint24 indexed fee,
+        uint32 indexed index,
         address pool
     );
 
     function getPool(
         address tokenA,
         address tokenB,
-        uint24 fee
+        uint32 index
     ) external view returns (address pool);
 
     function createPool(
         address tokenA,
         address tokenB,
+        uint32 index,
         uint24 fee
     ) external returns (address pool);
 }
