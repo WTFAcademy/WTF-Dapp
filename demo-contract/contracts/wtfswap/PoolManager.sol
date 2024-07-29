@@ -26,10 +26,10 @@ contract PoolManager is IPoolManager {
     function getPoolInfo(
         address token0,
         address token1,
-        uint24 fee
+        uint32 index
     ) external view override returns (PoolInfo memory poolInfo) {}
 
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
-    ) external payable override returns (address pool) {}
+    ) external payable override returns (address pool, uint32 index) {}
 }

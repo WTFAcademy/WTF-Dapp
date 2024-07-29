@@ -47,8 +47,7 @@ interface IPositionManager {
         );
 
     function burn(
-        uint256 positionId,
-        uint128 amount
+        uint256 positionId
     ) external returns (uint256 amount0, uint256 amount1);
 
     function collect(
