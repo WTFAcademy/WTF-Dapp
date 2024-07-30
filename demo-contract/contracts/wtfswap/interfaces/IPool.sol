@@ -18,37 +18,37 @@ interface ISwapCallback {
 }
 
 interface IPool {
-    // function factory() external view returns (address);
+    // function factory() public view returns (address);
 
-    function getToken0() external view returns (address);
+    function getToken0() public view returns (address);
 
-    function getToken1() external view returns (address);
+    function getToken1() public view returns (address);
 
-    function getFee() external view returns (uint24);
+    function getFee() public view returns (uint24);
 
-    function getTickLower() external view returns (int24);
+    function getTickLower() public view returns (int24);
 
-    function getTickUpper() external view returns (int24);
+    function getTickUpper() public view returns (int24);
 
-    function getSqrtPriceX96() external view returns (uint160);
+    function getSqrtPriceX96() public view returns (uint160);
 
-    function getTick() external view returns (int24);
+    function getTick() public view returns (int24);
 
-    function getLiquidity() external view returns (uint128);
+    function getLiquidity() public view returns (uint128);
 
     function getPositions(
         address owner,
         int24 tickLower,
         int24 tickUpper
     )
-        external
+        public
         view
         returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1);
 
     function initialize(
-        uint160 sqrtPriceX96,
-        int24 tickLower,
-        int24 tickUpper
+        uint160 sqrtPriceX96_,
+        int24 tickLower_,
+        int24 tickUpper_
     ) external;
 
     event Mint(
