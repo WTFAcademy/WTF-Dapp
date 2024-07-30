@@ -77,36 +77,36 @@ contract Pool is IPool {
         );
     }
 
-    // function factory() external view returns (address);
+    // function factory() public view returns (address);
     function getToken0() external view returns (address) {
         return token0;
     }
 
-    function getToken1() external view returns (address) {
+    function getToken1() public view returns (address) {
         return token1;
     }
 
-    function getFee() external view returns (uint24) {
+    function getFee() public view returns (uint24) {
         return fee;
     }
 
-    function getTickLower() external view returns (int24) {
+    function getTickLower() public view returns (int24) {
         return slot0.tick - tickSpacing;
     }
 
-    function getTickUpper() external view returns (int24) {
+    function getTickUpper() public view returns (int24) {
         return slot0.tick + tickSpacing;
     }
 
-    function getSqrtPriceX96() external view returns (uint160) {
+    function getSqrtPriceX96() public view returns (uint160) {
         return slot0.sqrtPriceX96;
     }
 
-    function getTick() external view returns (int24) {
+    function getTick() public view returns (int24) {
         return slot0.tick;
     }
 
-    function getLiquidity() external view returns (uint128) {
+    function getLiquidity() public view returns (uint128) {
         return liquidity;
     }
 
@@ -115,7 +115,7 @@ contract Pool is IPool {
         int24 tickLower,
         int24 tickUpper
     )
-        external
+        public
         view
         returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1)
     {
