@@ -18,32 +18,23 @@ interface ISwapCallback {
 }
 
 interface IPool {
-    // function factory() external view returns (address);
+    function factory() external view returns (address);
 
-    function getToken0() external view returns (address);
+    function token0() external view returns (address);
 
-    function getToken1() external view returns (address);
+    function token1() external view returns (address);
 
-    function getFee() external view returns (uint24);
+    function fee() external view returns (uint24);
 
-    function getTickLower() external view returns (int24);
+    function tickLower() external view returns (int24);
 
-    function getTickUpper() external view returns (int24);
+    function tickUpper() external view returns (int24);
 
-    function getSqrtPriceX96() external view returns (uint160);
+    function sqrtPriceX96() external view returns (uint160);
 
-    function getTick() external view returns (int24);
+    function tick() external view returns (int24);
 
-    function getLiquidity() external view returns (uint128);
-
-    function getPositions(
-        address owner,
-        int24 tickLower,
-        int24 tickUpper
-    )
-        external
-        view
-        returns (uint128 _liquidity, uint128 tokensOwed0, uint128 tokensOwed1);
+    function liquidity() external view returns (uint128);
 
     function initialize(
         uint160 sqrtPriceX96,
@@ -101,6 +92,7 @@ interface IPool {
         address recipient,
         bool zeroForOne,
         int256 amountSpecified,
-        uint160 sqrtPriceLimitX96
+        uint160 sqrtPriceLimitX96,
+        bytes calldata data
     ) external returns (int256 amount0, int256 amount1);
 }
