@@ -5,7 +5,14 @@ interface IFactory {
     function parameters()
         external
         view
-        returns (address factory, address token0, address token1, uint24 fee);
+        returns (
+            address factory,
+            address token0,
+            address token1,
+            uint24 fee,
+            int24 tickLower,
+            int24 tickUpper
+        );
 
     event PoolCreated(
         address indexed token0,

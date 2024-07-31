@@ -36,11 +36,7 @@ interface IPool {
 
     function liquidity() external view returns (uint128);
 
-    function initialize(
-        uint160 sqrtPriceX96,
-        int24 tickLower,
-        int24 tickUpper
-    ) external;
+    function initialize(uint160 sqrtPriceX96) external;
 
     event Mint(
         address sender,
