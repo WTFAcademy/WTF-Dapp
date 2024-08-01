@@ -2,19 +2,21 @@
 pragma solidity ^0.8.24;
 
 import "./interfaces/IPool.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "./interfaces/IFactory.sol";
 
-contract Pool is IPool {
+contract Pool is IPool, ERC20 {
     function factory() external view override returns (address) {}
 
     function token0() external view override returns (address) {}
 
     function token1() external view override returns (address) {}
 
-    function fee() external view override returns (uint24) {}
-
     function tickLower() external view override returns (int24) {}
 
     function tickUpper() external view override returns (int24) {}
+
+    function fee() external view override returns (uint24) {}
 
     function sqrtPriceX96() external view override returns (uint160) {}
 
@@ -22,11 +24,15 @@ contract Pool is IPool {
 
     function liquidity() external view override returns (uint128) {}
 
-    function initialize(
-        uint160 sqrtPriceX96_,
-        int24 tickLower_,
-        int24 tickUpper_
-    ) external override {}
+    constructor() {
+        ERC20("Wtfswap", "WTF-SWAP");
+        // 调用 IFactory 的 parameters 获取参数
+        (factory, token0, token1, tickLower, tickUpper, fee) = IFactory(
+            msg.sender
+        ).parameters();
+    }
+
+    function initialize(uint160 sqrtPriceX96_) external override {}
 
     function mint(
         address recipient,

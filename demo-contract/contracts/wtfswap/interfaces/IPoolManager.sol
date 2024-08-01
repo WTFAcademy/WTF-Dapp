@@ -2,43 +2,31 @@
 pragma solidity ^0.8.24;
 pragma abicoder v2;
 
-interface IPoolManager {
-    struct PoolKey {
-        address token0;
-        address token1;
-        uint32 index;
-    }
+import "./IFactory.sol";
 
-    function getPools() external view returns (PoolKey[] memory pools);
-
-    function getTokens() external view returns (address[] memory tokens);
-
-    function getTokenPools(
-        address token
-    ) external view returns (PoolKey[] memory pools);
-
+interface IPoolManager is IFactory {
     struct PoolInfo {
-        // the current protocol fee as a percentage of the swap fee taken on withdrawal
-        // represented as an integer denominator (1/x)%
+        address tokenA;
+        address tokenB;
         uint8 feeProtocol;
-        // tick range
         int24 tickLower;
         int24 tickUpper;
-        // the current tick
         int24 tick;
-        // the current price
         uint160 sqrtPriceX96;
     }
 
-    function getPoolInfo(
-        address token0,
-        address token1,
-        uint32 index
-    ) external view returns (PoolInfo memory poolInfo);
+    struct Pair {
+        address tokenA;
+        address tokenB;
+    }
+
+    function getPairs() external view returns (Pair[] memory);
+
+    function getAllPools() external view returns (PoolInfo[] memory poolsInfo);
 
     struct CreateAndInitializeParams {
-        address token0;
-        address token1;
+        address tokenA;
+        address tokenB;
         uint24 fee;
         int24 tickLower;
         int24 tickUpper;
@@ -47,5 +35,5 @@ interface IPoolManager {
 
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
-    ) external payable returns (address pool, uint32 index);
+    ) external payable returns (address pool);
 }
