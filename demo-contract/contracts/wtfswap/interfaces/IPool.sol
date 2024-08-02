@@ -18,6 +18,12 @@ interface ISwapCallback {
 }
 
 interface IPool {
+    struct Position {
+        uint128 liquidity;
+        uint256 tokensOwed0;
+        uint256 tokensOwed1;
+    }
+
     function factory() external view returns (address);
 
     function token0() external view returns (address);

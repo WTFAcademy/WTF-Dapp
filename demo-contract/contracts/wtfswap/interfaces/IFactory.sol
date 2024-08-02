@@ -28,6 +28,12 @@ interface IFactory {
         address tokenB
     ) external view returns (address[] memory pools);
 
+    function getPool(
+        address tokenA,
+        address tokenB,
+        uint32 index
+    ) external view returns (address pool);
+
     function createPool(
         address tokenA,
         address tokenB,

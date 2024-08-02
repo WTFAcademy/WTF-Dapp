@@ -31,6 +31,14 @@ contract Factory is IFactory {
         return pools[tokenA][tokenB];
     }
 
+    function getPool(
+        address tokenA,
+        address tokenB,
+        uint32 index
+    ) external view override returns (address) {
+        return pools[tokenA][tokenB][index];
+    }
+
     function createPool(
         address tokenA,
         address tokenB,
