@@ -61,10 +61,9 @@ contract Pool is IPool {
     function collect(
         address recipient
     ) external override returns (uint128 amount0, uint128 amount1) {
-        // 获取当前用户的 position
-        Position storage position = positions[msg.sender];
+        // 获取当前用户的 position，TODO recipient 应该改为 msg.sender
+        Position storage position = positions[recipient];
         // TODO 把钱退给用户 recipient
-
         // 修改 position 中的信息
         position.tokensOwed0 -= amount0;
         position.tokensOwed1 -= amount1;

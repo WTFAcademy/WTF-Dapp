@@ -31,6 +31,7 @@ contract SwapRouter is ISwapRouter {
             bytes memory data;
             // 交易的钱统一转给本合约，最后都完成之后在 swapCallback 中打给用户
             pool.swap(msg.sender, true, 12, 12, data);
+            amountOut += 2;
             index++;
         }
     }
