@@ -12,14 +12,14 @@ contract Factory is IFactory {
     {}
 
     function getPool(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
         uint24 fee
     ) external view override returns (address pool) {}
 
     function createPool(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
         uint24 fee
     ) external override returns (address pool) {}
 }

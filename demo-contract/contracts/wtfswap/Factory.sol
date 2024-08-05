@@ -16,37 +16,30 @@ contract Factory is IFactory {
         override
         returns (
             address factory,
-            address tokenA,
-            address tokenB,
+            address token0,
+            address token1,
             int24 tickLower,
             int24 tickUpper,
             uint24 fee
         )
     {}
 
-    function getPools(
-        address tokenA,
-        address tokenB
-    ) external view override returns (address[] memory) {
-        return pools[tokenA][tokenB];
-    }
-
     function getPool(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
         uint32 index
     ) external view override returns (address) {
-        return pools[tokenA][tokenB][index];
+        return pools[token0][token1][index];
     }
 
     function createPool(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
         int24 tickLower,
         int24 tickUpper,
         uint24 fee
     ) external override returns (address pool) {
-        // 先调用 getPools 获取当前 tokenA tokenB 的所有 pool
+        // 先调用 getPools 获取当前 token0 token1 的所有 pool
         // 然后判断是否已经存在 tickLower tickUpper fee 相同的 pool
         // 如果存在就直接返回
         // 如果不存在就创建一个新的 pool

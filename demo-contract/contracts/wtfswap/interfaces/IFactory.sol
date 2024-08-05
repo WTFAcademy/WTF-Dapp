@@ -15,28 +15,24 @@ interface IFactory {
         );
 
     event PoolCreated(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
+        uint32 index,
         int24 tickLower,
         int24 tickUpper,
         uint24 fee,
         address pool
     );
 
-    function getPools(
-        address tokenA,
-        address tokenB
-    ) external view returns (address[] memory pools);
-
     function getPool(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
         uint32 index
     ) external view returns (address pool);
 
     function createPool(
-        address tokenA,
-        address tokenB,
+        address token0,
+        address token1,
         int24 tickLower,
         int24 tickUpper,
         uint24 fee

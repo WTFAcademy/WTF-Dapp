@@ -104,8 +104,8 @@ function createAndInitializePoolIfNecessary(
 
 创建交易池调用的是 `UniswapV3Factory` 合约的 [createPool](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Factory.sol#L35)，参数为：
 
-- tokenA：token0 的地址
-- tokenB 地址：token1 的地址；
+- token0：token0 的地址
+- token1 地址：token1 的地址；
 - fee：手续费费率。
 
 代码为：
@@ -113,12 +113,12 @@ function createAndInitializePoolIfNecessary(
 ```solidity
 /// @inheritdoc IUniswapV3Factory
 function createPool(
-    address tokenA,
-    address tokenB,
+    address token0,
+    address token1,
     uint24 fee
 ) external override noDelegateCall returns (address pool) {
-    require(tokenA != tokenB);
-    (address token0, address token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+    require(token0 != token1);
+    (address token0, address token1) = token0 < token1 ? (token0, token1) : (token1, token0);
     require(token0 != address(0));
     int24 tickSpacing = feeAmountTickSpacing[fee];
     require(tickSpacing != 0);

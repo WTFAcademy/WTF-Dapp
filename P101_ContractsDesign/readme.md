@@ -18,11 +18,15 @@ wtfswap 设计每个池子都有一个价格范围，swap 只能在此价格范�
 
 以简单为原则，我们不按照 Uniswap V3 将合约分为 `periphery` 和 `core` 两个独立仓库，而是自顶向下分为以下四个合约。
 
-- `PoolManager.sol`: 顶层合约，对应 Pool 页面，负责 Pool 的创建和管理；
+- `PoolManager.sol`: 顶层合约，对应 Pool 页面，负责 Pool 的创建和管理。
 - `PositionManager.sol`: 顶层合约，对应 Position 页面，负责 LP 头寸和流动性的管理；
 - `SwapRouter.sol`: 顶层合约，对应 Swap 页面，负责预估价格和交易；
 - `Factory.sol`: 底层合约，Pool 的工厂合约；
 - `Pool.sol`: 最底层合约，对应一个交易池，记录了当前价格、头寸、流动性等信息。
+
+下面是合约的 UML 图：
+
+![uml](./img/uml.png)
 
 ## 合约接口设计
 
@@ -30,22 +34,26 @@ wtfswap 设计每个池子都有一个价格范围，swap 只能在此价格范�
 
 #### PoolManager
 
-`PoolManager.sol` 对应 Pool 页面，我们首先来看 Pool 页面有哪些功能
+`PoolManager.sol` 对应 Pool 页面，我们首先来看 Pool 页面有哪些功能。
 
 首先是展示所有的 pool ，对应前端页面如下：
 
 ![pool](../P003_OverallDesign/img/pool.png)
 
-注意，由于相同交易对和费率的池子可以重复创建，因此我们定义一个 `PoolKey` 的结构，参数包含 `token0`、`token1` 和 `index`，`index` 表示相同交易对池子的序号，从 0 开始递增，池子的地址可以由 `PoolKey` 唯一计算出来。定义出返回所有 pool 的方法 `getPools`，接口定义如下：
+对应我们需要有接口支持 DApp 前端获取所有的交易池。在 Uniswap 中，这个接口是通过服务端提供的，服务端拉取链上的合约信息，然后返回给前端。但是我们的设计是直接调用合约获取当前可供交易的交易池，使得 DApp 不依赖于服务端（当然，对于实际项目来说，依赖服务端可能更合适）。为此，我们定义了 `getAllPools` 接口，用于获取所有的交易池，定义 `PoolInfo` 保存每个池子的信息。
 
 ```solidity
-struct PoolKey {
+struct PoolInfo {
     address token0;
     address token1;
     uint32 index;
+    uint8 feeProtocol;
+    int24 tickLower;
+    int24 tickUpper;
+    int24 tick;
+    uint160 sqrtPriceX96;
 }
-
-function getPools() external view returns (PoolKey[] memory pools);
+function getAllPools() external view returns (PoolInfo[] memory poolsInfo);
 ```
 
 每个 pool 的信息包括：
@@ -55,29 +63,6 @@ function getPools() external view returns (PoolKey[] memory pools);
 - 价格范围；
 - 当前价格；
 - 三个区间的总流动性。
-
-我们可以根据以上信息定义出 `PoolInfo`，以及获取 `PoolInfo` 的方法 `getPoolInfo`，接口定义如下：
-
-```solidity
-struct PoolInfo {
-    // the current protocol fee as a percentage of the swap fee taken on withdrawal
-    // represented as an integer denominator (1/x)%
-    uint8 feeProtocol;
-    // tick range
-    int24 tickLower;
-    int24 tickUpper;
-    // the current tick
-    int24 tick;
-    // the current price
-    uint160 sqrtPriceX96;
-}
-
-function getPoolInfo(
-    address token0,
-    address token1,
-    uint32 index
-) external view returns (PoolInfo memory poolInfo);
-```
 
 此外还有一个添加池子的操作，当添加头寸时如果发现还没有对应的池子，需要先创建一个池子。
 
@@ -105,10 +90,12 @@ struct CreateAndInitializeParams {
 
 function createAndInitializePoolIfNecessary(
     CreateAndInitializeParams calldata params
-) external payable returns (address pool, uint32 index);
+) external payable returns (address pool);
 ```
 
-完整的接口在 [IPoolManager](./code/IPoolManager.sol) 中。
+`PoolManager` 直接继承了 `Factory`（交易池的工厂合约），而不是通过合约调用来调用 `Factory`，所有交易池的创建都需要经过 `PoolManager`。你可以理解为 `PoolManager` 就是一个加强版的 `Factory` 合约。
+
+完整的接口在 [IPoolManager](../demo-contract/contracts/wtfswap/interfaces/IPoolManager.sol) 中。
 
 #### PositionManager
 
@@ -118,32 +105,26 @@ function createAndInitializePoolIfNecessary(
 
 ![positions](../P003_OverallDesign/img/positions.png)
 
-可以通过用户地址返回所有其创建的头寸，定义 `getPositions` 方法，接口定义如下：
+在我们的设计中 `PositionManager` 并不是必须的。因为理论上来说 LP 可以直接调用 `Pool` 合约来管理头寸，DApp 提供一个后端接口来获取 LP 的头寸信息。但是为了课程需要，我们设计了一个符合 ERC721 标准的 `PositionManager` 合约，用于管理 LP 的头寸。你可以理解为 `PositionManager` 就是一个代理，是一个中间商，帮助 LP 管理头寸。你也可以直接调用 `Pool` 合约来注入流动性，但是这部分头寸不会被 `PositionManager` 所感知。
 
 ```solidity
-function getPositions(
-    address owner
-) external view returns (uint256[] memory positionIds);
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
+interface IPositionManager is IERC721 {
+    // 相关接口
+}
 ```
 
-每个头寸的信息包括：
-
-- token 对的符号以及数量（这里的数量是头寸拥有的两种代币数量）；
-- 费率；
-- 价格范围；
-- 添加的流动性；
-- 收取的两种代币的手续费。
-
-我们可以根据以上信息定义出 `PositionInfo`，以及获取 `PositionInfo` 的方法 `getPositionInfo`，接口定义如下：
+`PositionManager` 合约就是一个 ERC721 的合约，LP 可以通过 NFT 的 id（对应我们定义为 `positionId`）来获取他创建的头寸信息，定义 `getPositionInfo` 方法，接口定义如下：
 
 ```solidity
 struct PositionInfo {
-    // address owner;
+    address owner;
     address token0;
     address token1;
+    uint32 index;
     uint24 fee;
-    int128 liquidity;
-    // tick range
+    uint128 liquidity;
     int24 tickLower;
     int24 tickUpper;
     uint256 tokensOwed0;
@@ -155,7 +136,17 @@ function getPositionInfo(
 ) external view returns (PositionInfo memory positionInfo);
 ```
 
-右上角有一个添加头寸的操作，点击弹出以下页面：
+每个头寸的信息包括：
+
+- token 对的符号以及数量（这里的数量是头寸拥有的两种代币数量）；
+- 费率；
+- 价格范围；
+- 添加的流动性；
+- 收取的两种代币的手续费。
+
+另外我们不单独定义获取所有头寸的接口，因为这个合约本身是一个 ERC721 的合约，所以我们可以通过类似 [ZAN Advanced API](https://zan.top/service/advance-api) 这样的服务来获取某个用户的所有的头寸（`zan_getNFTsByOwner`）。
+
+接下来我们来看如何注入流动性（添加头寸），在 UI 设计的右上角有一个添加头寸的操作，点击弹出以下页面：
 
 ![add](../P003_OverallDesign/img/add.png)
 
@@ -191,19 +182,15 @@ function mint(
     );
 ```
 
-值得注意的是，选定 token0 和 token1 是两个下拉框，费率会自动显示。要想实现这个逻辑，我们需要进一步完善 `PoolManager.sol`，新增两个方法：
+值得注意的是，选定 token0 和 token1 是两个下拉框，费率会自动显示。要想实现这个逻辑，我们需要依赖 `PoolManager.sol` 的接口，分别是：
 
-- `getTokens`: 获取所有的 tokens，用于用户第一个下拉框选择；
-- `getTokenPools`：参数是一个 token 地址，返回所有的池子，用于用户第二个下拉框选择。
+- `getPairs`: 获取所有的交易对，用于 LP 选择交易对。
+- `getAllPools`：获取所有的交易池信息，选择交易对后可以通过该方法获得全部的交易池，并按照 LP 选择的交易对等信息过滤。
 
-接口定义如下：
+`getPairs` 在上面的 PositionManager 中未定义，需要接口定义如下：
 
 ```solidity
-function getTokens() external view returns (address[] memory tokens);
-
-function getTokenPools(
-    address token
-) external view returns (PoolKey[] memory pools);
+function getPairs() external view returns (Pair[] memory);
 ```
 
 每行头寸的信息还有两个按钮，分别是 `burn` 和 `collect`，分别代表销毁头寸的流动性，以及提取全部手续费。
@@ -212,8 +199,7 @@ function getTokenPools(
 
 ```solidity
 function burn(
-    uint256 positionId,
-    uint128 amount
+    uint256 positionId
 ) external returns (uint256 amount0, uint256 amount1);
 
 function collect(
@@ -222,7 +208,7 @@ function collect(
 ) external returns (uint256 amount0, uint256 amount1);
 ```
 
-完整的接口在 [IPositionManager](./code/IPositionManager.sol) 中。
+完整的接口在 [IPositionManager](../demo-contract/contracts/wtfswap/interfaces/IPositionManager.sol) 中。
 
 #### SwapRouter
 
@@ -309,7 +295,9 @@ function exactOutput(
 ) external payable returns (uint256 amountIn);
 ```
 
-完整的接口在 [ISwapRouter](./code/ISwapRouter.sol) 中。
+理论上来说，用户也可以直接调用 `Pool` 来交易。但是因为同一个交易对会有很多交易池，所以为了让用户交易更方便，我们设计了 `SwapRouter` 合约。DApp 通过分析交易池的情况，选择最优的交易池，然后由 `SwapRouter` 合约来调用 `Pool` 合约，一次性完成在不同交易池的交易。在 Uniswap 中也设计了类似的合约，只不过 Uniswap 是用来选择不同的交易对的，Uniswap 支持跨交易对的交易，比如用户想要交易 `A` 和 `C`，但是没有直接的交易对，那么 Uniswap 会选择 `A` 和 `B` 以及 `B` 和 `C` 两个交易对来完成交易。在本课程中，为了简化课程，我们不做这样的设计。但是因为我们在一个交易池上定义了不同的价格区间，所以我们也设计了 `SwapRouter` 合约来选择不同的价格区间的交易池。
+
+完整的接口在 [ISwapRouter](../demo-contract/contracts/wtfswap/interfaces/ISwapRouter.sol) 中。
 
 #### Factory
 
@@ -326,16 +314,16 @@ event PoolCreated(
 );
 
 function getPool(
-    address tokenA,
-    address tokenB,
-    uint24 fee,
-    uint8 bump
+    address token0,
+    address token1,
+    uint32 index
 ) external view returns (address pool);
 
 function createPool(
-    address tokenA,
-    address tokenB,
-    uint32 index,
+    address token0,
+    address token1,
+    int24 tickLower,
+    int24 tickUpper,
     uint24 fee
 ) external returns (address pool);
 ```
@@ -346,10 +334,17 @@ function createPool(
 function parameters()
     external
     view
-    returns (address factory, address token0, address token1, uint24 fee);
+    returns (
+        address factory,
+        address token0,
+        address token1,
+        int24 tickLower,
+        int24 tickUpper,
+        uint24 fee
+    );
 ```
 
-完整的接口在 [IFactory](./code/IFactory.sol) 中。
+完整的接口在 [IFactory](../demo-contract//contracts/wtfswap/interfaces/IFactory.sol) 中。
 
 #### Pool
 
@@ -385,9 +380,7 @@ function liquidity() external view returns (uint128);
 
 ```solidity
 function initialize(
-    uint160 sqrtPriceX96,
-    int24 tickLower,
-    int24 tickUpper
+    uint160 sqrtPriceX96
 ) external;
 ```
 
@@ -471,4 +464,4 @@ interface ISwapCallback {
 }
 ```
 
-完整的接口在 [IPool.sol](./code/IPool.sol) 中。
+完整的接口在 [IPool.sol](../demo-contract/contracts/wtfswap/interfaces/IPool.sol) 中。

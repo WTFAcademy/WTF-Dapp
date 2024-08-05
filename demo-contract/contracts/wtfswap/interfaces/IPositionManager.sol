@@ -2,7 +2,9 @@
 pragma solidity ^0.8.24;
 pragma abicoder v2;
 
-interface IPositionManager {
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
+interface IPositionManager is IERC721 {
     struct PositionInfo {
         address owner;
         address token0;
