@@ -19,8 +19,8 @@ interface IPositionManager is IERC721 {
     }
 
     function getPositionInfo(
-        uint256 positionId
-    ) external view returns (PositionInfo memory positionInfo);
+        uint256[] memory positionId
+    ) external view returns (PositionInfo[] memory positionInfo);
 
     struct MintParams {
         address token0;

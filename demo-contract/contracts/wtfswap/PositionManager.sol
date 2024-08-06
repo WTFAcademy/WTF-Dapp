@@ -21,8 +21,8 @@ contract PositionManager is IPositionManager, ERC721 {
     // 通过 positionId 获取 Position 信息，positionId 就是 NFT 的 tokenId
     // 如果要获得某个用户的所有的 Position 信息，需要自己遍历所有的 tokenId，可以通过 ZAN 的节点服务来获取
     function getPositionInfo(
-        uint256 positionId
-    ) external view override returns (PositionInfo memory positionInfo) {}
+        uint256[] memory positionId
+    ) external view override returns (PositionInfo[] memory positionInfo) {}
 
     function mint(
         MintParams calldata params
