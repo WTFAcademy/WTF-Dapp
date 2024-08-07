@@ -56,4 +56,10 @@ interface ISwapRouter {
     function quoteExactOutput(
         QuoteExactOutputParams memory params
     ) external returns (uint256 amountIn);
+
+    function swapCallback(
+        uint256 amount0In,
+        uint256 amount1In,
+        bytes calldata data
+    ) external;
 }

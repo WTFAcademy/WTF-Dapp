@@ -44,7 +44,7 @@ WTF Dapp 是一个 DApp 极简入门教程，帮助开发者入门去中心应�
 
 **第 P003 讲：Wtfswap 整体设计**：[教程](./P003_OverallDesign/readme.md)
 
-**第 P101 讲：Wtfswap 合约设计**：[教程](./P101_ContractsDesign/readme.md) | [代码](./P101_ContractsDesign/code/)
+**第 P101 讲：Wtfswap 合约设计**：[教程](./P101_ContractsDesign/readme.md) | [代码](./demo-contract/contracts/wtfswap/interfaces/)
 
 **第 P102 讲：初始化合约和开发环境**：[教程](./P102_InitContracts/readme.md) | [代码](./P102_InitContracts/code/)
 

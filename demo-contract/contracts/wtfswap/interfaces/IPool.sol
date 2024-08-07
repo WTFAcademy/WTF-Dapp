@@ -18,6 +18,12 @@ interface ISwapCallback {
 }
 
 interface IPool {
+    struct Position {
+        uint128 liquidity;
+        uint256 tokensOwed0;
+        uint256 tokensOwed1;
+    }
+
     function factory() external view returns (address);
 
     function token0() external view returns (address);
@@ -36,11 +42,7 @@ interface IPool {
 
     function liquidity() external view returns (uint128);
 
-    function initialize(
-        uint160 sqrtPriceX96,
-        int24 tickLower,
-        int24 tickUpper
-    ) external;
+    function initialize(uint160 sqrtPriceX96) external;
 
     event Mint(
         address sender,

@@ -2,18 +2,16 @@
 pragma solidity ^0.8.24;
 pragma abicoder v2;
 
-interface IPositionManager {
-    function getPositions(
-        address owner
-    ) external view returns (uint256[] memory positionIds);
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+interface IPositionManager is IERC721 {
     struct PositionInfo {
-        // address owner;
+        address owner;
         address token0;
         address token1;
+        uint32 index;
         uint24 fee;
-        int128 liquidity;
-        // tick range
+        uint128 liquidity;
         int24 tickLower;
         int24 tickUpper;
         uint256 tokensOwed0;
@@ -21,8 +19,8 @@ interface IPositionManager {
     }
 
     function getPositionInfo(
-        uint256 positionId
-    ) external view returns (PositionInfo memory positionInfo);
+        uint256[] memory positionId
+    ) external view returns (PositionInfo[] memory positionInfo);
 
     struct MintParams {
         address token0;
@@ -54,4 +52,10 @@ interface IPositionManager {
         uint256 positionId,
         address recipient
     ) external returns (uint256 amount0, uint256 amount1);
+
+    function mintCallback(
+        uint256 amount0,
+        uint256 amount1,
+        bytes calldata data
+    ) external;
 }
