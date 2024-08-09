@@ -4,7 +4,7 @@
 
 ## 初始化合约
 
-Wtfswap 的合约开发我们继续基于之前在[《合约本地开发和测试环境》](../14_LocalDev/readme.md)中搭建的本地开发环境开发，如果你还没有搭建过，请基于那一讲课程搭建。
+Wtfswap 的合约开发我们继续基于之前在[《合约本地开发和测试环境》](../14_LocalDev/readme.md) 和[《使用 Wagmi CLI 调试本地合约》](../15_WagmiCli/)中搭建的本地开发环境开发，如果你还没有搭建过，请基于那一讲课程搭建。
 
 我们结合在上一讲中接口的设计，我们新增一个 `contract/wtfswap` 的目录按照如下结构初始化合约：
 
@@ -122,7 +122,9 @@ contract Pool is IPool {
 
 其它合约对应的代码可以参考 [code](./code/) 查看。
 
-初始化完成后执行 `npx hardhat compile` 编译合约。
+初始化完成后执行 `npx hardhat compile` 编译合约，合约编译完成后你可以在 `demo-contract/artifacts` 目录下看到编译后的产物，里面包含了合约的 ABI 等信息。
+
+然后进入到前端项目 `demo` 目录，执行 `npx wagmi generate` 生成合约的 React Hooks（具体可以参考[《使用 Wagmi CLI 调试本地合约》](../15_WagmiCli/)），这样我们就可以在前端代码中方便的调用合约了。
 
 ## 初始化部署脚本
 

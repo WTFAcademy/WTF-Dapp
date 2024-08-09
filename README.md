@@ -44,6 +44,8 @@
 
 **第 14 讲：合约本地开发和测试环境**：[教程](./14_LocalDev/readme.md) | [代码](./demo-contract)
 
+**第 15 讲：使用 Wagmi CLI 调试本地合约**：[教程](./15_WagmiCli/readme.md) | [代码](./demo/wagmi.config.ts)
+
 ## DEX 开发实战（开发中）
 
 **第 P000 讲：为什么要做这个实战课程**：[教程](./P000_WhyDEX/readme.md)
