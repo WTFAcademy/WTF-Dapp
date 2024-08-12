@@ -94,9 +94,9 @@ npx wagmi generate
 -  const { writeContract } = useWriteContract();
 +  const { writeContract: mintNFT } = useWriteMyTokenMint();
 
-   useWatchContractEvent({
-     address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
-@@ -122,26 +110,10 @@ const CallTest = () => {
+// ...
+
+     const CallTest = () => {
        {result.data?.toString()}
        <Button
          onClick={() => {
