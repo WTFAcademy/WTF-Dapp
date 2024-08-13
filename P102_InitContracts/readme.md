@@ -134,8 +134,6 @@ contract Pool is IPool {
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const WtfswapModule = buildModule("Wtfswap", (m) => {
-  const pool = m.contract("Pool");
-  const factory = m.contract("Factory");
   const poolManager = m.contract("PoolManager");
   const swapRouter = m.contract("SwapRouter");
   const positionManager = m.contract("PositionManager");
@@ -146,11 +144,47 @@ const WtfswapModule = buildModule("Wtfswap", (m) => {
 export default WtfswapModule;
 ```
 
-通过 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 启动本地的测试链。
+需要注意的是，`Factory` 合约和 `Pool` 合约不需要单独部署，`Factory` 是由 `PoolManager` 继承，部署 `PoolManager` 即可，而 `Pool` 合约则是应该在链上由 `PoolManager` 部署。
 
-然后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 部署。
+通过 `npx hardhat node` 启动本地的测试链。
 
-如果顺利你可以看到如下结果：
+然后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 来部署合约，这个时候你会发现报如下的错误：
+
+```
+[ Wtfswap ] validation failed ⛔
+
+The module contains futures that would fail to execute:
+
+Wtfswap#SwapRouter:
+ - IGN703: The constructor of the contract 'SwapRouter' expects 1 arguments but 0 were given
+
+Wtfswap#PositionManager:
+ - IGN703: The constructor of the contract 'PositionManager' expects 1 arguments but 0 were given
+
+Update the invalid futures and rerun the deployment.
+```
+
+这是因为合约 `SwapRouter` 和 `PositionManager` 的构造函数需要以 `PoolManager` 合约地址为参数。我们继续修改 `ignition/modules/Wtfswap.ts`，补充相关逻辑。
+
+```diff
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+const WtfswapModule = buildModule("Wtfswap", (m) => {
+  const poolManager = m.contract("PoolManager");
+-  const swapRouter = m.contract("SwapRouter");
+-  const positionManager = m.contract("PositionManager");
++  const swapRouter = m.contract("SwapRouter", [poolManager]);
++  const positionManager = m.contract("PositionManager", [poolManager]);
+
+  return { poolManager, swapRouter, positionManager };
+});
+
+export default WtfswapModule;
+```
+
+如上面代码所示，我们将 `PoolManager` 合约作为参数来部署 `SwapRouter` 和 `PositionManager` 合约，具体可以参考 [Hardhat 官方文档](https://hardhat.org/ignition/docs/guides/creating-modules#deploying-a-contract)。
+
+然后重新执行上面的部署命令，如果顺利你可以看到如下结果：
 
 ![deploy](./img/deploy.png)
 

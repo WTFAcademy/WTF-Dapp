@@ -1,13 +1,11 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const WtfswapModule = buildModule("Wtfswap", (m) => {
-  const pool = m.contract("Pool");
-  const factory = m.contract("Factory");
   const poolManager = m.contract("PoolManager");
-  const swapRouter = m.contract("SwapRouter");
-  const positionManager = m.contract("PositionManager");
+  const swapRouter = m.contract("SwapRouter", [poolManager]);
+  const positionManager = m.contract("PositionManager", [poolManager]);
 
-  return { pool, factory, poolManager, swapRouter, positionManager };
+  return { poolManager, swapRouter, positionManager };
 });
 
 export default WtfswapModule;
