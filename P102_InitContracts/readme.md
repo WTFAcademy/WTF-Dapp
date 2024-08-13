@@ -148,7 +148,7 @@ export default WtfswapModule;
 
 通过 `npx hardhat node` 启动本地的测试链。
 
-然后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 来部署合约，这个时候你会发现报如下的错误：
+然后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 来部署合约到本地的测试链，这个时候你会发现报如下的错误：
 
 ```
 [ Wtfswap ] validation failed ⛔
@@ -188,4 +188,76 @@ export default WtfswapModule;
 
 ![deploy](./img/deploy.png)
 
-接下来，从下一章开始，我们就可以愉快的进行开发了。🎉
+## 合约调试
+
+在开发中，我们需要测试合约的逻辑。
+
+我们可以通过编写[单元测试](https://hardhat.org/hardhat-runner/docs/guides/test-contracts)来测试合约，也可以通过运行上面的部署脚本将合约部署到 Hardhat 本地网络或者测试网络进行调试。
+
+下面是一段参考代码，你可以把它放到 `demo/pages/test.tsx` 下，然后访问 [http://localhost:3000/test](http://localhost:3000/test) 来连接 Hardhat 本地网络进行调试。
+
+```tsx
+import { useReadSwapRouterQuoteExactInput } from "@/utils/contracts";
+
+import { hardhat } from "wagmi/chains";
+import { WagmiWeb3ConfigProvider, Hardhat } from "@ant-design/web3-wagmi";
+import { Button } from "antd";
+import { createConfig, http } from "wagmi";
+import { Connector, ConnectButton } from "@ant-design/web3";
+
+const config = createConfig({
+  chains: [hardhat],
+  transports: {
+    [hardhat.id]: http("http://127.0.0.1:8545/"),
+  },
+});
+
+const CallTest = () => {
+  const { data, refetch } = useReadSwapRouterQuoteExactInput({
+    address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    args: [
+      {
+        tokenIn: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        tokenOut: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        indexPath: [],
+        amountIn: BigInt(123),
+        sqrtPriceLimitX96: BigInt(123),
+      },
+    ],
+  });
+  console.log("get data", data);
+  return (
+    <>
+      {data?.toString()}
+      <Button
+        onClick={() => {
+          refetch();
+        }}
+      >
+        refetch
+      </Button>
+    </>
+  );
+};
+
+export default function Web3() {
+  return (
+    <WagmiWeb3ConfigProvider
+      config={config}
+      eip6963={{
+        autoAddInjectedWallets: true,
+      }}
+      chains={[Hardhat]}
+    >
+      <Connector>
+        <ConnectButton />
+      </Connector>
+      <CallTest />
+    </WagmiWeb3ConfigProvider>
+  );
+}
+```
+
+上面的代码中我们调用了 `SwapRouter` 的 `quoteExactInput` 方法，你可以在开发过程中按照具体需求修改上述代码进行调试。
+
+接下来，从下一讲开始，我们就可以愉快的进行开发了。🎉
