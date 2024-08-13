@@ -44,7 +44,7 @@ ethereum
 
 EIP6963 的规范地址在[https://eips.ethereum.org/EIPS/eip-6963](https://eips.ethereum.org/EIPS/eip-6963)。
 
-EIP6963 不再通过 `window.ethereum` 对象来和钱包进行交互，而是通过发送往 `window` 发送事件的方式来和钱包进行交互。这样就解决了 EIP1193 的问题，多个钱包可以和 DApp 进行交互，而不会争抢 `window.ethereum` 对象。
+EIP6963 不再通过 `window.ethereum` 对象来和钱包进行交互，而是通过往 `window` 发送事件的方式来和钱包进行交互。这样就解决了 EIP1193 的问题，多个钱包可以和 DApp 进行交互，而不会争抢 `window.ethereum` 对象。
 
 另外钱包也可以通过发送事件的方式主动告知 DApp 它的存在，这样 DApp 就可以知道用户安装了哪些钱包，然后根据用户的选择来和钱包进行交互。
 
