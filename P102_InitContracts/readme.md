@@ -134,8 +134,6 @@ contract Pool is IPool {
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const WtfswapModule = buildModule("Wtfswap", (m) => {
-  const pool = m.contract("Pool");
-  const factory = m.contract("Factory");
   const poolManager = m.contract("PoolManager");
   const swapRouter = m.contract("SwapRouter");
   const positionManager = m.contract("PositionManager");
@@ -146,12 +144,120 @@ const WtfswapModule = buildModule("Wtfswap", (m) => {
 export default WtfswapModule;
 ```
 
-通过 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 启动本地的测试链。
+需要注意的是，`Factory` 合约和 `Pool` 合约不需要单独部署，`Factory` 是由 `PoolManager` 继承，部署 `PoolManager` 即可，而 `Pool` 合约则是应该在链上由 `PoolManager` 部署。
 
-然后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 部署。
+通过 `npx hardhat node` 启动本地的测试链。
 
-如果顺利你可以看到如下结果：
+然后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network localhost` 来部署合约到本地的测试链，这个时候你会发现报如下的错误：
+
+```
+[ Wtfswap ] validation failed ⛔
+
+The module contains futures that would fail to execute:
+
+Wtfswap#SwapRouter:
+ - IGN703: The constructor of the contract 'SwapRouter' expects 1 arguments but 0 were given
+
+Wtfswap#PositionManager:
+ - IGN703: The constructor of the contract 'PositionManager' expects 1 arguments but 0 were given
+
+Update the invalid futures and rerun the deployment.
+```
+
+这是因为合约 `SwapRouter` 和 `PositionManager` 的构造函数需要以 `PoolManager` 合约地址为参数。我们继续修改 `ignition/modules/Wtfswap.ts`，补充相关逻辑。
+
+```diff
+import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+
+const WtfswapModule = buildModule("Wtfswap", (m) => {
+  const poolManager = m.contract("PoolManager");
+-  const swapRouter = m.contract("SwapRouter");
+-  const positionManager = m.contract("PositionManager");
++  const swapRouter = m.contract("SwapRouter", [poolManager]);
++  const positionManager = m.contract("PositionManager", [poolManager]);
+
+  return { poolManager, swapRouter, positionManager };
+});
+
+export default WtfswapModule;
+```
+
+如上面代码所示，我们将 `PoolManager` 合约作为参数来部署 `SwapRouter` 和 `PositionManager` 合约，具体可以参考 [Hardhat 官方文档](https://hardhat.org/ignition/docs/guides/creating-modules#deploying-a-contract)。
+
+然后重新执行上面的部署命令，如果顺利你可以看到如下结果：
 
 ![deploy](./img/deploy.png)
 
-接下来，从下一章开始，我们就可以愉快的进行开发了。🎉
+## 合约调试
+
+在开发中，我们需要测试合约的逻辑。
+
+我们可以通过编写[单元测试](https://hardhat.org/hardhat-runner/docs/guides/test-contracts)来测试合约，也可以通过运行上面的部署脚本将合约部署到 Hardhat 本地网络或者测试网络进行调试。
+
+下面是一段参考代码，你可以把它放到 `demo/pages/test.tsx` 下，然后访问 [http://localhost:3000/test](http://localhost:3000/test) 来连接 Hardhat 本地网络进行调试。
+
+```tsx
+import { useReadSwapRouterQuoteExactInput } from "@/utils/contracts";
+
+import { hardhat } from "wagmi/chains";
+import { WagmiWeb3ConfigProvider, Hardhat } from "@ant-design/web3-wagmi";
+import { Button } from "antd";
+import { createConfig, http } from "wagmi";
+import { Connector, ConnectButton } from "@ant-design/web3";
+
+const config = createConfig({
+  chains: [hardhat],
+  transports: {
+    [hardhat.id]: http("http://127.0.0.1:8545/"),
+  },
+});
+
+const CallTest = () => {
+  const { data, refetch } = useReadSwapRouterQuoteExactInput({
+    address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+    args: [
+      {
+        tokenIn: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        tokenOut: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+        indexPath: [],
+        amountIn: BigInt(123),
+        sqrtPriceLimitX96: BigInt(123),
+      },
+    ],
+  });
+  console.log("get data", data);
+  return (
+    <>
+      {data?.toString()}
+      <Button
+        onClick={() => {
+          refetch();
+        }}
+      >
+        refetch
+      </Button>
+    </>
+  );
+};
+
+export default function Web3() {
+  return (
+    <WagmiWeb3ConfigProvider
+      config={config}
+      eip6963={{
+        autoAddInjectedWallets: true,
+      }}
+      chains={[Hardhat]}
+    >
+      <Connector>
+        <ConnectButton />
+      </Connector>
+      <CallTest />
+    </WagmiWeb3ConfigProvider>
+  );
+}
+```
+
+上面的代码中我们调用了 `SwapRouter` 的 `quoteExactInput` 方法，你可以在开发过程中按照具体需求修改上述代码进行调试。
+
+接下来，从下一讲开始，我们就可以愉快的进行开发了。🎉
