@@ -28,12 +28,31 @@ contract PoolManager is Factory, IPoolManager {
         return poolsInfo;
     }
 
+
+    // 遍历 poolInfos，查找下一个 index 以及是否已经存在。返回的 index 代表应该出现的位置
+    function getNextPoolIndex(address token0, address token1, uint24 fee) external view returns ( uint32 length, bool isExist) {
+        length = 0;
+        for (uint32 i = 0; i < poolInfos.length; i++) {
+            PoolInfo memory pool = poolInfos[i];
+            if (pool.token0 == token0 && pool.token1 == token1) {
+                if (pool.fee == fee) {
+                    // 返回当前的 index
+                    return (length, true);
+                } else {
+                    length++;
+                }
+            }
+        }
+        return (length, false);
+    }
+
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address pool) {
-        pool = this.getPool(params.token0, params.token1, params.index);
+        (uint32 index, bool isExist) = this.getNextPoolIndex(params.token0, params.token1, params.fee);
         
-        if (pool != address(0)) {
+        if (isExist) {
+            pool = this.getPool(params.token0, params.token1, index);
             return pool;
         }
 
@@ -44,7 +63,8 @@ contract PoolManager is Factory, IPoolManager {
         PoolInfo memory poolInfo = PoolInfo({
             token0: params.token0,
             token1: params.token1,
-            index: params.index,
+            index: index,
+            fee: params.fee,
             feeProtocol: 0,
             tickLower: params.tickLower,
             tickUpper: params.tickUpper,
@@ -53,8 +73,8 @@ contract PoolManager is Factory, IPoolManager {
         });
 
         poolInfos.push(poolInfo);
-        // 创建成功后记录到 pairs 中。如果 index 不为0，说明之前已经添加过了，就不添加pairs，否则添加
-        if (params.index == 0) {
+        // 创建成功后记录到 pairs 中。如果 index 为 1，说明是新的交易对
+        if (index == 1) {
             pairs.push(Pair({
                 token0: params.token0,
                 token1: params.token1

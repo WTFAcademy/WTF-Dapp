@@ -9,6 +9,7 @@ interface IPoolManager is IFactory {
         address token0;
         address token1;
         uint32 index;
+        uint24 fee;
         uint8 feeProtocol;
         int24 tickLower;
         int24 tickUpper;
@@ -29,7 +30,6 @@ interface IPoolManager is IFactory {
         address token0;
         address token1;
         uint24 fee;
-        uint32 index;
         int24 tickLower;
         int24 tickUpper;
         uint160 sqrtPriceX96;
