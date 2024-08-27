@@ -124,9 +124,6 @@ contract Pool is IPool {
         amount1 = uint256(amount1Int);
         // 把流动性记录到对应的 position 中
         positions[recipient].liquidity += amount;
-        // 记录用户的 tokenOwed0 和 tokenOwed1
-        positions[recipient].tokensOwed0 += amount0;
-        positions[recipient].tokensOwed1 += amount1;
 
         uint256 balance0Before;
         uint256 balance1Before;
