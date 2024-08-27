@@ -73,8 +73,8 @@ contract PoolManager is Factory, IPoolManager {
         });
 
         poolInfos.push(poolInfo);
-        // 创建成功后记录到 pairs 中。如果 index 为 1，说明是新的交易对
-        if (index == 1) {
+        // 创建成功后记录到 pairs 中。如果 index 为 0，说明是新的交易对
+        if (index == 0) {
             pairs.push(Pair({
                 token0: params.token0,
                 token1: params.token1
