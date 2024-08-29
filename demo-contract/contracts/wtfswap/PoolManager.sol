@@ -30,12 +30,12 @@ contract PoolManager is Factory, IPoolManager {
 
 
     // 遍历 poolInfos，查找下一个 index 以及是否已经存在。返回的 index 代表应该出现的位置
-    function getNextPoolIndex(address token0, address token1, uint24 fee) external view returns ( uint32 length, bool isExist) {
+    function getNextPoolIndex(CreateAndInitializeParams calldata params) external view returns ( uint32 length, bool isExist) {
         length = 0;
         for (uint32 i = 0; i < poolInfos.length; i++) {
             PoolInfo memory pool = poolInfos[i];
-            if (pool.token0 == token0 && pool.token1 == token1) {
-                if (pool.fee == fee) {
+            if (pool.token0 == params.token0 && pool.token1 == params.token1) {
+                if (pool.fee == params.fee && pool.tickUpper == params.tickUpper && pool.tickLower == params.tickLower) {
                     // 返回当前的 index
                     return (length, true);
                 } else {
@@ -49,7 +49,7 @@ contract PoolManager is Factory, IPoolManager {
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address pool) {
-        (uint32 index, bool isExist) = this.getNextPoolIndex(params.token0, params.token1, params.fee);
+        (uint32 index, bool isExist) = this.getNextPoolIndex(params);
         
         if (isExist) {
             pool = this.getPool(params.token0, params.token1, index);
