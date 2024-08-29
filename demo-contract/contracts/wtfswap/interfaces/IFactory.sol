@@ -7,16 +7,16 @@ interface IFactory {
         view
         returns (
             address factory,
-            address token0,
-            address token1,
+            address tokenA,
+            address tokenB,
             int24 tickLower,
             int24 tickUpper,
             uint24 fee
         );
 
     event PoolCreated(
-        address token0,
-        address token1,
+        address tokenA,
+        address tokenB,
         uint32 index,
         int24 tickLower,
         int24 tickUpper,
@@ -25,14 +25,14 @@ interface IFactory {
     );
 
     function getPool(
-        address token0,
-        address token1,
+        address tokenA,
+        address tokenB,
         uint32 index
     ) external view returns (address pool);
 
     function createPool(
-        address token0,
-        address token1,
+        address tokenA,
+        address tokenB,
         int24 tickLower,
         int24 tickUpper,
         uint24 fee
