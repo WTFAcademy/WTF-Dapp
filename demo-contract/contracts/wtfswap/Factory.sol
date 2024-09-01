@@ -6,34 +6,31 @@ import "./interfaces/IPool.sol";
 import "./Pool.sol";
 
 contract Factory is IFactory {
+    struct PoolInfo {
+        address tokenA;
+        address tokenB;
+        int24 tickLower;
+        int24 tickUpper;
+        uint24 fee;
+    }
+
     mapping(address => mapping(address => address[])) public pools;
 
-    // parameters 是用于 Pool 创建时回调获取参数用
-    // 不是用构造函数是为了避免构造函数变化，那样会导致 Pool 合约地址不能按照参数计算出来
-    // 具体参考 https://docs.openzeppelin.com/cli/2.8/deploying-with-create2
-    // new_address = hash(0xFF, sender, salt, bytecode)
+    PoolInfo public poolInfo;
+
     function parameters()
-        external
+        public
         view
         override
-        returns (
-            address factory,
-            address token0,
-            address token1,
-            int24 tickLower,
-            int24 tickUpper,
-            uint24 fee
-        )
+        returns (address, address, address, int24, int24, uint24)
     {
-        IPool pool = IPool(msg.sender);
-
         return (
-            address(this),
-            pool.token0(),
-            pool.token1(),
-            pool.tickLower(),
-            pool.tickUpper(),
-            pool.fee()
+            msg.sender,
+            poolInfo.tokenA,
+            poolInfo.tokenB,
+            poolInfo.tickLower,
+            poolInfo.tickUpper,
+            poolInfo.fee
         );
     }
 
@@ -71,6 +68,9 @@ contract Factory is IFactory {
         // validate token's individuality
         require(tokenA != tokenB, "IDENTICAL_ADDRESSES");
 
+        // save pool info
+        poolInfo = PoolInfo(tokenA, tokenB, tickLower, tickUpper, fee);
+
         // Declare token0 and token1
         address token0;
         address token1;
@@ -90,6 +90,7 @@ contract Factory is IFactory {
                 currentPool.tickUpper() == tickUpper &&
                 currentPool.fee() == fee
             ) {
+                delete poolInfo;
                 return existingPools[i];
             }
         }
@@ -104,6 +105,8 @@ contract Factory is IFactory {
 
         // save pool
         pools[token0][token1].push(poolAddress);
+
+        delete poolInfo;
 
         return address(pool);
     }
