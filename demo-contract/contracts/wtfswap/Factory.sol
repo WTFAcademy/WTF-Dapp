@@ -19,7 +19,7 @@ contract Factory is IFactory {
     PoolInfo public poolInfo;
 
     function parameters()
-        public
+        external
         view
         override
         returns (address, address, address, int24, int24, uint24)
@@ -68,9 +68,6 @@ contract Factory is IFactory {
         // validate token's individuality
         require(tokenA != tokenB, "IDENTICAL_ADDRESSES");
 
-        // save pool info
-        poolInfo = PoolInfo(tokenA, tokenB, tickLower, tickUpper, fee);
-
         // Declare token0 and token1
         address token0;
         address token1;
@@ -95,6 +92,9 @@ contract Factory is IFactory {
             }
         }
 
+        // save pool info
+        poolInfo = PoolInfo(tokenA, tokenB, tickLower, tickUpper, fee);
+
         // generate create2 salt
         bytes32 salt = keccak256(
             abi.encodePacked(token0, token1, tickLower, tickUpper, fee)
@@ -103,9 +103,10 @@ contract Factory is IFactory {
         // create pool
         address poolAddress = address(new Pool{salt: salt}());
 
-        // save pool
+        // save created pool
         pools[token0][token1].push(poolAddress);
 
+        // delete pool info
         delete poolInfo;
 
         return address(pool);
