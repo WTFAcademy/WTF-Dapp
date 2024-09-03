@@ -9,13 +9,19 @@ import "./libraries/TickMath.sol";
 import "./libraries/LiquidityMath.sol";
 import "./libraries/LowGasSafeMath.sol";
 import "./libraries/TransferHelper.sol";
+import "./libraries/TickBitmap.sol";
+import "./libraries/SwapMath.sol";
+import "./libraries/FixedPoint128.sol";
 
 import "./interfaces/IPool.sol";
 import "./interfaces/IFactory.sol";
 
 contract Pool is IPool {
     using SafeCast for int256;
+    using SafeCast for uint256;
+    using LowGasSafeMath for int256;
     using LowGasSafeMath for uint256;
+    using TickBitmap for mapping(int16 => uint256);
 
     /// @inheritdoc IPool
     address public immutable override factory;
@@ -36,6 +42,11 @@ contract Pool is IPool {
     int24 public override tick;
     /// @inheritdoc IPool
     uint128 public override liquidity;
+
+    /// @inheritdoc IPool
+    uint256 public override feeGrowthGlobal0X128;
+    /// @inheritdoc IPool
+    uint256 public override feeGrowthGlobal1X128;
 
     // 用一个 mapping 来存放所有 Position 的信息
     mapping(address => Position) public positions;
@@ -189,11 +200,118 @@ contract Pool is IPool {
         emit Burn(msg.sender, amount, amount0, amount1);
     }
 
+    // the top level state of the swap, the results of which are recorded in storage at the end
+    struct SwapState {
+        // the amount remaining to be swapped in/out of the input/output asset
+        int256 amountSpecifiedRemaining;
+        // the amount already swapped out/in of the output/input asset
+        int256 amountCalculated;
+        // current sqrt(price)
+        uint160 sqrtPriceX96;
+        // the tick associated with the current price
+        int24 tick;
+        // the global fee growth of the input token
+        uint256 feeGrowthGlobalX128;
+        // the current liquidity in range
+        uint128 liquidity;
+    }
+
     function swap(
         address recipient,
         bool zeroForOne,
         int256 amountSpecified,
         uint160 sqrtPriceLimitX96,
         bytes calldata data
-    ) external override returns (int256 amount0, int256 amount1) {}
+    ) external override returns (int256 amount0, int256 amount1) {
+        require(amountSpecified != 0, "AS");
+
+        // zeroForOne: 如果从 token0 交换 token1 则为 true，从 token1 交换 token0 则为 false
+        // 判断当前价格是否满足交易的条件
+        require(
+            zeroForOne
+                ? sqrtPriceLimitX96 < sqrtPriceX96 &&
+                    sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO
+                : sqrtPriceLimitX96 > sqrtPriceX96 &&
+                    sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,
+            "SPL"
+        );
+
+        // 临时存储交易状态
+        SwapState memory state = SwapState({
+            amountSpecifiedRemaining: amountSpecified,
+            amountCalculated: 0,
+            sqrtPriceX96: sqrtPriceX96,
+            tick: tick,
+            feeGrowthGlobalX128: zeroForOne
+                ? feeGrowthGlobal0X128
+                : feeGrowthGlobal1X128,
+            liquidity: liquidity
+        });
+
+        // amountSpecified 大于 0 代表用户指定了 token0 的数量，小于 0 代表用户指定了 token1 的数量
+        bool exactInput = amountSpecified > 0;
+
+        // TODO 这里计算交易
+        // TODO state.sqrtPriceX96 交易后的价格
+        // TODO state.amountCalculated 交易的 token 数量
+        // TODO state.amountSpecifiedRemaining 没有完成的交易数量
+        // TODO state.tick 交易后的 tick
+        // TODO state.liquidity 交易后的流动性
+        // TODO 累计手续费 feeGrowthGlobal0X128
+        // TODO 累计手续费 feeGrowthGlobal1X128
+        // TODO _modifyPosition 中也要考虑计算手续费
+
+        // 更新新的价格
+        sqrtPriceX96 = state.sqrtPriceX96;
+        tick = state.tick;
+
+        // 更新流动性
+        liquidity = state.liquidity;
+
+        // 计算交易后用户手里的 token0 和 token1 的数量
+        (amount0, amount1) = zeroForOne == exactInput
+            ? (
+                amountSpecified - state.amountSpecifiedRemaining,
+                state.amountCalculated
+            )
+            : (
+                state.amountCalculated,
+                amountSpecified - state.amountSpecifiedRemaining
+            );
+
+        // do the transfers and collect payment
+        if (zeroForOne) {
+            if (amount1 < 0)
+                TransferHelper.safeTransfer(
+                    token1,
+                    recipient,
+                    uint256(-amount1)
+                );
+
+            uint256 balance0Before = balance0();
+            ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
+            require(balance0Before.add(uint256(amount0)) <= balance0(), "IIA");
+        } else {
+            if (amount0 < 0)
+                TransferHelper.safeTransfer(
+                    token0,
+                    recipient,
+                    uint256(-amount0)
+                );
+
+            uint256 balance1Before = balance1();
+            ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
+            require(balance1Before.add(uint256(amount1)) <= balance1(), "IIA");
+        }
+
+        emit Swap(
+            msg.sender,
+            recipient,
+            amount0,
+            amount1,
+            state.sqrtPriceX96,
+            state.liquidity,
+            state.tick
+        );
+    }
 }
