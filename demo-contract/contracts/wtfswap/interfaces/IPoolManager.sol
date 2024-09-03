@@ -22,8 +22,6 @@ interface IPoolManager is IFactory {
         address token1;
     }
 
-    function getPairs() external view returns (Pair[] memory);
-
     function getAllPools() external view returns (PoolInfo[] memory poolsInfo);
 
     struct CreateAndInitializeParams {
