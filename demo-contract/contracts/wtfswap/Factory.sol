@@ -2,37 +2,12 @@
 pragma solidity ^0.8.24;
 
 import "./interfaces/IFactory.sol";
-import "./interfaces/IPool.sol";
 import "./Pool.sol";
 
 contract Factory is IFactory {
-    struct PoolInfo {
-        address tokenA;
-        address tokenB;
-        int24 tickLower;
-        int24 tickUpper;
-        uint24 fee;
-    }
-
     mapping(address => mapping(address => address[])) public pools;
 
-    PoolInfo public poolInfo;
-
-    function parameters()
-        external
-        view
-        override
-        returns (address, address, address, int24, int24, uint24)
-    {
-        return (
-            msg.sender,
-            poolInfo.tokenA,
-            poolInfo.tokenB,
-            poolInfo.tickLower,
-            poolInfo.tickUpper,
-            poolInfo.fee
-        );
-    }
+    Parameters public override parameters;
 
     function sortToken(
         address tokenA,
@@ -87,13 +62,19 @@ contract Factory is IFactory {
                 currentPool.tickUpper() == tickUpper &&
                 currentPool.fee() == fee
             ) {
-                delete poolInfo;
                 return existingPools[i];
             }
         }
 
         // save pool info
-        poolInfo = PoolInfo(tokenA, tokenB, tickLower, tickUpper, fee);
+        parameters = Parameters(
+            address(this),
+            tokenA,
+            tokenB,
+            tickLower,
+            tickUpper,
+            fee
+        );
 
         // generate create2 salt
         bytes32 salt = keccak256(
@@ -107,7 +88,7 @@ contract Factory is IFactory {
         pools[token0][token1].push(poolAddress);
 
         // delete pool info
-        delete poolInfo;
+        delete parameters;
 
         return address(pool);
     }
