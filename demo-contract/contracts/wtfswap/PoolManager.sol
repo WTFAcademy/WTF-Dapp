@@ -44,34 +44,15 @@ contract PoolManager is Factory, IPoolManager {
         return poolsInfo;
     }
 
-
-    // 遍历 poolInfos，查找下一个 index 以及是否已经存在。返回的 index 代表应该出现的位置
-    function getPoolIndex(CreateAndInitializeParams calldata params) external view returns ( uint32 length, bool isExist) {
-        address[] memory pools = pools[params.token0][params.token1];
-        for (uint32 i = 0; i < pools.length; i++) {
-            IPool pool = IPool(pools[i]);
-            if (pool.fee() == params.fee && pool.tickUpper() == params.tickUpper && pool.tickLower() == params.tickLower) {
-                return (i, true);
-            }
-        }
-        return (0, false);
-    }
-
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address pool) {
-        // 需要找一下对应的 Pool index
-        (uint32 index, bool isExist) = this.getPoolIndex(params);
-        
-        if (isExist) {
-            pool = this.getPool(params.token0, params.token1, index);
-            return pool;
-        }
-
-        // 如果没有对应的 Pool 就创建一个 Pool
+        uint256 index = pools[params.token0][params.token1].length;
         pool = this.createPool(params.token0, params.token1, params.tickLower, params.tickUpper, params.fee);
 
         if (index == 0) {
+            // 如果是新增，还需要初始化价格
+            IPool(pool).initialize(params.sqrtPriceX96);
             pairs.push(Pair({
                 token0: params.token0,
                 token1: params.token1
