@@ -1,0 +1,72 @@
+# Uniswap V3 pool 合约部署
+
+一、使用Foundry部署合约
+
+1、安装Foundry
+
+curl -L [https://foundry.paradigm.xyz](https://foundry.paradigm.xyz/) | bash
+
+foundryup    // 安装foundry
+
+foundry 
+
+二、克隆合约代码仓库 git clone [https://github.com/Uniswap/v3-core.git](https://github.com/Uniswap/v3-core.git)
+
+1、添加  .env 文件
+
+里面填入 SEPOLIA_RPC_URL=https://1rpc.io/sepolia        
+PRIVATE_KEY=0xadef625bf2530e93c80873d633fef9daa9adae04ca5f690663136c2c45033dd7
+ETHERSCAN_API_KEY=6R9K4BAA2RHMRD5NXQB5YKKCNGQ8URW5Y8
+
+2、添加foundry.toml  文件
+
+里面填入
+
+```
+[profile.default]
+solc_version = "0.7.6"
+src = "src"
+out = "out"
+libs = ["lib"]
+extra_output = ["storageLayout"]
+build_info = true
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+[rpc_endpoints]
+sepolia = "${SEPOLIA_RPC_URL}"
+
+[etherscan]
+sepolia = { key = "${ETHERSCAN_API_KEY}" }
+```
+
+3、添加src 文件夹在里面添加 deploy.sol文件，
+
+填入
+
+```solidity
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.7.6;
+
+import {Script, console} from "forge-std/Script.sol";
+import {UniswapV3Factory} from "./../contracts/UniswapV3Factory.sol";
+
+contract Deploy is Script {
+    UniswapV3Factory public factory;
+
+    function setUp() public {}
+
+    function run() public {
+        vm.startBroadcast();
+
+        factory = new UniswapV3Factory();
+
+        vm.stopBroadcast();
+    }
+}
+
+```
+
+4、安装库 ： forge install foundry-rs/forge-std --no-commit
+
+最后运行命令进行部署 ： 
+
+forge script src/deploy.sol:Deploy --rpc-url $SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast --verifier etherscan $ETHERSCAN_API_KEY -vvvv --verify         // 合约不需要开源就去掉后面的参数
