@@ -18,6 +18,8 @@ foundry
 PRIVATE_KEY=0xadef625bf2530e93c80873d633fef9daa9adae04ca5f690663136c2c45033dd7
 ETHERSCAN_API_KEY=6R9K4BAA2RHMRD5NXQB5YKKCNGQ8URW5Y8
 
+执行source .env  保存
+
 2、添加foundry.toml  文件
 
 里面填入
