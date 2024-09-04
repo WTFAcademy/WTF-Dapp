@@ -8,6 +8,7 @@ import "./libraries/SqrtPriceMath.sol";
 import "./libraries/TickMath.sol";
 import "./libraries/LiquidityMath.sol";
 import "./libraries/LowGasSafeMath.sol";
+import "./libraries/TransferHelper.sol";
 
 import "./interfaces/IPool.sol";
 import "./interfaces/IFactory.sol";
@@ -143,24 +144,49 @@ contract Pool is IPool {
     function collect(
         address recipient
     ) external override returns (uint128 amount0, uint128 amount1) {
-        // 获取当前用户的 position，TODO recipient 应该改为 msg.sender
-        Position storage position = positions[recipient];
-        // TODO 把钱退给用户 recipient
-        // 修改 position 中的信息
-        position.tokensOwed0 -= amount0;
-        position.tokensOwed1 -= amount1;
+        // 获取当前用户的 position
+        Position storage position = positions[msg.sender];
+        // 把钱退给用户 recipient，只支持全部退还
+        amount0 = position.tokensOwed0;
+        amount1 = position.tokensOwed1;
+
+        if (amount0 > 0) {
+            position.tokensOwed0 -= amount0;
+            TransferHelper.safeTransfer(token0, recipient, amount0);
+        }
+        if (amount1 > 0) {
+            position.tokensOwed1 -= amount1;
+            TransferHelper.safeTransfer(token1, recipient, amount1);
+        }
+
+        emit Collect(msg.sender, recipient, amount0, amount1);
     }
 
     function burn(
         uint128 amount
     ) external override returns (uint256 amount0, uint256 amount1) {
         // 修改 positions 中的信息
-        positions[msg.sender].liquidity -= amount;
+        (int256 amount0Int, int256 amount1Int) = _modifyPosition(
+            ModifyPositionParams({
+                owner: msg.sender,
+                liquidityDelta: -int256(int128(amount)).toInt128()
+            })
+        );
         // 获取燃烧后的 amount0 和 amount1
-        // TODO 当前先写个假的
-        (amount0, amount1) = (amount / 2, amount / 2);
-        positions[msg.sender].tokensOwed0 += amount0;
-        positions[msg.sender].tokensOwed1 += amount1;
+        amount0 = uint256(-amount0Int);
+        amount1 = uint256(-amount1Int);
+
+        if (amount0 > 0 || amount1 > 0) {
+            (
+                positions[msg.sender].tokensOwed0,
+                positions[msg.sender].tokensOwed1
+            ) = (
+                positions[msg.sender].tokensOwed0 + uint128(amount0),
+                positions[msg.sender].tokensOwed1 + uint128(amount1)
+            );
+        }
+
+        emit Burn(msg.sender, amount, amount0, amount1);
     }
 
     function swap(
