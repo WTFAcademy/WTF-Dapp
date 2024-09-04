@@ -89,10 +89,38 @@ contract Pool is IPool {
             params.liquidityDelta
         );
 
+        Position memory position = positions[params.owner];
+
+        // 提取手续费，计算从上一次提取到当前的手续费
+        uint128 tokensOwed0 = uint128(
+            FullMath.mulDiv(
+                feeGrowthGlobal0X128 - position.feeGrowthInside0LastX128,
+                position.liquidity,
+                FixedPoint128.Q128
+            )
+        );
+        uint128 tokensOwed1 = uint128(
+            FullMath.mulDiv(
+                feeGrowthGlobal1X128 - position.feeGrowthInside1LastX128,
+                position.liquidity,
+                FixedPoint128.Q128
+            )
+        );
+
+        // 更新提取手续费的记录，同步到当前最新的 feeGrowthGlobal0X128，代表都提取完了
+        position.feeGrowthInside0LastX128 = feeGrowthGlobal0X128;
+        position.feeGrowthInside1LastX128 = feeGrowthGlobal1X128;
+        // 把可以提取的手续费记录到 tokensOwed0 和 tokensOwed1 中
+        // LP 可以通过 collect 来最终提取到用户自己账户上
+        if (tokensOwed0 > 0 || tokensOwed1 > 0) {
+            position.tokensOwed0 += tokensOwed0;
+            position.tokensOwed1 += tokensOwed1;
+        }
+
         // 修改 liquidity
-        uint128 liquidityBefore = liquidity;
-        liquidity = LiquidityMath.addDelta(
-            liquidityBefore,
+        liquidity = LiquidityMath.addDelta(liquidity, params.liquidityDelta);
+        position.liquidity = LiquidityMath.addDelta(
+            position.liquidity,
             params.liquidityDelta
         );
     }
@@ -200,6 +228,24 @@ contract Pool is IPool {
         emit Burn(msg.sender, amount, amount0, amount1);
     }
 
+    // 交易中需要临时存储的变量
+    struct SwapState {
+        // the amount remaining to be swapped in/out of the input/output asset
+        int256 amountSpecifiedRemaining;
+        // the amount already swapped out/in of the output/input asset
+        int256 amountCalculated;
+        // current sqrt(price)
+        uint160 sqrtPriceX96;
+        // the global fee growth of the input token
+        uint256 feeGrowthGlobalX128;
+        // 该交易中用户转入的 token0 的数量
+        uint256 amountIn;
+        // 该交易中用户转出的 token1 的数量
+        uint256 amountOut;
+        // 该交易中的手续费，如果 zeroForOne 是 ture，则是用户转入 token0，单位是 token0 的数量，反正是 token1 的数量
+        uint256 feeAmount;
+    }
+
     function swap(
         address recipient,
         bool zeroForOne,
@@ -222,18 +268,18 @@ contract Pool is IPool {
 
         // amountSpecified 大于 0 代表用户指定了 token0 的数量，小于 0 代表用户指定了 token1 的数量
         bool exactInput = amountSpecified > 0;
-        // 该交易中用户转入的 token0 的数量
-        uint256 amountIn;
-        // 该交易中用户转出的 token1 的数量
-        uint256 amountOut;
-        // 该交易中的手续费，如果 zeroForOne 是 ture，则是用户转入 token0，单位是 token0 的数量，反正是 token1 的数量
-        uint256 feeAmount;
-        // 交易完成后的价格
-        uint160 newSqrtPriceX96;
-        // 交易完成后因为手续费新的流动性，如果 zeroForOne 是 ture，则是 token0 的流动性，反正是 token1 的流动性
-        uint256 feeGrowthGlobalX128 = zeroForOne
-            ? feeGrowthGlobal0X128
-            : feeGrowthGlobal1X128;
+
+        SwapState memory state = SwapState({
+            amountSpecifiedRemaining: amountSpecified,
+            amountCalculated: 0,
+            sqrtPriceX96: sqrtPriceX96,
+            feeGrowthGlobalX128: zeroForOne
+                ? feeGrowthGlobal0X128
+                : feeGrowthGlobal1X128,
+            amountIn: 0,
+            amountOut: 0,
+            feeAmount: 0
+        });
 
         // 计算交易的上下限，基于 tick 计算价格
         uint160 sqrtPriceX96Lower = TickMath.getSqrtRatioAtTick(tickLower);
@@ -244,58 +290,67 @@ contract Pool is IPool {
             : sqrtPriceX96Upper;
 
         // 计算交易的具体数值
-        (newSqrtPriceX96, amountIn, amountOut, feeAmount) = SwapMath
-            .computeSwapStep(
-                sqrtPriceX96,
-                (
-                    zeroForOne
-                        ? sqrtPriceX96PoolLimit < sqrtPriceLimitX96
-                        : sqrtPriceX96PoolLimit > sqrtPriceLimitX96
-                )
-                    ? sqrtPriceLimitX96
-                    : sqrtPriceX96PoolLimit,
-                liquidity,
-                amountSpecified,
-                fee
-            );
+        (
+            state.sqrtPriceX96,
+            state.amountIn,
+            state.amountOut,
+            state.feeAmount
+        ) = SwapMath.computeSwapStep(
+            sqrtPriceX96,
+            (
+                zeroForOne
+                    ? sqrtPriceX96PoolLimit < sqrtPriceLimitX96
+                    : sqrtPriceX96PoolLimit > sqrtPriceLimitX96
+            )
+                ? sqrtPriceLimitX96
+                : sqrtPriceX96PoolLimit,
+            liquidity,
+            amountSpecified,
+            fee
+        );
 
         // 更新新的价格
-        sqrtPriceX96 = newSqrtPriceX96;
-        tick = TickMath.getTickAtSqrtRatio(newSqrtPriceX96);
+        sqrtPriceX96 = state.sqrtPriceX96;
+        tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
 
         // 因为手续费的注入，流动性会变化，更新流动性
         // 先计算手续费
-        feeGrowthGlobalX128 += FullMath.mulDiv(
-            feeAmount,
+        state.feeGrowthGlobalX128 += FullMath.mulDiv(
+            state.feeAmount,
             FixedPoint128.Q128,
             liquidity
         );
 
-        // 添加因为手续费而新增的流动性到 liquidity 中
-        // TODO 确认 feeGrowthGlobalX128 是否是手续费新增的流动性的变化
-        // TODO _modifyPosition 中也要考虑计算手续费
-        liquidity = LiquidityMath.addDelta(
-            liquidity,
-            int256(feeGrowthGlobalX128).toInt128()
-        );
-
-        int256 amountSpecifiedRemaining = amountSpecified;
-        int256 amountCalculated = 0;
-
-        if (exactInput) {
-            amountSpecifiedRemaining -= (amountIn + feeAmount).toInt256();
-            amountCalculated = amountCalculated.sub(amountOut.toInt256());
+        // 更新手续费相关信息
+        if (zeroForOne) {
+            feeGrowthGlobal0X128 = state.feeGrowthGlobalX128;
         } else {
-            amountSpecifiedRemaining += amountOut.toInt256();
-            amountCalculated = amountCalculated.add(
-                (amountIn + feeAmount).toInt256()
-            );
+            feeGrowthGlobal1X128 = state.feeGrowthGlobalX128;
         }
 
         // 计算交易后用户手里的 token0 和 token1 的数量
+        if (exactInput) {
+            state.amountSpecifiedRemaining -= (state.amountIn + state.feeAmount)
+                .toInt256();
+            state.amountCalculated = state.amountCalculated.sub(
+                state.amountOut.toInt256()
+            );
+        } else {
+            state.amountSpecifiedRemaining += state.amountOut.toInt256();
+            state.amountCalculated = state.amountCalculated.add(
+                (state.amountIn + state.feeAmount).toInt256()
+            );
+        }
+
         (amount0, amount1) = zeroForOne == exactInput
-            ? (amountSpecified - amountSpecifiedRemaining, amountCalculated)
-            : (amountCalculated, amountSpecified - amountSpecifiedRemaining);
+            ? (
+                amountSpecified - state.amountSpecifiedRemaining,
+                state.amountCalculated
+            )
+            : (
+                state.amountCalculated,
+                amountSpecified - state.amountSpecifiedRemaining
+            );
 
         // 转 Token 给用户
         if (zeroForOne) {
