@@ -9,7 +9,6 @@ import "./libraries/TickMath.sol";
 import "./libraries/LiquidityMath.sol";
 import "./libraries/LowGasSafeMath.sol";
 import "./libraries/TransferHelper.sol";
-import "./libraries/TickBitmap.sol";
 import "./libraries/SwapMath.sol";
 import "./libraries/FixedPoint128.sol";
 
@@ -21,7 +20,6 @@ contract Pool is IPool {
     using SafeCast for uint256;
     using LowGasSafeMath for int256;
     using LowGasSafeMath for uint256;
-    using TickBitmap for mapping(int16 => uint256);
 
     /// @inheritdoc IPool
     address public immutable override factory;
