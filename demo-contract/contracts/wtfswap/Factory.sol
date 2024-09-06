@@ -78,18 +78,26 @@ contract Factory is IFactory {
 
         // generate create2 salt
         bytes32 salt = keccak256(
-            abi.encodePacked(token0, token1, tickLower, tickUpper, fee)
+            abi.encode(token0, token1, tickLower, tickUpper, fee)
         );
 
         // create pool
-        address poolAddress = address(new Pool{salt: salt}());
+        pool = address(new Pool{salt: salt}());
 
         // save created pool
-        pools[token0][token1].push(poolAddress);
+        pools[token0][token1].push(pool);
 
         // delete pool info
         delete parameters;
 
-        return address(pool);
+        emit PoolCreated(
+            token0,
+            token1,
+            uint32(existingPools.length),
+            tickLower,
+            tickUpper,
+            fee,
+            pool
+        );
     }
 }

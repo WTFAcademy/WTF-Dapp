@@ -60,15 +60,15 @@
 
 **第 P102 讲：初始化合约和开发环境**：[教程](./P102_InitContracts/readme.md) | [代码](./P102_InitContracts/code/)
 
-**第 P103 讲：Pool 合约 LP 相关接口开发**
+**第 P103 讲：Factory 合约开发**
 
-**第 P104 讲：Factory 合约开发**
+**第 P104 讲：Pool 合约 LP 相关接口开发**
 
-**第 P105 讲：PoolManager 合约开发**
+**第 P105 讲：Pool 合约 swap 接口开发**
 
-**第 P106 讲：PositionManager 合约开发**
+**第 P106 讲：PoolManager 合约开发**
 
-**第 P107 讲：Pool 合约 swap 接口开发**
+**第 P107 讲：PositionManager 合约开发**
 
 **第 P108 讲：SwapRouter 合约开发**
 
@@ -92,7 +92,9 @@
 
 **第 P211 讲：支持 Swap**
 
-**第 P301 讲：Wtfswap 部署**
+**第 P301 讲：合约的优化和安全**
+
+**第 P302 讲：Wtfswap 部署**
 
 ## 经验手册（PR Welcome）
 
