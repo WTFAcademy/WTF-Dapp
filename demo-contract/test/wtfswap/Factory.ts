@@ -45,4 +45,17 @@ describe("Factory", function () {
     expect(poolAddress.result).to.match(/^0x[a-fA-F0-9]{40}$/);
     expect(poolAddress.result).to.equal(createEvents[0].args.pool);
   });
+
+  it("createPool with same token", async function () {
+    const { factory } = await loadFixture(deployFixture);
+    const tokenA: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
+    const tokenB: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
+    await expect(
+      factory.write.createPool([tokenA, tokenB, 1, 100000, 3000])
+    ).to.be.rejectedWith("IDENTICAL_ADDRESSES");
+
+    await expect(factory.read.getPool([tokenA, tokenB, 3])).to.be.rejectedWith(
+      "IDENTICAL_ADDRESSES"
+    );
+  });
 });
