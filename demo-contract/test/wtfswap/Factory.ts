@@ -34,4 +34,19 @@ describe("Factory", function () {
     expect(createEvents[0].args.tickUpper).to.equal(100000);
     expect(createEvents[0].args.fee).to.equal(3000);
   });
+
+  it("createPool return", async function () {
+    const { factory, publicClient } = await loadFixture(deployFixture);
+    const tokenA: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
+    const tokenB: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+
+    const poolAddress = await factory.simulate.createPool([
+      tokenA,
+      tokenB,
+      1,
+      100000,
+      3000,
+    ]);
+    expect(poolAddress.result).to.match(/^0x[a-fA-F0-9]{40}$/);
+  });
 });
