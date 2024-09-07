@@ -6,7 +6,7 @@
 
 1、安装Foundry
 
-curl -L [https://foundry.paradigm.xyz](https://foundry.paradigm.xyz/) | bash
+curl -L https://foundry.paradigm.xyz | bash
 
 foundryup    // 安装foundry
 
@@ -16,9 +16,9 @@ foundry
 
 1、添加  .env 文件         // 用于存储 链的RPC节点、 部署钱包私钥、  浏览器API key
 
-里面填入 SEPOLIA_RPC_URL=https://1rpc.io/sepolia        
+里面填入 ```SEPOLIA_RPC_URL=https://1rpc.io/sepolia        
 PRIVATE_KEY=0xadef625bf2530e93c80873d633fef9daa9adae04ca5f690663136c2c45033dd7
-ETHERSCAN_API_KEY=6R9K4BAA2RHMRD5NXQB5YKKCNGQ8URW5Y8
+ETHERSCAN_API_KEY=6R9K4BAA2RHMRD5NXQB5YKKCNGQ8URW5Y8```
 
 执行source .env  保存     //  更新环境变量，才能使用Foundry
 
