@@ -421,7 +421,7 @@ $$L = \Delta{y}/(\sqrt{Pc}-\sqrt{Pa})$$
 
 $$L = \Delta{y}/(\sqrt{Pb}-\sqrt{Pa})$$
 
-当前价格大于上界 a 时，只有 $\Delta{x}$ 个 token0 起作用，，意味着向 a 点左边添加了如下流动性：
+当前价格大于上界 a 时，只有 $\Delta{x}$ 个 token0 起作用，意味着向 a 点左边添加了如下流动性：
 
 $$L = \Delta{x}\sqrt{Pb*Pa}/(\sqrt{Pb}-\sqrt{Pa})$$
 
