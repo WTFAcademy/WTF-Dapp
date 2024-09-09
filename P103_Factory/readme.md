@@ -8,7 +8,7 @@
 
 另外 `Factory` 合约主要参考了 [UniswapV3Factory.sol](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Factory.sol) 的设计，它是必须的。而 `PoolManager` 合约中的逻辑只是为了给 DApp 提供获取所有交易池信息的接口，这样的接口可以通过服务端来提供，它并不是必须的。
 
-入下图所示：
+如下图所示：
 
 ![Factory](./img/Factory.png)
 
