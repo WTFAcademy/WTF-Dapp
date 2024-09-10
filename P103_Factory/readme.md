@@ -10,7 +10,7 @@
 
 如下图所示：
 
-![Factory](./img/Factory.png)
+![Factory](./img/factory.png)
 
 `Factory` 合约的主要功能是创建交易池（`Pool`），WTFSwap 部署后会得到一个 `Factory` 合约（也是 `PoolManager` 合约，它继承了 `Factory`），而不同的交易对包括相同交易对只要价格上下限和手续费不同就会创建一个新的交易池。而 `Factory` 合约则是主要用来创建 `Pool` 合约的。通过这一讲课程，你可以学习到如何通过合约创建合约，以及接触到我们之前基础课程中简单学习过的合约事件的开发，以及其他 Solidity 中的一些新的语法。
 
