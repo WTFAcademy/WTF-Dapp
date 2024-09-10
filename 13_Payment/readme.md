@@ -1,10 +1,12 @@
+本节作者：[@LiKang](https://x.com/banlideli)
+
 这一讲将会介绍如何实现通过区块链转账和收款。
 
 ---
 
 ## 转账
 
-在区块链环境中，转账是指在参与者之间转移资产的行为，这些资产可以是加密货币（如比特币、以太坊等）或者其他基于区块链的数字资产（如代币、NFTs等）。这些转账活动被记录在区块链上，并受到网络共识机制的安全保护。转账是最基础的区块链网络操作，它涉及以下几个要点：
+在区块链环境中，转账是指在参与者之间转移资产的行为，这些资产可以是加密货币（如比特币、以太坊等）或者其他基于区块链的数字资产（如代币、NFTs 等）。这些转账活动被记录在区块链上，并受到网络共识机制的安全保护。转账是最基础的区块链网络操作，它涉及以下几个要点：
 
 `源地址（发送方）` ： 需要转出资产的区块链账户地址。
 
@@ -33,6 +35,7 @@
 这个转账过程的确切细节可能会根据所使用的具体区块链技术和资产类型而有所不同。
 
 ### 发起一个转账
+
 我们先来实现前端部分逻辑，我们基于之前的课程先快速实现[连接钱包](../03_ConnectWallet/readme.md)。
 
 新建一个 `pages/transaction/index.tsx` 文件，复制之前的代码，然后做下修改，新建一个 `pages/transaction/SendEth.tsx` 的组件：
@@ -81,29 +84,42 @@
 ```
 
 然后在 `SendEth` 组件内写一个输入 `to` 和 `value` 的输入框并发起一个转账的按钮，代码如下：
+
 ```tsx
-import * as React from 'react';
-import { Button, Checkbox, Form, type FormProps, Input } from 'antd';
-import { type BaseError, useSendTransaction, useWaitForTransactionReceipt} from 'wagmi';
-import { parseEther } from 'viem';
+import * as React from "react";
+import { Button, Checkbox, Form, type FormProps, Input } from "antd";
+import {
+  type BaseError,
+  useSendTransaction,
+  useWaitForTransactionReceipt,
+} from "wagmi";
+import { parseEther } from "viem";
 
 type FieldType = {
   to: `0x${string}`;
   value: string;
 };
- 
-export const SendEth:React.FC = () => {
-  const { data: hash, error, isPending, sendTransaction } = useSendTransaction();
 
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
+export const SendEth: React.FC = () => {
+  const {
+    data: hash,
+    error,
+    isPending,
+    sendTransaction,
+  } = useSendTransaction();
+
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+    useWaitForTransactionReceipt({ hash });
 
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
-    console.log('Success:', values);
-    sendTransaction({ to: values.to, value: parseEther(values.value) }) 
+    console.log("Success:", values);
+    sendTransaction({ to: values.to, value: parseEther(values.value) });
   };
-  
-  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+
+  const onFinishFailed: FormProps<FieldType>["onFinishFailed"] = (
+    errorInfo
+  ) => {
+    console.log("Failed:", errorInfo);
   };
 
   return (
@@ -120,7 +136,7 @@ export const SendEth:React.FC = () => {
       <Form.Item<FieldType>
         label="to"
         name="to"
-        rules={[{ required: true, message: 'Please input!' }]}
+        rules={[{ required: true, message: "Please input!" }]}
       >
         <Input />
       </Form.Item>
@@ -128,31 +144,29 @@ export const SendEth:React.FC = () => {
       <Form.Item<FieldType>
         label="value"
         name="value"
-        rules={[{ required: true, message: 'Please input!' }]}
+        rules={[{ required: true, message: "Please input!" }]}
       >
         <Input />
       </Form.Item>
 
       <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
         <Button type="primary" htmlType="submit">
-          {isPending ? 'Confirming...' : 'Send'} 
+          {isPending ? "Confirming..." : "Send"}
         </Button>
       </Form.Item>
 
-      {hash && <div>Transaction Hash: {hash}</div>} 
-      {isConfirming && <div>Waiting for confirmation...</div>} 
-      {isConfirmed && <div>Transaction confirmed.</div>} 
-      {error && ( 
-        <div>Error: {(error as BaseError).shortMessage || error.message}</div> 
-      )} 
+      {hash && <div>Transaction Hash: {hash}</div>}
+      {isConfirming && <div>Waiting for confirmation...</div>}
+      {isConfirmed && <div>Transaction confirmed.</div>}
+      {error && (
+        <div>Error: {(error as BaseError).shortMessage || error.message}</div>
+      )}
     </Form>
-  )
-}
-
+  );
+};
 ```
 
 代码里，我们用了 [Ant Design](https://ant.design/components/form) 的 `Form` 组件 和 `wagmi` 的 `hooks` ，发起了一个交易，并进行了状态的监听，输入 `to` 和 `value` 点击发起会出现如下图的效果：
-
 
 ![发起](./img/send.png)
 
@@ -160,7 +174,7 @@ export const SendEth:React.FC = () => {
 
 ## 收款
 
-在区块链上收款通常意味着接收加密货币或其他基于区块链的资产，如代币（包括NFTs）。把你的公共地址提供给付款方。你可以直接提供地址字符串或者生成一个二维码，方便手机钱包扫码。
+在区块链上收款通常意味着接收加密货币或其他基于区块链的资产，如代币（包括 NFTs）。把你的公共地址提供给付款方。你可以直接提供地址字符串或者生成一个二维码，方便手机钱包扫码。
 
 值得我们注意的是：
 
@@ -171,4 +185,5 @@ export const SendEth:React.FC = () => {
 5. 请确保使用正确的区块链网络。比如，只能向以太坊网络的地址发送以太币（ETH），向比特币网络的地址发送比特币（BTC）。
 
 ### 二维码收款
+
 `ant-design-web3` 正在筹备一个收款的快捷组件，只需要传入选择链，选择钱包，输入金额就可以支持指定钱包的快捷扫码付款啦，尽情期待～

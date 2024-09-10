@@ -1,3 +1,5 @@
+本节作者：[@Web3Pignard](https://x.com/pignard_web3) [@愚指导](https://x.com/yudao1024)
+
 这一讲将会设计整体合约的结构，定义各个合约的接口，并做初步的技术分析。
 
 ---

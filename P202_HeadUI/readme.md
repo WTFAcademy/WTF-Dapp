@@ -1,3 +1,5 @@
+本节作者：[@愚指导](https://x.com/yudao1024)
+
 这一讲，我们来实现 Wtfswap 的 Layout 头部部分的 UI。
 
 ---
