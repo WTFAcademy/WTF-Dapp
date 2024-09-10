@@ -60,7 +60,7 @@
 
 **第 P102 讲：初始化合约和开发环境**：[教程](./P102_InitContracts/readme.md) | [代码](./P102_InitContracts/code/)
 
-**第 P103 讲：Factory 合约开发**
+**第 P103 讲：Factory 合约开发**：[教程](./P103_Factory/readme.md) | [代码](./demo-contract/contracts/wtfswap/Factory.sol)
 
 **第 P104 讲：Pool 合约 LP 相关接口开发**
 
