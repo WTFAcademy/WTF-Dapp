@@ -16,6 +16,8 @@
 
 ## 合约开发
 
+> 完整的代码在 [demo-contract/contracts/wtfswap/Factory.sol](../demo-contract/contracts/wtfswap/Factory.sol) 中。
+
 ### 1. 创建交易池
 
 在之前的[课程](../P102_InitContracts/readme.md)中，我们已经创建了一个 `mapping`，（如果你还没有创建，那可以现在在 `Pool.sol` 中加入这一行）：
@@ -240,4 +242,4 @@ it("createPool with same token", async function () {
 });
 ```
 
-完整的单测代码在 [test/wtfswap/Factory.ts](../demo-contract/test/wtfswap/Factory.ts) 中，在实际项目中，你的单测应该覆盖到所有的逻辑分支，以保证合约的安全。
+完整的单测代码在 [demo-contract/test/wtfswap/Factory.ts](../demo-contract/test/wtfswap/Factory.ts) 中，在实际项目中，你的单测应该覆盖到所有的逻辑分支，以保证合约的安全。
