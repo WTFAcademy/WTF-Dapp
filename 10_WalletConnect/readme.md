@@ -1,4 +1,8 @@
+本节作者：[@愚指导](https://x.com/yudao1024)
+
 这一讲将会介绍如何使用 [WalletConnect](https://walletconnect.com/) 来连接移动端 APP 钱包，这对提升 DApp 的用户体验至关重要。
+
+---
 
 ## 什么是 WalletConnect
 

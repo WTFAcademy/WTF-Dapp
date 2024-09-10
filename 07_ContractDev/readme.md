@@ -1,3 +1,5 @@
+本节作者：[@LiKang](https://x.com/banlideli)
+
 这一讲会简单介绍如何开发和测试一个智能合约。
 
 ---

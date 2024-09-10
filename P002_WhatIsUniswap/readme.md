@@ -1,3 +1,5 @@
+本节作者：[@Web3Pignard](https://x.com/pignard_web3)
+
 这一讲我们正式走进 Uniswap 的代码解析，准确来说是 Uniswap V3，通过阅读本节，你可以了解到：
 
 1. 什么是 Uniswap，Uniswap 推出了哪些版本，为什么要解析 V3 版本；
