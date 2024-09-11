@@ -2,6 +2,7 @@
   "name": "hardhat-project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "bignumber.js": "^9.1.2",
     "hardhat": "^2.22.3"
   },
   "dependencies": {

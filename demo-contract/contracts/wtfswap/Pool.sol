@@ -51,6 +51,12 @@ contract Pool is IPool {
     }
 
     function initialize(uint160 sqrtPriceX96_) external override {
+        // 通过价格获取 tick，判断 tick 是否在 tickLower 和 tickUpper 之间
+        tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96_);
+        require(
+            tick >= tickLower && tick < tickUpper,
+            "sqrtPriceX96 should be within the range of [tickLower, tickUpper)"
+        );
         // 初始化 Pool 的 sqrtPriceX96
         sqrtPriceX96 = sqrtPriceX96_;
     }
@@ -118,7 +124,7 @@ contract Pool is IPool {
         (int256 amount0Int, int256 amount1Int) = _modifyPosition(
             ModifyPositionParams({
                 owner: recipient,
-                liquidityDelta: int256(int128(amount)).toInt128()
+                liquidityDelta: int128(amount)
             })
         );
         amount0 = uint256(amount0Int);
@@ -131,7 +137,7 @@ contract Pool is IPool {
         if (amount0 > 0) balance0Before = balance0();
         if (amount1 > 0) balance1Before = balance1();
         // 回调 mintCallback
-        IMintCallback(recipient).mintCallback(amount0, amount1, data);
+        IMintCallback(msg.sender).mintCallback(amount0, amount1, data);
 
         if (amount0 > 0)
             require(balance0Before.add(amount0) <= balance0(), "M0");
@@ -165,11 +171,16 @@ contract Pool is IPool {
     function burn(
         uint128 amount
     ) external override returns (uint256 amount0, uint256 amount1) {
+        require(amount > 0, "Burn amount must be greater than 0");
+        require(
+            amount <= positions[msg.sender].liquidity,
+            "Burn amount exceeds liquidity"
+        );
         // 修改 positions 中的信息
         (int256 amount0Int, int256 amount1Int) = _modifyPosition(
             ModifyPositionParams({
                 owner: msg.sender,
-                liquidityDelta: -int256(int128(amount)).toInt128()
+                liquidityDelta: -int128(amount)
             })
         );
         // 获取燃烧后的 amount0 和 amount1
