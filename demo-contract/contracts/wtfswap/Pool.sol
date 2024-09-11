@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import "./libraries/SafeCast.sol";
 import "./libraries/SqrtPriceMath.sol";
 import "./libraries/TickMath.sol";
 import "./libraries/LiquidityMath.sol";
@@ -14,7 +13,6 @@ import "./interfaces/IPool.sol";
 import "./interfaces/IFactory.sol";
 
 contract Pool is IPool {
-    using SafeCast for int256;
     using LowGasSafeMath for uint256;
 
     /// @inheritdoc IPool

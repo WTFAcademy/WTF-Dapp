@@ -62,11 +62,11 @@
 
 **第 P103 讲：Factory 合约开发**：[教程](./P103_Factory/readme.md) | [代码](./demo-contract/contracts/wtfswap/Factory.sol)
 
-**第 P104 讲：Pool 合约 LP 相关接口开发**
+**第 P104 讲：PoolManager 合约开发**
 
-**第 P105 讲：Pool 合约 swap 接口开发**
+**第 P105 讲：Pool 合约 LP 相关接口开发**：[教程](./P105_PoolLP/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P106 讲：PoolManager 合约开发**
+**第 P106 讲：Pool 合约 swap 接口开发**
 
 **第 P107 讲：PositionManager 合约开发**
 
