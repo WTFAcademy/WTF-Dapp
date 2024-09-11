@@ -259,4 +259,8 @@ function collect(
 }
 ```
 
-在代码中，我们引入了 Uniswap V3 代码中的 `TransferHelper` 库来做转账，将 token 发送给传入的 `recipient` 地址。至此，基础的逻辑就实现完成了。
+在代码中，我们引入了 Uniswap V3 代码中的 [TransferHelper](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/TransferHelper.sol) 库来做转账，将 token 发送给传入的 `recipient` 地址。至此，基础的逻辑就实现完成了。
+
+## 合约测试
+
+TODO
