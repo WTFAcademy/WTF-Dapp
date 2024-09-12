@@ -83,7 +83,7 @@ describe("Pool", function () {
     );
 
     const position = await pool.read.positions([testLP.address]);
-    expect(position).to.deep.equal([20000000n, 0n, 0n]);
+    expect(position).to.deep.equal([20000000n, 0n, 0n, 0n, 0n]);
     expect(await pool.read.liquidity()).to.equal(20000000n);
 
     // 继续 mint 50000
