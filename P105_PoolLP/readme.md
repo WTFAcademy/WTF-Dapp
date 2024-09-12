@@ -415,6 +415,60 @@ it("mint and burn and collect", async function () {
 });
 ```
 
-需要注意的是，因为流动性到代币的计算基于一个相对复杂的公式，中间还涉及到计算时取整的问题。在我们的单测中只是简单的测试了一些基础的逻辑，实际上你需要更多的测试用例来覆盖更多的情况，以及测试具体的数学运算的逻辑是否正确。
+因为 `Pool` 的合约需要通过回调函数来处理代币的转移，所以我们需要新增一个测试 `TestLP` 合约，这个合约需要实现 `IMintCallback` 接口，具体代码如下：
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+import "../interfaces/IPool.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+contract TestLP is IMintCallback {
+    function mint(
+        address recipient,
+        uint128 amount,
+        address pool,
+        address token0,
+        address token1
+    ) external returns (uint256 amount0, uint256 amount1) {
+        (amount0, amount1) = IPool(pool).mint(
+            recipient,
+            amount,
+            abi.encode(token0, token1)
+        );
+    }
+
+    function burn(
+        uint128 amount,
+        address pool
+    ) external returns (uint256 amount0, uint256 amount1) {
+        (amount0, amount1) = IPool(pool).burn(amount);
+    }
+
+    function collect(
+        address recipient,
+        address pool
+    ) external returns (uint256 amount0, uint256 amount1) {
+        (amount0, amount1) = IPool(pool).collect(recipient);
+    }
+
+    function mintCallback(
+        uint256 amount0Owed,
+        uint256 amount1Owed,
+        bytes calldata data
+    ) external override {
+        // transfer token
+        (address token0, address token1) = abi.decode(data, (address, address));
+        if (amount0Owed > 0) {
+            IERC20(token0).transfer(msg.sender, amount0Owed);
+        }
+        if (amount1Owed > 0) {
+            IERC20(token1).transfer(msg.sender, amount1Owed);
+        }
+    }
+}
+```
+
+你还需要注意的是，因为流动性到代币的计算基于一个相对复杂的公式，中间还涉及到计算时取整的问题。在我们的单测中只是简单的测试了一些基础的逻辑，实际上你需要更多的测试用例来覆盖更多的情况，以及测试具体的数学运算的逻辑是否正确。
 
 更多的测试代码你可以在 [demo-contract/test/wtfswap/Pool.ts](../demo-contract/test/wtfswap/Pool.ts) 找到。至此，我们就完成了 `Pool` 合约中的 `LP` 相关接口开发，在下一讲中我们将会补充 `swap` 接口，并添加手续费相关逻辑，完成整个 `Pool` 合约的开发。
