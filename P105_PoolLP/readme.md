@@ -32,7 +32,7 @@ function mint(
 
 我们传入要添加流动性 `amount`，以及 `data`，这个 `data` 是用来在回调函数中传递参数的，后面会再讲。`recipient` 可以指定讲流动性的权益赋予谁。这里需要注意的是 `amount` 是流动性，而不是要 mint 的代币，至于流动性如何计算，我们在 `PositionManager` 的章节中讲解，这一讲中先不具体展开。但是在我们这一讲的实现中，我们需要基于传入的 `amount` 计算出 `amount0` 和 `amount1`，并返回这两个值。`amount0` 和 `amount1` 分别是两个代币的数量，另外还需要在 `mint` 方法中调用我们定义的回调函数 `mintCallback`，以及修改 `Pool` 合约中的一些状态。
 
-首先，我们参考 [Uniswap V3 的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L466)来写一个 `_modifyPosition` 的方法，在该方法中修改交易池整体的流动性 `liquidity` 并计算返回 `amount0` 和 `amount1`。
+首先，我们参考 [Uniswap V3 的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L466)来写一个 `_modifyPosition` 的方法，这是一个 `priviate` 的函数，只有合约内部可以调用，在该方法中修改交易池整体的流动性 `liquidity` 并计算返回 `amount0` 和 `amount1`。
 
 ```solidity
 function _modifyPosition(
@@ -263,4 +263,158 @@ function collect(
 
 ## 合约测试
 
-TODO
+接下来，我们补充一些单元测试。因为创建 `Pool` 需要对应一个交易对，所以我们先创建一个满足 `ERC20` 规范的代币合约。关于 `ERC20` 规范，你可以参考[这篇文章](https://github.com/AmazingAng/WTF-Solidity/blob/main/31_ERC20/readme.md)。
+
+我们在 `demo-contract/contracts/wtfswap` 中新建一个 `test-contracts/TestToken.sol` 的文件，内容如下：
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract TestToken is ERC20 {
+    uint256 private _nextTokenId = 0;
+
+    constructor() ERC20("TestToken", "TK") {}
+
+    function mint(address recipient, uint256 quantity) public payable {
+        _mint(recipient, quantity);
+    }
+}
+```
+
+具体的合约代码你可以参考[这里](../demo-contract/contracts/wtfswap/test-contracts/TestToken.sol)，这个合约我们实现了一个可以随意 mint 的代币合约，用于测试。
+
+接着，我们新建 `demo-contract/test/wtfswap/Pool.test.js` 文件，编写测试代码：
+
+```ts
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import { expect } from "chai";
+import hre from "hardhat";
+import { getSqrtPriceX96 } from "./utils";
+
+describe("Pool", function () {
+  async function deployFixture() {
+    const factory = await hre.viem.deployContract("Factory");
+    const token0 = await hre.viem.deployContract("TestToken");
+    const token1 = await hre.viem.deployContract("TestToken");
+    const tickLower = -100000;
+    const tickUpper = 100000;
+    const fee = 3000;
+    const publicClient = await hre.viem.getPublicClient();
+    await factory.write.createPool([
+      token0.address,
+      token1.address,
+      tickLower,
+      tickUpper,
+      fee,
+    ]);
+    const createEvents = await factory.getEvents.PoolCreated();
+    const poolAddress: `0x${string}` = createEvents[0].args.pool || "0x";
+    const pool = await hre.viem.getContractAt("Pool" as string, poolAddress);
+
+    const price = 2000;
+    const sqrtPriceX96: bigint = getSqrtPriceX96(price); // => 3961408125713216879677197516800n
+
+    await pool.write.initialize([sqrtPriceX96]);
+
+    return {
+      token0,
+      token1,
+      factory,
+      pool,
+      publicClient,
+      tickLower,
+      tickUpper,
+      fee,
+      sqrtPriceX96,
+      price,
+    };
+  }
+
+  it("pool info", async function () {
+    const { pool, token0, token1, tickLower, tickUpper, fee, sqrtPriceX96 } =
+      await loadFixture(deployFixture);
+
+    expect(((await pool.read.token0()) as string).toLocaleLowerCase()).to.equal(
+      token0.address
+    );
+    expect(((await pool.read.token1()) as string).toLocaleLowerCase()).to.equal(
+      token1.address
+    );
+    expect(await pool.read.tickLower()).to.equal(tickLower);
+    expect(await pool.read.tickUpper()).to.equal(tickUpper);
+    expect(await pool.read.fee()).to.equal(fee);
+    expect(await pool.read.sqrtPriceX96()).to.equal(sqrtPriceX96);
+  });
+});
+```
+
+我们部署了一个 `Factory` 和两个 `TestToken` 代币合约，然后创建了一个 `Pool` 合约，初始化了价格，然后测试了一下 `Pool` 合约的基本信息。另外我们新建了一个 `utils.ts` 文件，用来计算 `sqrtPriceX96`，代码如下：
+
+```ts
+import BigNumber from "bignumber.js";
+
+// Uniswap V3 引入了一种新的价格表示方法，即 sqrtPriceX96。它表示的实际上是价格的平方根乘以一个大的常数（即2的96次方），而不是价格本身。这种表示方法带来了几个方便的优点。
+// 先让我们理解一下这个概念。sqrtPriceX96 的 "sqrt" 是指 "square root"，也就是平方根；"X96" 是指结果被左移（或乘）了 96 位。因此，如果你有一个价格（即 token0 价格对 token1），你可以通过取其平方根，然后把结果左移 96 位来得到 sqrtPriceX96。
+// 这样做的目的主要是为了方便在 solidity 合约中的计算，特别是在处理价格变动时。由于 solidity 不支持浮点数操作，因此开发者需要采取一些策略来模拟浮点数运算，其中一个常见的策略就是使用固定点数。这里，开发者选择把价格的平方根乘以 2 的 96 次方，这就意味着价格的平方根被表示成了一个非常大的整数。
+export const getSqrtPriceX96 = (price: number): bigint => {
+  // Uniswap uses a price calculation with 2^96 precision
+  const SCALAR = new BigNumber(2).exponentiatedBy(96);
+
+  // Set the decimal precision to a large number to handle the large numbers involved
+  BigNumber.config({ DECIMAL_PLACES: 100 });
+
+  // Define the price
+  const PRICE = new BigNumber(price);
+
+  // Calculate the square root
+  const SQRT_PRICE = PRICE.sqrt();
+
+  // Multiply by the scalar and round down to get an integer result
+  const SQRT_PRICE_X96 = SQRT_PRICE.multipliedBy(SCALAR).integerValue(
+    BigNumber.ROUND_DOWN
+  );
+
+  return BigInt(SQRT_PRICE_X96.toFixed());
+};
+```
+
+你还需要在项目中使用 `npm install bignumber.js` 安装需要的 `bignumber.js` 依赖。
+
+接下来我们可以继续编写更多的测试样例，比如我们添加下面的样例测试 mint 流动性，然后检查代币的转移是否正确。
+
+```ts
+it("mint and burn and collect", async function () {
+  const { pool, token0, token1, price } = await loadFixture(deployFixture);
+  const testLP = await hre.viem.deployContract("TestLP");
+
+  const initBalanceValue = 1000n * 10n ** 18n;
+  await token0.write.mint([testLP.address, initBalanceValue]);
+  await token1.write.mint([testLP.address, initBalanceValue]);
+
+  await testLP.write.mint([
+    testLP.address,
+    20000000n,
+    pool.address,
+    token0.address,
+    token1.address,
+  ]);
+
+  expect(await token0.read.balanceOf([pool.address])).to.equal(
+    initBalanceValue - (await token0.read.balanceOf([testLP.address]))
+  );
+  expect(await token1.read.balanceOf([pool.address])).to.equal(
+    initBalanceValue - (await token1.read.balanceOf([testLP.address]))
+  );
+
+  const position = await pool.read.positions([testLP.address]);
+  expect(position).to.deep.equal([20000000n, 0n, 0n]);
+  expect(await pool.read.liquidity()).to.equal(20000000n);
+});
+```
+
+需要注意的是，因为流动性到代币的计算基于一个相对复杂的公式，中间还涉及到计算时取整的问题。在我们的单测中只是简单的测试了一些基础的逻辑，实际上你需要更多的测试用例来覆盖更多的情况，以及测试具体的数学运算的逻辑是否正确。
+
+更多的测试代码你可以在 [demo-contract/test/wtfswap/Pool.ts](../demo-contract/test/wtfswap/Pool.ts) 找到。至此，我们就完成了 `Pool` 合约中的 `LP` 相关接口开发，在下一讲中我们将会补充 `swap` 接口，并添加手续费相关逻辑，完成整个 `Pool` 合约的开发。
