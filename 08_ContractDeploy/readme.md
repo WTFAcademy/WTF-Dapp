@@ -38,7 +38,7 @@
 
 点击 `Deploy&Run` 可以将将交易发送到当前的 `ENVIRONMENT` 中。
 
-接下来我们尝试通过 MetaMask 部署合约到测试网 Goerli 中，请先将你的 MetaMask 切换到测试网 Goerli（当然你也可以切换到其它你习惯使用的测试网）。
+接下来我们尝试通过 MetaMask 部署合约到测试网 Sepolia 中，请先将你的 MetaMask 切换到测试网 Sepolia（当然你也可以切换到其它你习惯使用的测试网）。
 
 点击 `ENVIRONMENT` 的下拉选择框，可以看到有许多的选项可供选择，我们选择 `Injected Provider - MetaMask`。
 
@@ -82,11 +82,11 @@
 ```diff
 import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
 - import { mainnet } from "wagmi/chains";
-+ import { mainnet, goerli } from "wagmi/chains";
++ import { mainnet, sepolia } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
-+  Goerli,
++  Sepolia,
 } from "@ant-design/web3-wagmi";
 import {
   Address,
@@ -101,10 +101,10 @@ import { parseEther } from "viem";
 
 const config = createConfig({
 -  chains: [mainnet],
-+  chains: [mainnet, goerli],
++  chains: [mainnet, sepolia],
   transports: {
      [mainnet.id]: http(),
-+    [goerli.id]: http(),
++    [sepolia.id]: http(),
   },
   connectors: [
     injected({
@@ -181,7 +181,7 @@ export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider
       config={config}
-+      chains={[Goerli]}
++      chains={[Sepolia]}
       wallets={[MetaMask()]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
@@ -199,7 +199,7 @@ export default function Web3() {
 
 ```
 
-然后在 DApp 页面中切换到 Goerli 测试网，点击 `mint` 按钮后如果顺利会触发 MetaMask 的交易确认弹窗：
+然后在 DApp 页面中切换到 Sepolia 测试网，点击 `mint` 按钮后如果顺利会触发 MetaMask 的交易确认弹窗：
 
 ![](./img/mint-test-net.png)
 
