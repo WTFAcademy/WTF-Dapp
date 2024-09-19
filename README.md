@@ -18,7 +18,7 @@
 
 **第 1 讲：快速开始（三分钟展示 NFT）**：[教程](./01_QuickStart/readme.md) | [代码](./01_QuickStart/web3.tsx)
 
-**第 2 讲：节点服务**：[教程](./02_NodeService/readme.md) | [代码](./02_NodeService/web3.tsx)
+**第 2 讲：节点服务和水龙头**：[教程](./02_NodeService/readme.md) | [代码](./02_NodeService/web3.tsx)
 
 **第 3 讲：连接钱包**：[教程](./03_ConnectWallet/readme.md) | [代码](./03_ConnectWallet/web3.tsx)
 

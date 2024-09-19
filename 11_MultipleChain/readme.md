@@ -26,12 +26,12 @@ DApp 支持多链是指能够在多个区块链平台上运行或与之交互。
 
 ```diff
 import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
-- import { mainnet, goerli } from "wagmi/chains";
-+ import { mainnet, goerli, polygon } from "wagmi/chains";
+- import { mainnet, sepolia } from "wagmi/chains";
++ import { mainnet, sepolia, polygon } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
-  Goerli,
+  Sepolia,
 + Polygon
 } from "@ant-design/web3-wagmi";
 import {
@@ -47,11 +47,11 @@ import { Button, message } from "antd";
 import { parseEther } from "viem";
 
 const config = createConfig({
-- chains: [mainnet, goerli],
-+ chains: [mainnet, goerli, polygon],
+- chains: [mainnet, sepolia],
++ chains: [mainnet, sepolia, polygon],
   transports: {
     [mainnet.id]: http(),
-    [goerli.id]: http(),
+    [sepolia.id]: http(),
 +   [polygon.id]: http(),
   },
   connectors: [
@@ -68,7 +68,7 @@ const config = createConfig({
 +    contractAddress: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
 +  }, {
 +    id:5,
-+    name: "Goerli",
++    name: "Sepolia",
 +    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c"
 +  }, {
 +    id:137,
@@ -90,7 +90,7 @@ const CallTest = () => {
         outputs: [{ type: "uint256" }],
       },
     ],
--   // Goerli test contract 0x418325c3979b7f8a17678ec2463a74355bdbe72c
+-   // Sepolia test contract 0x418325c3979b7f8a17678ec2463a74355bdbe72c
 -   address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
 +   address: contractInfo.find((item) => item.id === chain?.id)?.contractAddress as `0x${string}`,
     functionName: "balanceOf",
@@ -147,8 +147,8 @@ export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider
       config={config}
--     chains={[Goerli]}
-+     chains={[Goerli, Polygon]}
+-     chains={[Sepolia]}
++     chains={[Sepolia, Polygon]}
       wallets={[MetaMask()]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
