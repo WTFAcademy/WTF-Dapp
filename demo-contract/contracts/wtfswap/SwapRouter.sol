@@ -14,10 +14,21 @@ contract SwapRouter is ISwapRouter {
     }
 
     // 确定输入的 token 交易
-    function exactInput(
-        ExactInputParams calldata params
-    ) external payable override returns (uint256 amountOut) {
+    function exactInput(ExactInputParams calldata params)
+        external
+        payable
+        override
+        returns (uint256 amountOut)
+    {
         uint256 amountIn = params.amountIn;
+        uint256 amountOut;
+
+        /**
+         * 在创建池子时为了避免 token 顺序导致的重复问题
+         * 我们将 token 按照从小到大的顺序确定为池子中的 token0 和 token1
+         * 此处需要根据 tokenIn 和 tokenOut 的大小关系来确定输入和输出的 token
+         */
+        bool zeroForOne = params.tokenIn < params.tokenOut;
 
         for (uint256 i = 0; i < params.indexPath.length; i++) {
             address _pool = poolManager.getPool(
@@ -25,73 +36,61 @@ contract SwapRouter is ISwapRouter {
                 params.tokenOut,
                 params.indexPath[i]
             );
-            IPool pool = IPool(_pool);
 
-            (uint256 amount0Out, uint256 amount1Out) = pool.getAmountsOut(
-                amountIn
-            );
-            amountOut = params.tokenIn < params.tokenOut
-                ? amount1Out
-                : amount0Out;
+            require(_pool != address(0), "Pool not found");
+
+            IPool pool = IPool(_pool);
 
             bytes memory data = abi.encode(
                 msg.sender,
                 params.tokenIn,
                 params.tokenOut
             );
-            pool.swap(
+
+            // 执行交易
+            (int256 amount0, int256 amount1) = pool.swap(
                 msg.sender,
-                params.tokenIn < params.tokenOut,
+                zeroForOne,
                 amountIn,
-                amountOut,
+                params.sqrtPriceLimitX96,
                 data
             );
 
-            amountIn = amountOut; // 为下一次循环准备
+            // 将输入的 token 数量减去交易用掉的 token 数量
+            amountIn -= zeroForOne ? amount0 : amount1;
+
+            // 将输出的 token 数量加上交易得到的 token 数量
+            amountOut += zeroForOne ? amount1 : amount0;
+
+            // 如果输入的 token 数量为 0，则退出循环
+            if (amountIn == 0) {
+                break;
+            }
         }
+
+        require(amountOut >= params.amountOutMinimum, "Slippage exceeded");
+
+        emit Swap(msg.sender, zeroForOne, params.amountIn, amountIn, amountOut);
+
+        return amountOut;
     }
 
     // 确定输出的 token 交易
-    function exactOutput(
-        ExactOutputParams calldata params
-    ) external payable override returns (uint256 amountIn) {
-        uint256 amountOut = params.amountOut;
-
-        for (uint256 i = params.indexPath.length; i > 0; i--) {
-            address _pool = poolManager.getPool(
-                params.tokenIn,
-                params.tokenOut,
-                params.indexPath[i - 1]
-            );
-            IPool pool = IPool(_pool);
-
-            (uint256 amount0In, uint256 amount1In) = pool.getAmountsIn(
-                amountOut
-            );
-            amountIn = params.tokenIn < params.tokenOut ? amount0In : amount1In;
-
-            bytes memory data = abi.encode(
-                msg.sender,
-                params.tokenIn,
-                params.tokenOut
-            );
-            pool.swap(
-                msg.sender,
-                params.tokenIn > params.tokenOut,
-                amountIn,
-                amountOut,
-                data
-            );
-
-            amountOut = amountIn; // 为下一次循环准备
-        }
-    }
-
-    // 确认输入的 token，估算可以获得多少输出的 token
-    function quoteExactInput(
-        QuoteExactInputParams memory params
-    ) external view override returns (uint256 amountOut) {
+    function exactOutput(ExactOutputParams calldata params)
+        external
+        payable
+        override
+        returns (uint256 amountIn)
+    {
         uint256 amountIn = params.amountIn;
+        uint256 amountOut;
+
+        /**
+         * 在创建池子时为了避免 token 顺序导致的重复问题
+         * 我们将 token 按照从小到大的顺序确定为池子中的 token0 和 token1
+         * 此处需要根据 tokenIn 和 tokenOut 的大小关系来确定输入和输出的 token
+         */
+        bool zeroForOne = params.tokenIn < params.tokenOut;
 
         for (uint256 i = 0; i < params.indexPath.length; i++) {
             address _pool = poolManager.getPool(
@@ -99,55 +98,58 @@ contract SwapRouter is ISwapRouter {
                 params.tokenOut,
                 params.indexPath[i]
             );
+
+            require(_pool != address(0), "Pool not found");
+
             IPool pool = IPool(_pool);
 
-            (uint256 amount0Out, uint256 amount1Out) = pool.getAmountsOut(
-                amountIn
+            bytes memory data = abi.encode(
+                msg.sender,
+                params.tokenIn,
+                params.tokenOut
             );
-            amountOut = params.tokenIn < params.tokenOut
-                ? amount1Out
-                : amount0Out;
 
-            amountIn = amountOut; // 为下一次循环准备
+            // 执行交易
+            (int256 amount0, int256 amount1) = pool.swap(
+                msg.sender,
+                zeroForOne,
+                amountIn,
+                params.sqrtPriceLimitX96,
+                data
+            );
+
+            // 将输入的 token 数量减去交易用掉的 token 数量
+            amountIn -= zeroForOne ? amount0 : amount1;
+
+            // 将输出的 token 数量加上交易得到的 token 数量
+            amountOut += zeroForOne ? amount1 : amount0;
+
+            // 如果输入的 token 数量为 0，则退出循环
+            if (amountIn == 0) {
+                break;
+            }
         }
+
+        require(amountOut >= params.amountOutMinimum, "Slippage exceeded");
+
+        emit Swap(msg.sender, zeroForOne, params.amountIn, amountIn, amountOut);
+
+        return amountOut;
     }
+
+    // 确认输入的 token，估算可以获得多少输出的 token
+    function quoteExactInput(QuoteExactInputParams memory params)
+        external
+        view
+        override
+        returns (uint256 amountOut)
+    {}
 
     // 确认输出的 token，估算需要多少输入的 token
-    function quoteExactOutput(
-        QuoteExactOutputParams memory params
-    ) external view override returns (uint256 amountIn) {
-        uint256 amountOut = params.amountOut;
-
-        for (uint256 i = params.indexPath.length; i > 0; i--) {
-            address _pool = poolManager.getPool(
-                params.tokenIn,
-                params.tokenOut,
-                params.indexPath[i - 1]
-            );
-            IPool pool = IPool(_pool);
-
-            (uint256 amount0In, uint256 amount1In) = pool.getAmountsIn(
-                amountOut
-            );
-            amountIn = params.tokenIn < params.tokenOut ? amount0In : amount1In;
-
-            amountOut = amountIn; // 为下一次循环准备
-        }
-    }
-
-    function swapCallback(
-        uint256 amount0In,
-        uint256 amount1In,
-        bytes calldata data
-    ) external override {
-        (address sender, address tokenIn, address tokenOut) = abi.decode(
-            data,
-            (address, address, address)
-        );
-        uint256 amountIn = tokenIn < tokenOut ? amount0In : amount1In;
-        require(
-            IERC20(tokenIn).transferFrom(sender, msg.sender, amountIn),
-            "Transfer failed"
-        );
-    }
+    function quoteExactOutput(QuoteExactOutputParams memory params)
+        external
+        view
+        override
+        returns (uint256 amountIn)
+    {}
 }
