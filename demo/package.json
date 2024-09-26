@@ -13,7 +13,7 @@
     "@ant-design/web3-wagmi": "^2.9.1",
     "@tanstack/react-query": "^5.28.4",
     "antd": "^5.21.1",
-    "next": "14.0.4",
+    "next": "^14.0.4",
     "react": "^18",
     "react-dom": "^18",
     "viem": "^2.21.15",
@@ -25,7 +25,7 @@
     "@types/react-dom": "^18",
     "@wagmi/cli": "^2.1.15",
     "eslint": "^8",
-    "eslint-config-next": "14.0.4",
+    "eslint-config-next": "^14.0.4",
     "typescript": "^5"
   },
   "repository": "git@github.com:WTFAcademy/WTF-Dapp.git"
