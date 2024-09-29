@@ -18,8 +18,7 @@ contract PoolManager is Factory, IPoolManager {
         uint32 length = 0;
         // 先算一下大小
         for (uint32 i = 0; i < pairs.length; i++) {
-            address[] memory addresses = pools[pairs[i].token0][pairs[i].token1];
-            length += uint32(addresses.length);
+            length += uint32(pools[pairs[i].token0][pairs[i].token1].length);
         }
 
         // 再填充数据
