@@ -42,11 +42,11 @@ function _modifyPosition(
     // 参考 UniswapV3 的代码
     amount0 = SqrtPriceMath.getAmount0Delta(
         sqrtPriceX96,
-        TickMath.getSqrtRatioAtTick(tickUpper),
+        TickMath.getSqrtPriceAtTick(tickUpper),
         params.liquidityDelta
     );
     amount1 = SqrtPriceMath.getAmount1Delta(
-        TickMath.getSqrtRatioAtTick(tickLower),
+        TickMath.getSqrtPriceAtTick(tickLower),
         sqrtPriceX96,
         params.liquidityDelta
     );
@@ -78,11 +78,7 @@ function mint(
 
 相比 Uniswap V3 的 [\_modifyPosition](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L306)，我们的代码要简单许多。整个交易池都固定在一个价格区间内，mint 也只能在这个价格区间内 mint。所以我们只需要取 Uniswap V3 中的部分代码即可，在 Uniswap V3 中，计算流动性时的上下限是参数动态传入的 `params.tickLower` 和 `params.tickUpper`，而我们的代码中是固定的 `tickLower` 和 `tickUpper`。
 
-另外计算过程中会用到 [SqrtPriceMath](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/SqrtPriceMath.sol) 库，这个库是 Uniswap V3 中的一个工具库，也需要你在我们的合约代码中引入，改库还依赖了其它几个库，也需要一并引入，有部分库因为依赖于 solidity `<0.8.0;` 版本，但是我们课程用的是 `0.8.0+`，所以有几个点需要你修改，不然编译会报错：
-
-- `FullMath.sol` 的 `uint256 twos = -denominator & denominator;` 修改为 `uint256 twos = denominator ^ (denominator - 1);`
-- `TickMath.sol` 的 `require(absTick <= uint256(MAX_TICK), 'T');` 修改为 `require(absTick <= uint256(int256(MAX_TICK)), "T");`
-- 上面两个文件的 `solidity <0.8.0` 的限制去掉了（也是导致上面两个地方报错需要修改的原因）。0.8 版本的 solidity 在一些运算上和 0.7 有一些差异。
+另外计算过程中会用到 [SqrtPriceMath](https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/SqrtPriceMath.sol) 库，这个库是 Uniswap V3 中的一个工具库，也需要你在我们的合约代码中引入，改库还依赖了其它几个库，也需要一并引入，其中 `FullMath.sol` 和 `TickMath.sol` 因为依赖于 solidity `<0.8.0;` 版本，但是我们课程用的是 `0.8.0+`，所以我们使用 [Uniswap V4 的代码](https://github.com/Uniswap/v4-core/tree/main/src/libraries)，Uniswap V4 还没有正式发布，但是它的一些基础库已经给予 solidity 0.8 版本的支持，所以我们可以直接使用。0.8 版本的 solidity 在一些数学运算上和 0.7 有一些差异，尤其是对溢出的处理上，这里先不展开了。
 
 当然你也可以直接复制课程提供的[代码](../demo-contract/contracts/wtfswap/libraries/)，不用自己去修改，我们的代码中已经做了这些修改。你可以直接引入下面代码：
 
@@ -292,15 +288,17 @@ contract TestToken is ERC20 {
 import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
 import { expect } from "chai";
 import hre from "hardhat";
-import { getSqrtPriceX96 } from "./utils";
+import { TickMath, encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
 
 describe("Pool", function () {
   async function deployFixture() {
+    // 初始化一个池子，价格上限是 40000，下限是 1，初始化价格是 10000，费率是 0.3%
     const factory = await hre.viem.deployContract("Factory");
     const token0 = await hre.viem.deployContract("TestToken");
     const token1 = await hre.viem.deployContract("TestToken");
-    const tickLower = -100000;
-    const tickUpper = 100000;
+    const tickLower = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1));
+    const tickUpper = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(40000, 1));
+    // 以 1,000,000 为基底的手续费费率，Uniswap v3 前端界面支持四种手续费费率（0.01%，0.05%、0.30%、1.00%），对于一般的交易对推荐 0.30%，fee 取值即 3000；
     const fee = 3000;
     const publicClient = await hre.viem.getPublicClient();
     await factory.write.createPool([
@@ -314,9 +312,8 @@ describe("Pool", function () {
     const poolAddress: `0x${string}` = createEvents[0].args.pool || "0x";
     const pool = await hre.viem.getContractAt("Pool" as string, poolAddress);
 
-    const price = 2000;
-    const sqrtPriceX96: bigint = getSqrtPriceX96(price); // => 3961408125713216879677197516800n
-
+    // 计算一个初始化的价格，按照 1 个 token0 换 10000 个 token1 来算，其实就是 10000
+    const sqrtPriceX96 = encodeSqrtRatioX96(10000, 1);
     await pool.write.initialize([sqrtPriceX96]);
 
     return {
@@ -328,8 +325,7 @@ describe("Pool", function () {
       tickLower,
       tickUpper,
       fee,
-      sqrtPriceX96,
-      price,
+      sqrtPriceX96: BigInt(sqrtPriceX96.toString()),
     };
   }
 
@@ -351,37 +347,9 @@ describe("Pool", function () {
 });
 ```
 
-我们部署了一个 `Factory` 和两个 `TestToken` 代币合约，然后创建了一个 `Pool` 合约，初始化了价格，然后测试了一下 `Pool` 合约的基本信息。另外我们新建了一个 `utils.ts` 文件，用来计算 `sqrtPriceX96`，代码如下：
+我们部署了一个 `Factory` 和两个 `TestToken` 代币合约，然后创建了一个 `Pool` 合约，初始化了价格，然后测试了一下 `Pool` 合约的基本信息。另外我们需要引入 `@uniswap/v3-sdk` 用于 `sqrtPriceX96` 的计算，代码如下：
 
-```ts
-import BigNumber from "bignumber.js";
-
-// Uniswap V3 引入了一种新的价格表示方法，即 sqrtPriceX96。它表示的实际上是价格的平方根乘以一个大的常数（即2的96次方），而不是价格本身。这种表示方法带来了几个方便的优点。
-// 先让我们理解一下这个概念。sqrtPriceX96 的 "sqrt" 是指 "square root"，也就是平方根；"X96" 是指结果被左移（或乘）了 96 位。因此，如果你有一个价格（即 token0 价格对 token1），你可以通过取其平方根，然后把结果左移 96 位来得到 sqrtPriceX96。
-// 这样做的目的主要是为了方便在 solidity 合约中的计算，特别是在处理价格变动时。由于 solidity 不支持浮点数操作，因此开发者需要采取一些策略来模拟浮点数运算，其中一个常见的策略就是使用固定点数。这里，开发者选择把价格的平方根乘以 2 的 96 次方，这就意味着价格的平方根被表示成了一个非常大的整数。
-export const getSqrtPriceX96 = (price: number): bigint => {
-  // Uniswap uses a price calculation with 2^96 precision
-  const SCALAR = new BigNumber(2).exponentiatedBy(96);
-
-  // Set the decimal precision to a large number to handle the large numbers involved
-  BigNumber.config({ DECIMAL_PLACES: 100 });
-
-  // Define the price
-  const PRICE = new BigNumber(price);
-
-  // Calculate the square root
-  const SQRT_PRICE = PRICE.sqrt();
-
-  // Multiply by the scalar and round down to get an integer result
-  const SQRT_PRICE_X96 = SQRT_PRICE.multipliedBy(SCALAR).integerValue(
-    BigNumber.ROUND_DOWN
-  );
-
-  return BigInt(SQRT_PRICE_X96.toFixed());
-};
-```
-
-你还需要在项目中使用 `npm install bignumber.js` 安装需要的 `bignumber.js` 依赖。
+你还需要在项目中使用 `npm install @uniswap/v3-sdk` 安装需要的 `@uniswap/v3-sdk` 依赖。`@uniswap/v3-sdk` 是 Uniswap 的一个 Typescript 的 SDK，包含一些基础的计算逻辑，除了在单测中使用外，后续我们的 DApp 前端开发中也会用到。
 
 接下来我们可以继续编写更多的测试样例，比如我们添加下面的样例测试 mint 流动性，然后检查代币的转移是否正确。
 
