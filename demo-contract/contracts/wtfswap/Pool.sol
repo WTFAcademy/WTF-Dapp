@@ -290,8 +290,7 @@ contract Pool is IPool {
         });
 
         // 计算交易的上下限，基于 tick 计算价格
-        uint160 sqrtPriceX96Lower = TickMath.getSqrtPriceAtTick(tick);
-        (tickLower);
+        uint160 sqrtPriceX96Lower = TickMath.getSqrtPriceAtTick(tickLower);
         uint160 sqrtPriceX96Upper = TickMath.getSqrtPriceAtTick(tickUpper);
         // 计算用户交易价格的限制，如果是 zeroForOne 是 true，说明用户会换入 token0，会压低 token0 的价格（也就是池子的价格），所以要限制最低价格不能超过 sqrtPriceX96Lower
         uint160 sqrtPriceX96PoolLimit = zeroForOne
