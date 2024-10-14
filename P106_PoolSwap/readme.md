@@ -6,9 +6,9 @@
 
 ## 合约简介
 
-在上一讲中，我们实现了 `Pool` 合约的流动性添加和管理的相关方法，流动性添加本质上就是 LP 将代币注入到 `Pool` 合约中，这样用户就可以利用 LP 注入的代币来进行交易了。比如我们设置了初始化的价格为 10000，LP 往池子里面注入 100 个 Token0，以及 1000000 个 Token1，用户可以通过 `swap` 方法来交换 Token0 和 Token1。如果用户通过 10 个 token0 按照价格 10000 换走 100000 个 token1，那么池子里将会剩余 110 个 token0 和 990000 个 token1。对应的就体现为 token1 的价格也上涨了，这样我们就实现了去中心化的交易。
+在上一讲中，我们实现了 `Pool` 合约的流动性添加和管理的相关方法，流动性添加本质上就是 LP 将代币注入到 `Pool` 合约中，这样用户就可以利用 LP 注入的代币来进行交易了。比如我们设置了初始化的价格为 10000，LP 往池子里面注入 100 个 Token0，以及 1000000 个 Token1，用户可以通过 `swap` 方法来交换 Token0 和 Token1。如果用户通过 10 个 token0 按照价格 10000 换走 100000 个 token1，那么池子里将会剩余 110 个 token0 和 990000 个 token1。对应的就体现为 token1 的价格上涨了，这样我们就实现了去中心化交易所的 AMM（自动化做市商）。
 
-当然，实际的交易中上面的例子中价格并不是以 10000 成交的，在 Uniswap 中，价格是根据池子中代币数量来计算的，价格是动态变化的，当用户交易的时候，价格会随着交易的发生而变化。在这一讲的实现中我们就会参考 Uniswap V3 的代码来实现这一逻辑。`swap` 方法接收的参数并不是一个指定的价格，而是指定了价格的上限或者下限以及要获得或者要支付的代币数量。
+当然，实际的交易中上面的例子中价格并不是以 10000 成交的，在 Uniswap 中，价格是根据池子中代币数量来计算的，价格是动态变化的，当用户交易的时候，价格会随着交易的发生而变化。在这一讲的实现中我们就会参考 [Uniswap V3 的代码](https://github.com/Uniswap/v3-core)来实现这一逻辑。`swap` 方法接收的参数并不是一个指定的价格，而是指定了价格的上限或者下限以及要获得或者要支付的代币数量。
 
 好的，那接下来就让我们来实现 `swap` 方法吧。
 
@@ -17,33 +17,33 @@
 首先我们在 `Pool.sol` 中对入参做一下简单的验证：
 
 ```solidity
-    function swap(
-        address recipient,
-        bool zeroForOne,
-        int256 amountSpecified,
-        uint160 sqrtPriceLimitX96,
-        bytes calldata data
-    ) external override returns (int256 amount0, int256 amount1) {
-        require(amountSpecified != 0, "AS");
+function swap(
+    address recipient,
+    bool zeroForOne,
+    int256 amountSpecified,
+    uint160 sqrtPriceLimitX96,
+    bytes calldata data
+) external override returns (int256 amount0, int256 amount1) {
+    require(amountSpecified != 0, "AS");
 
-        // zeroForOne: 如果从 token0 交换 token1 则为 true，从 token1 交换 token0 则为 false
-        // 判断当前价格是否满足交易的条件
-        require(
-            zeroForOne
-                ? sqrtPriceLimitX96 < sqrtPriceX96 &&
-                    sqrtPriceLimitX96 > TickMath.MIN_SQRT_PRICE
-                : sqrtPriceLimitX96 > sqrtPriceX96 &&
-                    sqrtPriceLimitX96 < TickMath.MAX_SQRT_PRICE,
-            "SPL"
-        );
-    }
+    // zeroForOne: 如果从 token0 交换 token1 则为 true，从 token1 交换 token0 则为 false
+    // 判断当前价格是否满足交易的条件
+    require(
+        zeroForOne
+            ? sqrtPriceLimitX96 < sqrtPriceX96 &&
+                sqrtPriceLimitX96 > TickMath.MIN_SQRT_PRICE
+            : sqrtPriceLimitX96 > sqrtPriceX96 &&
+                sqrtPriceLimitX96 < TickMath.MAX_SQRT_PRICE,
+        "SPL"
+    );
+}
 ```
 
 在上面的代码中，我们首先验证 `amountSpecified` 必须不为 0，`amountSpecified` 大于 0 代表我们指定了要支付的 token0 的数量，`amountSpecified` 小于 0 则代表我们指定了要获取的 token1 的数量。`zeroForOne` 为 `true` 代表了是 token0 换 token1，反之则相反。如果是 token0 换 token1，那么交易会导致池子的 token0 变多，价格下跌，我们需要验证 `sqrtPriceLimitX96` 必须小于当前的价格，也就是指 `sqrtPriceLimitX96` 是交易的一个价格下限。另外价格也需要大于可用的最小价格和小于可用的最大价格。
 
 这里的实现也基本是参考了 [Uniswap V3 中的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L608)。
 
-然后我们需要计算在用户指定的价格和数量情况下该池子可以提供交易的 token0 和 token1 的数量，在这里我们直接调用了 `SwapMath.computeSwapStep` 方法，该方法是直接复制的 [Uniswap V4 的代码](https://github.com/Uniswap/v4-core/blob/main/src/libraries/SwapMath.sol#L51)。为什么不用 V3 的代码？之前我们提到过，因为课程使用的是 solidity 0.8.0+，而 Uniswap V3 的代码是使用 0.7.6 的，所以不兼容 0.8.0 的库我们需要使用 Uniswap V4 的代码，不过代码逻辑上来说它和 Uniswap V3 基本一致。
+然后我们需要计算在用户指定的价格和数量情况下该池子可以提供交易的 token0 和 token1 的数量，在这里我们直接调用了 `SwapMath.computeSwapStep` 方法，该方法是直接复制的 [Uniswap V4 的代码](https://github.com/Uniswap/v4-core/blob/main/src/libraries/SwapMath.sol#L51)。为什么不用 V3 的代码？之前我们提到过，因为课程使用的是 solidity 0.8.0+，而 Uniswap V3 的代码是使用 0.7.6 的，所以不兼容 0.8.0 的库，所以我们需要使用一部分 Uniswap V4 的代码，不过代码逻辑上来说它和 Uniswap V3 基本一致。
 
 `SwapMath.computeSwapStep` 方法需要传入当前价格、限制价格、流动性数量、交易量和手续费，然后会返回可以交易的数量，以及手续的手续费和交易后新的价格。在这个计算中，价格、流动性都是一个很大的数，这其实是为了避免出现精度问题。具体计算的公式如下：
 
@@ -53,7 +53,31 @@ $$\sqrt{1/P_{target}}-\sqrt{1/P_{current}}=\Delta{x}/L$$
 
 公式的具体说明你可以参考之前的课程[《Uniswap 代码解析》](https://github.com/WTFAcademy/WTF-Dapp/blob/main/P002_WhatIsUniswap/readme.md#swap-1)中的说明即可。如果你只是想要学习 DApp 应用开发，你可以忽略这一部分的细节，直接使用该方法即可。你需要知道的是，在 DApp 开发中，我们需要谨慎的考虑数字的计算问题，考虑计算中的溢出和精度问题。还要考虑 Solidity 0.7 和 0.8 在一些计算逻辑上处理的差异。
 
-接下来，我们补充具体的实现：
+接下来，我们补充具体的实现。
+
+首先我们定义一个 `SwapState` 结构体，用于存储交易中需要临时存储的变量：
+
+```solidity
+// 交易中需要临时存储的变量
+struct SwapState {
+    // the amount remaining to be swapped in/out of the input/output asset
+    int256 amountSpecifiedRemaining;
+    // the amount already swapped out/in of the output/input asset
+    int256 amountCalculated;
+    // current sqrt(price)
+    uint160 sqrtPriceX96;
+    // the global fee growth of the input token
+    uint256 feeGrowthGlobalX128;
+    // 该交易中用户转入的 token0 的数量
+    uint256 amountIn;
+    // 该交易中用户转出的 token1 的数量
+    uint256 amountOut;
+    // 该交易中的手续费，如果 zeroForOne 是 ture，则是用户转入 token0，单位是 token0 的数量，反正是 token1 的数量
+    uint256 feeAmount;
+}
+```
+
+然后我们在 `swap` 方法中计算交易的具体数值：
 
 ```solidity
 // amountSpecified 大于 0 代表用户指定了 token0 的数量，小于 0 代表用户指定了 token1 的数量
@@ -100,14 +124,14 @@ uint160 sqrtPriceX96PoolLimit = zeroForOne
 );
 ```
 
-在上面的代码中，我们还使用了 `TickMath` 中的方法来将 tick 转换为价格，如果你还没有引入 `TickMath` 的话，你需要在 `Pool.sol` 中引入 `TickMath` 后才能使用，其它库也是一样，它们也都是从 Uniswap V3 或者 V4 中复制过来的代码，我们在之前的课程中已经介绍过了。
+在上面的代码中，我们还使用了 `TickMath` 中的方法来将 tick 转换为价格，如果你还没有引入 `TickMath` 的话，你需要在 `Pool.sol` 中引入 `TickMath` 后才能使用，其它库也是一样，它们也都是从 Uniswap V3 或者 V4 中复制过来的代码，我们在[上一讲课程](../P105_PoolLP/readme.md)中已经介绍过了。
 
 ```diff
 + import "./libraries/TickMath.sol";
 + import "./libraries/SwapMath.sol";
 ```
 
-计算完成后，我们要更新一下池子的状态，以及调用回调方法（交易用户应该在回调中转入要卖出的 token），并且将换出的 token 转给用户。需要注意的是，手续费的计算和更新我们会在后面的代码中完成。
+计算完成后，我们要更新一下池子的状态，以及调用回调方法（交易用户应该在回调中转入要卖出的 token），并且将换出的 token 转给用户。需要注意的是，手续费的计算和更新我们会在后面的课程中完成，在这里可以先忽略。
 
 ```solidity
 
@@ -182,7 +206,7 @@ contract Pool is IPool {
 +    using SafeCast for uint256;
 ```
 
-以上的代码我们都参考了 [Uniswap V3 的实现](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L596)，但是整体要简单得多。在 Uniswap V3 中，一个池子本身没有价格上下限，而是池子中的每个头寸都有自己的上下限。所以在交易的时候需要去循环在不同的头寸中移动来找到合适的头寸来交易。而在我们的实现中，我们限制了池子的价格上下限，池子中的每个头寸都是同样的价格范围，所以我们不需要通过一个 `while` 在不同的头寸中移动交易，而是直接一个计算即可。如果你感兴趣，可以对照 Uniswap V3 的代码来学习。
+以上的代码我们都参考了 [Uniswap V3 的实现](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L596)，但是整体要简单得多。在 Uniswap V3 中，一个池子本身没有价格上下限，而是池子中的每个头寸都有自己的上下限。所以在交易的时候需要去循环在不同的头寸中移动来找到合适的头寸来交易。而在我们的实现中，我们限制了池子的价格上下限，池子中的每个头寸都是同样的价格范围，所以我们不需要通过一个 `while` 在不同的头寸中移动交易，而是直接一个计算即可。如果你感兴趣，可以对照 [Uniswap V3 的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L641)来学习。
 
 至此，我们就完成了基础的交易的逻辑开发，下一讲我们会补充手续费收取的逻辑。
 
@@ -231,7 +255,9 @@ contract TestSwap is ISwapCallback {
 }
 ```
 
-我们在 `test/wtfswap/Pool.ts` 中添加 `swap` 的测试样例：
+在这个合约中我们定义了回调函数 `swapCallback`，它会被 `Pool` 合约调用。另外我们定义了一个 `testSwap` 方法，可以在测试样例中调用。
+
+接下来，我们在 `test/wtfswap/Pool.ts` 中添加 `swap` 的测试样例：
 
 ```solidity
 it("swap", async function () {
@@ -310,7 +336,7 @@ it("swap", async function () {
 });
 ```
 
-在上面的样例中，我们注入了流动性，并且完成了一次交易，验证了交易的具体数值。
+在上面的样例中，我们注入了流动性，并且完成了一次交易，验证了交易的具体数值。具体的测试逻辑不再做过多的解释，你可以参考上面的代码来学习。
 
 需要注意的是，我们在测试样例中也使用了 `@uniswap/v3-sdk` 提供的放，我们在上一讲中已经引入了，如果你还没有引入，你需要在测试文件上引入它：
 
@@ -318,4 +344,4 @@ it("swap", async function () {
 + import { TickMath, encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
 ```
 
-完整的代码你可以在 [这里](../demo-contract/contracts/wtfswap/Pool.sol) 查看，完整的测试代码你也可以在 [这里](../demo-contract/test/wtfswap/Pool.ts) 查看。
+完整的合约代码在 [contracts/wtfswap/Pool.sol](../demo-contract/contracts/wtfswap/Pool.sol) 查看，完整的测试代码在 [test/wtfswap/Pool.ts](../demo-contract/test/wtfswap/Pool.ts) 查看。
