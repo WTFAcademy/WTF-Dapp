@@ -109,4 +109,24 @@ if (tokensOwed0 > 0 || tokensOwed1 > 0) {
 
 ## 合约测试
 
-TODO
+我们尝试继续在上一讲课程中的 `test/wtfswap/Pool.ts` 的 `swap` 样例中补充测试代码：
+
+```typescript
+// 提取流动性，调用 burn 方法
+await testLP.write.burn([liquidityDelta, pool.address]);
+// 查看当前 token 数量
+expect(await token0.read.balanceOf([testLP.address])).to.equal(
+  99995000161384542080378486215n
+);
+// 提取 token
+await testLP.write.collect([testLP.address, pool.address]);
+// 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费
+// 初始的 token0 是 const initBalanceValue = 100000000000n * 10n ** 18n;
+expect(await token0.read.balanceOf([testLP.address])).to.equal(
+  100000000099699999999999999999n
+);
+```
+
+至此，我们完成了全部 `Pool` 合约逻辑的开发。🎉
+
+完整的代码你可以在 [这里](../demo-contract/contracts/wtfswap/Pool.sol) 查看，完整的测试代码你也可以在 [这里](../demo-contract/test/wtfswap/Pool.ts) 查看。需要注意的是，在实际的项目中，你应该书写更加完整的测试样例。

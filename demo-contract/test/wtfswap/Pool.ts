@@ -219,5 +219,19 @@ describe("Pool", function () {
     expect(costToken0).to.equal(100n * 10n ** 18n);
     // 用户获得了大约 100 * 10000 个 token1
     expect(receivedToken1).to.equal(996990060009101709255958n);
+
+    // 提取流动性，调用 burn 方法
+    await testLP.write.burn([liquidityDelta, pool.address]);
+    // 查看当前 token 数量
+    expect(await token0.read.balanceOf([testLP.address])).to.equal(
+      99995000161384542080378486215n
+    );
+    // 提取 token
+    await testLP.write.collect([testLP.address, pool.address]);
+    // 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费
+    // 初始的 token0 是 const initBalanceValue = 100000000000n * 10n ** 18n;
+    expect(await token0.read.balanceOf([testLP.address])).to.equal(
+      100000000099699999999999999999n
+    );
   });
 });
