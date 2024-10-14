@@ -14,6 +14,8 @@
 
 ## 合约开发
 
+> 完整的代码在 [demo-contract/contracts/wtfswap/Pool.sol](../demo-contract/contracts/wtfswap/Pool.sol) 中。
+
 首先我们在 `Pool.sol` 中对入参做一下简单的验证：
 
 ```solidity

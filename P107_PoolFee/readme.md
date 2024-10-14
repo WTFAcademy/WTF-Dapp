@@ -23,6 +23,8 @@ uint256 public override feeGrowthGlobal1X128;
 
 ## 开发
 
+> 完整的代码在 [demo-contract/contracts/wtfswap/Pool.sol](../demo-contract/contracts/wtfswap/Pool.sol) 中。
+
 如上所说，在 `Pool.sol` 中需要添加如下定义：
 
 ```solidity
