@@ -66,11 +66,13 @@
 
 **第 P105 讲：Pool 合约 LP 相关接口开发**：[教程](./P105_PoolLP/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P106 讲：Pool 合约 swap 接口开发**
+**第 P106 讲：Pool 合约 swap 接口开发**：[教程](./P106_PoolSwap/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P107 讲：PositionManager 合约开发**
+**第 P107 讲：Pool 合约交易手续费逻辑开发**：[教程](./P107_PoolFee/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P108 讲：SwapRouter 合约开发**
+**第 P108 讲：PositionManager 合约开发**
+
+**第 P109 讲：SwapRouter 合约开发**
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 

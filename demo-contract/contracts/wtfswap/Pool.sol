@@ -7,6 +7,7 @@ import "./libraries/SqrtPriceMath.sol";
 import "./libraries/TickMath.sol";
 import "./libraries/LiquidityMath.sol";
 import "./libraries/LowGasSafeMath.sol";
+import "./libraries/SafeCast.sol";
 import "./libraries/TransferHelper.sol";
 import "./libraries/SwapMath.sol";
 import "./libraries/FixedPoint128.sol";
@@ -321,8 +322,7 @@ contract Pool is IPool {
         sqrtPriceX96 = state.sqrtPriceX96;
         tick = TickMath.getTickAtSqrtPrice(state.sqrtPriceX96);
 
-        // 因为手续费的注入，流动性会变化，更新流动性
-        // 先计算手续费
+        // 计算手续费
         state.feeGrowthGlobalX128 += FullMath.mulDiv(
             state.feeAmount,
             FixedPoint128.Q128,
