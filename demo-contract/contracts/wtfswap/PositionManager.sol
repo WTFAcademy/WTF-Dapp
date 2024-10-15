@@ -3,6 +3,11 @@ pragma solidity ^0.8.24;
 pragma abicoder v2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "./libraries/LiquidityAmounts.sol";
+import "./libraries/TickMath.sol";
+
 import "./interfaces/IPositionManager.sol";
 import "./interfaces/IPool.sol";
 import "./interfaces/IPoolManager.sol";
@@ -10,6 +15,9 @@ import "./interfaces/IPoolManager.sol";
 contract PositionManager is IPositionManager, ERC721 {
     // 保存 PoolManager 合约地址
     IPoolManager public poolManager;
+
+    /// @dev The ID of the next token that will be minted. Skips 0
+    uint176 private _nextId = 1;
 
     constructor(address _poolManger) ERC721("WTFSwapPosition", "WTFP") {
         poolManager = IPoolManager(_poolManger);
@@ -47,24 +55,56 @@ contract PositionManager is IPositionManager, ERC721 {
             params.index
         );
         IPool pool = IPool(_pool);
+
         // 通过获取 pool 相关信息，结合 params.amount0Desired 和 params.amount1Desired 计算这次要注入的流动性
-        // TODO: 计算 _liquidity，这里只是随便写的
-        uint128 _liquidity = uint128(
-            params.amount0Desired * params.amount1Desired
+        uint160 sqrtPriceX96 = pool.sqrtPriceX96();
+        uint160 sqrtRatioAX96 = TickMath.getSqrtPriceAtTick(pool.tickLower());
+        uint160 sqrtRatioBX96 = TickMath.getSqrtPriceAtTick(pool.tickUpper());
+
+        liquidity = LiquidityAmounts.getLiquidityForAmounts(
+            sqrtPriceX96,
+            sqrtRatioAX96,
+            sqrtRatioBX96,
+            params.amount0Desired,
+            params.amount1Desired
         );
+
         // data 是 mint 后回调 PositionManager 会额外带的数据
         // 需要 PoistionManger 实现回调，在回调中给 Pool 打钱
-        bytes memory data = abi.encode("todo");
-        (amount0, amount1) = pool.mint(params.recipient, _liquidity, data);
-        positionId = 1;
-        liquidity = _liquidity;
-        // TODO 以 NFT 的形式把 Position 的所有权发给 LP
+        bytes memory data = abi.encode(params.token0, params.token1);
+        (amount0, amount1) = pool.mint(params.recipient, liquidity, data);
+
+        _mint(params.recipient, (positionId = _nextId++));
+
+        positions[positionId] = PositionInfo({
+            owner: params.recipient,
+            token0: params.token0,
+            token1: params.token1,
+            index: params.index,
+            fee: pool.fee(),
+            liquidity: liquidity,
+            tickLower: pool.tickLower(),
+            tickUpper: pool.tickUpper(),
+            tokensOwed0: 0,
+            tokensOwed1: 0
+        });
+    }
+
+    modifier isAuthorizedForToken(uint256 tokenId) {
+        address owner = ERC721.ownerOf(tokenId);
+        require(_isAuthorized(owner, msg.sender, tokenId), "Not approved");
+        _;
     }
 
     function burn(
         uint256 positionId
-    ) external override returns (uint256 amount0, uint256 amount1) {
-        // TODO 检查 positionId 是否属于 msg.sender
+    )
+        external
+        override
+        isAuthorizedForToken(positionId)
+        returns (uint256 amount0, uint256 amount1)
+    {
+        // 通过 isAuthorizedForToken 检查 positionId 是否有权限
         // 移除流动性，但是 token 还是保留在 pool 中，需要再调用 collect 方法才能取回 token
         // 通过 positionId 获取对应 LP 的流动性
         uint128 _liquidity = positions[positionId].liquidity;
@@ -85,8 +125,13 @@ contract PositionManager is IPositionManager, ERC721 {
     function collect(
         uint256 positionId,
         address recipient
-    ) external override returns (uint256 amount0, uint256 amount1) {
-        // TODO 检查 positionId 是否属于 msg.sender
+    )
+        external
+        override
+        isAuthorizedForToken(positionId)
+        returns (uint256 amount0, uint256 amount1)
+    {
+        // 通过 isAuthorizedForToken 检查 positionId 是否有权限
         // 调用 Pool 的方法给 LP 退流动性
         address _pool = poolManager.getPool(
             positions[positionId].token0,
@@ -106,5 +151,12 @@ contract PositionManager is IPositionManager, ERC721 {
         bytes calldata data
     ) external override {
         // 在这里给 Pool 打钱，需要用户先 approve 足够的金额，这里才会成功
+        (address token0, address token1) = abi.decode(data, (address, address));
+        if (amount0 > 0) {
+            IERC20(token0).transfer(msg.sender, amount0);
+        }
+        if (amount1 > 0) {
+            IERC20(token1).transfer(msg.sender, amount1);
+        }
     }
 }
