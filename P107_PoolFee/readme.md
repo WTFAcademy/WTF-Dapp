@@ -17,15 +17,15 @@ uint256 public override feeGrowthGlobal0X128;
 uint256 public override feeGrowthGlobal1X128;
 ```
 
-它们代表了从池子创建以来累计收取到的手续费（具体是每个流动性可以提取的手续费乘以 2 的 96 次方），为什么需要记录这两个值呢？因为 LP 是可以随时提取手续费的，而且每个 LP 提取的时间不一样，所以 LP 提取手续费时我们需要计算出他历史累计的手续费收益。
+它们代表了从池子创建以来累计收取到的手续费，为什么需要记录这两个值呢？因为 LP 是可以随时提取手续费的，而且每个 LP 提取的时间不一样，所以 LP 提取手续费时我们需要计算出他历史累计的手续费收益。
 
-其中 `feeGrowthGlobal0X128` 和 `feeGrowthGlobal1X128` 是通过手续费乘以 `FixedPoint128.Q128`（2 的 96 次方），然后除以流动性数量得到的，和上面交易类似，乘以 `FixedPoint128.Q128` 是为了避免精度问题。
+具体值的计算上 `feeGrowthGlobal0X128` 和 `feeGrowthGlobal1X128` 是通过手续费乘以 `FixedPoint128.Q128`（2 的 96 次方），然后除以流动性数量得到的。和上一讲课程中的交易类似，乘以 `FixedPoint128.Q128` 是为了避免精度问题，最终 LP 提取手续费时会计算回实际的 token 数量。
 
 ## 开发
 
 > 完整的代码在 [demo-contract/contracts/wtfswap/Pool.sol](../demo-contract/contracts/wtfswap/Pool.sol) 中。
 
-如上所说，在 `Pool.sol` 中需要添加如下定义：
+如简介中所说，在 `Pool.sol` 中需要添加如下定义：
 
 ```solidity
 /// @inheritdoc IPool
