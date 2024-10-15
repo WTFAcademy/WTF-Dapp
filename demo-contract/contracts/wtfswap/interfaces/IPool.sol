@@ -18,19 +18,6 @@ interface ISwapCallback {
 }
 
 interface IPool {
-    struct Position {
-        // 该 Position 拥有的流动性
-        uint128 liquidity;
-        // 可提取的 token0 数量
-        uint128 tokensOwed0;
-        // 可提取的 token1 数量
-        uint128 tokensOwed1;
-        // 上次提取手续费时的 feeGrowthGlobal0X128
-        uint256 feeGrowthInside0LastX128;
-        // 上次提取手续费是的 feeGrowthGlobal1X128
-        uint256 feeGrowthInside1LastX128;
-    }
-
     function factory() external view returns (address);
 
     function token0() external view returns (address);
