@@ -32,12 +32,26 @@ contract PositionManager is IPositionManager, ERC721 {
         uint256[] memory positionId
     ) external view override returns (PositionInfo[] memory positionInfo) {}
 
+    function getSender() public view returns (address) {
+        return msg.sender;
+    }
+
+    function _blockTimestamp() internal view virtual returns (uint256) {
+        return block.timestamp;
+    }
+
+    modifier checkDeadline(uint256 deadline) {
+        require(_blockTimestamp() <= deadline, "Transaction too old");
+        _;
+    }
+
     function mint(
         MintParams calldata params
     )
         external
         payable
         override
+        checkDeadline(params.deadline)
         returns (
             uint256 positionId,
             uint128 liquidity,
@@ -71,8 +85,13 @@ contract PositionManager is IPositionManager, ERC721 {
 
         // data 是 mint 后回调 PositionManager 会额外带的数据
         // 需要 PoistionManger 实现回调，在回调中给 Pool 打钱
-        bytes memory data = abi.encode(params.token0, params.token1);
-        (amount0, amount1) = pool.mint(params.recipient, liquidity, data);
+        bytes memory data = abi.encode(
+            params.token0,
+            params.token1,
+            params.index,
+            msg.sender
+        );
+        (amount0, amount1) = pool.mint(address(this), liquidity, data);
 
         _mint(params.recipient, (positionId = _nextId++));
 
@@ -150,13 +169,18 @@ contract PositionManager is IPositionManager, ERC721 {
         uint256 amount1,
         bytes calldata data
     ) external override {
+        // 检查 callback 的合约地址是否是 Pool
+        (address token0, address token1, uint32 index, address payer) = abi
+            .decode(data, (address, address, uint32, address));
+        address _pool = poolManager.getPool(token0, token1, index);
+        require(_pool == msg.sender, "Invalid callback caller");
+
         // 在这里给 Pool 打钱，需要用户先 approve 足够的金额，这里才会成功
-        (address token0, address token1) = abi.decode(data, (address, address));
         if (amount0 > 0) {
-            IERC20(token0).transfer(msg.sender, amount0);
+            IERC20(token0).transferFrom(payer, msg.sender, amount0);
         }
         if (amount1 > 0) {
-            IERC20(token1).transfer(msg.sender, amount1);
+            IERC20(token1).transferFrom(payer, msg.sender, amount1);
         }
     }
 }
