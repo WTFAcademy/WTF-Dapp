@@ -36,7 +36,7 @@ uint256 public override feeGrowthGlobal1X128;
 
 我们在 `Position` 中也需要添加 `feeGrowthInside0LastX128` 和 `feeGrowthInside1LastX128`，它代表了 LP 上次提取手续费时的全局手续费收益，这样当 LP 提取手续费时我们就可以和池子累计的手续费收益来做计算算出他可以提取的收益了。
 
-```solidity
+```diff
 struct Position {
     // 该 Position 拥有的流动性
     uint128 liquidity;
@@ -45,9 +45,9 @@ struct Position {
     // 可提取的 token1 数量
     uint128 tokensOwed1;
     // 上次提取手续费时的 feeGrowthGlobal0X128
-    uint256 feeGrowthInside0LastX128;
++   uint256 feeGrowthInside0LastX128;
     // 上次提取手续费是的 feeGrowthGlobal1X128
-    uint256 feeGrowthInside1LastX128;
++   uint256 feeGrowthInside1LastX128;
 }
 ```
 
@@ -75,33 +75,58 @@ if (zeroForOne) {
 
 然后在 `_modifyPosition` 中补充相关逻辑，每次 LP 调用 `mint` 或者 `burn` 方法时更新头寸（`Position`）中的 `tokensOwed0` 和 `tokensOwed1`。
 
-```solidity
-Position memory position = positions[params.owner];
+```diff
+function _modifyPosition(
+    ModifyPositionParams memory params
+) private returns (int256 amount0, int256 amount1) {
+    // 通过新增的流动性计算 amount0 和 amount1
+    // 参考 UniswapV3 的代码
 
-// 提取手续费，计算从上一次提取到当前的手续费
-uint128 tokensOwed0 = uint128(
-    FullMath.mulDiv(
-        feeGrowthGlobal0X128 - position.feeGrowthInside0LastX128,
-        position.liquidity,
-        FixedPoint128.Q128
-    )
-);
-uint128 tokensOwed1 = uint128(
-    FullMath.mulDiv(
-        feeGrowthGlobal1X128 - position.feeGrowthInside1LastX128,
-        position.liquidity,
-        FixedPoint128.Q128
-    )
-);
+    amount0 = SqrtPriceMath.getAmount0Delta(
+        sqrtPriceX96,
+        TickMath.getSqrtPriceAtTick(tickUpper),
+        params.liquidityDelta
+    );
 
-// 更新提取手续费的记录，同步到当前最新的 feeGrowthGlobal0X128，代表都提取完了
-position.feeGrowthInside0LastX128 = feeGrowthGlobal0X128;
-position.feeGrowthInside1LastX128 = feeGrowthGlobal1X128;
-// 把可以提取的手续费记录到 tokensOwed0 和 tokensOwed1 中
-// LP 可以通过 collect 来最终提取到用户自己账户上
-if (tokensOwed0 > 0 || tokensOwed1 > 0) {
-    position.tokensOwed0 += tokensOwed0;
-    position.tokensOwed1 += tokensOwed1;
+    amount1 = SqrtPriceMath.getAmount1Delta(
+        TickMath.getSqrtPriceAtTick(tickLower),
+        sqrtPriceX96,
+        params.liquidityDelta
+    );
+    Position memory position = positions[params.owner];
+
++    // 提取手续费，计算从上一次提取到当前的手续费
++    uint128 tokensOwed0 = uint128(
++        FullMath.mulDiv(
++            feeGrowthGlobal0X128 - position.feeGrowthInside0LastX128,
++            position.liquidity,
++            FixedPoint128.Q128
++        )
++    );
++    uint128 tokensOwed1 = uint128(
++        FullMath.mulDiv(
++            feeGrowthGlobal1X128 - position.feeGrowthInside1LastX128,
++            position.liquidity,
++            FixedPoint128.Q128
++        )
++    );
++
++    // 更新提取手续费的记录，同步到当前最新的 feeGrowthGlobal0X128，代表都提取完了
++    position.feeGrowthInside0LastX128 = feeGrowthGlobal0X128;
++    position.feeGrowthInside1LastX128 = feeGrowthGlobal1X128;
++    // 把可以提取的手续费记录到 tokensOwed0 和 tokensOwed1 中
++    // LP 可以通过 collect 来最终提取到用户自己账户上
++    if (tokensOwed0 > 0 || tokensOwed1 > 0) {
++        position.tokensOwed0 += tokensOwed0;
++        position.tokensOwed1 += tokensOwed1;
++    }
+
+    // 修改 liquidity
+    liquidity = LiquidityMath.addDelta(liquidity, params.liquidityDelta);
+    position.liquidity = LiquidityMath.addDelta(
+        position.liquidity,
+        params.liquidityDelta
+    );
 }
 ```
 

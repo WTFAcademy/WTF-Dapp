@@ -45,6 +45,19 @@ contract Pool is IPool {
     /// @inheritdoc IPool
     uint256 public override feeGrowthGlobal1X128;
 
+    struct Position {
+        // 该 Position 拥有的流动性
+        uint128 liquidity;
+        // 可提取的 token0 数量
+        uint128 tokensOwed0;
+        // 可提取的 token1 数量
+        uint128 tokensOwed1;
+        // 上次提取手续费时的 feeGrowthGlobal0X128
+        uint256 feeGrowthInside0LastX128;
+        // 上次提取手续费是的 feeGrowthGlobal1X128
+        uint256 feeGrowthInside1LastX128;
+    }
+
     // 用一个 mapping 来存放所有 Position 的信息
     mapping(address => Position) public positions;
 

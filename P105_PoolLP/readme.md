@@ -34,6 +34,23 @@ function mint(
 
 首先，我们参考 [Uniswap V3 的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L466)来写一个 `_modifyPosition` 的方法，这是一个 `priviate` 的函数，只有合约内部可以调用，在该方法中修改交易池整体的流动性 `liquidity` 并计算返回 `amount0` 和 `amount1`。
 
+首先我们需要定义 `Position` 结构体，用来记录 LP 的流动性信息：
+
+```solidity
+struct Position {
+    // 该 Position 拥有的流动性
+    uint128 liquidity;
+    // 可提取的 token0 数量
+    uint128 tokensOwed0;
+    // 可提取的 token1 数量
+    uint128 tokensOwed1;
+}
+// 用一个 mapping 来存放所有 Position 的信息
+mapping(address => Position) public positions;
+```
+
+然后实现 `_modifyPosition` 方法用来在 `mint`、`burn` 等时修改 `positions` 中的信息：
+
 ```solidity
 function _modifyPosition(
     ModifyPositionParams memory params
@@ -58,7 +75,6 @@ function _modifyPosition(
         params.liquidityDelta
     );
 }
-
 
 function mint(
     address recipient,

@@ -16,6 +16,8 @@
 
 > 完整的代码在 [demo-contract/contracts/wtfswap/Pool.sol](../demo-contract/contracts/wtfswap/Pool.sol) 中。
 
+### 1. 入参验证
+
 首先我们在 `Pool.sol` 中对入参做一下简单的验证：
 
 ```solidity
@@ -44,6 +46,8 @@ function swap(
 在上面的代码中，我们首先验证 `amountSpecified` 必须不为 0，`amountSpecified` 大于 0 代表我们指定了要支付的 token0 的数量，`amountSpecified` 小于 0 则代表我们指定了要获取的 token1 的数量。`zeroForOne` 为 `true` 代表了是 token0 换 token1，反之则相反。如果是 token0 换 token1，那么交易会导致池子的 token0 变多，价格下跌，我们需要验证 `sqrtPriceLimitX96` 必须小于当前的价格，也就是指 `sqrtPriceLimitX96` 是交易的一个价格下限。另外价格也需要大于可用的最小价格和小于可用的最大价格。
 
 这里的实现也基本是参考了 [Uniswap V3 中的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L608)。
+
+### 2. 交易计算
 
 然后我们需要计算在用户指定的价格和数量情况下该池子可以提供交易的 token0 和 token1 的数量，在这里我们直接调用了 `SwapMath.computeSwapStep` 方法，该方法是直接复制的 [Uniswap V4 的代码](https://github.com/Uniswap/v4-core/blob/main/src/libraries/SwapMath.sol#L51)。为什么不用 V3 的代码？之前我们提到过，因为课程使用的是 solidity 0.8.0+，而 Uniswap V3 的代码是使用 0.7.6 的，所以不兼容 0.8.0 的库，所以我们需要使用一部分 Uniswap V4 的代码，不过代码逻辑上来说它和 Uniswap V3 基本一致。
 
@@ -132,6 +136,8 @@ uint160 sqrtPriceX96PoolLimit = zeroForOne
 + import "./libraries/TickMath.sol";
 + import "./libraries/SwapMath.sol";
 ```
+
+### 3. 完成交易并更新状态
 
 计算完成后，我们要更新一下池子的状态，以及调用回调方法（交易用户应该在回调中转入要卖出的 token），并且将换出的 token 转给用户。需要注意的是，手续费的计算和更新我们会在后面的课程中完成，在这里可以先忽略。
 
