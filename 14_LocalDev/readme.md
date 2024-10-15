@@ -130,12 +130,12 @@ npx hardhat ignition deploy ./ignition/modules/MyToken.ts --network localhost
 在代码中添加一个 `Hardhat` 网络：
 
 ```diff
-- import { mainnet, goerli, polygon } from "wagmi/chains";
-+ import { mainnet, goerli, polygon, hardhat } from "wagmi/chains";
+- import { mainnet, sepolia, polygon } from "wagmi/chains";
++ import { mainnet, sepolia, polygon, hardhat } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
-  Goerli,
+  Sepolia,
   Polygon,
 +  Hardhat,
   WalletConnect,
@@ -144,11 +144,11 @@ import {
 // ...
 
 const config = createConfig({
--  chains: [mainnet, goerli, polygon],
-+  chains: [mainnet, goerli, polygon, hardhat],
+-  chains: [mainnet, sepolia, polygon],
++  chains: [mainnet, sepolia, polygon, hardhat],
   transports: {
     [mainnet.id]: http(),
-    [goerli.id]: http(),
+    [sepolia.id]: http(),
     [polygon.id]: http(),
 +    [hardhat.id]: http("http://127.0.0.1:8545/"),
   },
@@ -171,7 +171,7 @@ const contractInfo = [
   },
   {
     id: 5,
-    name: "Goerli",
+    name: "Sepolia",
     contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
   },
   {
@@ -197,7 +197,7 @@ export default function Web3() {
         autoAddInjectedWallets: true,
       }}
       chains={[
-        Goerli,
+        Sepolia,
         Polygon,
 +       Hardhat,
       ]}

@@ -50,7 +50,7 @@ const CallTest = () => {
         outputs: [{ type: "uint256" }],
       },
     ],
-    // Goerli test contract 0x418325c3979b7f8a17678ec2463a74355bdbe72c
+    // Sepolia test contract 0x418325c3979b7f8a17678ec2463a74355bdbe72c
     address: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
     functionName: "balanceOf",
     args: [account?.address as `0x${string}`],

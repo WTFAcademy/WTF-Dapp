@@ -14,11 +14,19 @@
 
 👉 你的 Star 是对我们最好的鼓励，如果对我们的课程感兴趣，欢迎给一个 Star 吧 ⭐
 
+## 赞助商
+
+<a href="https://zan.top?chInfo=wtf"><image src="https://mdn.alipayobjects.com/huamei_hsbbrh/afts/img/A*ybcRSrUPqhsAAAAAAAAAAAAADiOMAQ/original" /></a>
+
+感谢 ZAN 对 WTF Dapp 课程的赞助 ❤️
+
+🔊 [ZAN](https://zan.top?chInfo=wtf) 是一家 Web3 技术服务提供商，提供[节点服务](https://zan.top/home/node-service?chInfo=wtf)、[测试网水龙头](https://zan.top/faucet?chInfo=wtf)、[智能合约审计](https://zan.top/home/ai-scan?chInfo=wtf)、[Web3 安全](https://zan.top/home/know-your-transaction?chInfo=wtf)等服务，为 DApp 开发者提供技术服务支持。
+
 ## 新手入门
 
 **第 1 讲：快速开始（三分钟展示 NFT）**：[教程](./01_QuickStart/readme.md) | [代码](./01_QuickStart/web3.tsx)
 
-**第 2 讲：节点服务**：[教程](./02_NodeService/readme.md) | [代码](./02_NodeService/web3.tsx)
+**第 2 讲：节点服务和水龙头**：[教程](./02_NodeService/readme.md) | [代码](./02_NodeService/web3.tsx)
 
 **第 3 讲：连接钱包**：[教程](./03_ConnectWallet/readme.md) | [代码](./03_ConnectWallet/web3.tsx)
 
@@ -62,15 +70,17 @@
 
 **第 P103 讲：Factory 合约开发**：[教程](./P103_Factory/readme.md) | [代码](./demo-contract/contracts/wtfswap/Factory.sol)
 
-**第 P104 讲：PoolManager 合约开发**
+**第 P104 讲：PoolManager 合约开发**：[教程](./P104_PoolManager/readme.md) | [代码](./demo-contract/contracts/wtfswap/PoolManager.sol)
 
 **第 P105 讲：Pool 合约 LP 相关接口开发**：[教程](./P105_PoolLP/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P106 讲：Pool 合约 swap 接口开发**
+**第 P106 讲：Pool 合约 swap 接口开发**：[教程](./P106_PoolSwap/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P107 讲：PositionManager 合约开发**
+**第 P107 讲：Pool 合约交易手续费逻辑开发**：[教程](./P107_PoolFee/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P108 讲：SwapRouter 合约开发**
+**第 P108 讲：PositionManager 合约开发**
+
+**第 P109 讲：SwapRouter 合约开发**
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 

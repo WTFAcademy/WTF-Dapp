@@ -7,6 +7,7 @@ import "./libraries/SqrtPriceMath.sol";
 import "./libraries/TickMath.sol";
 import "./libraries/LiquidityMath.sol";
 import "./libraries/LowGasSafeMath.sol";
+import "./libraries/SafeCast.sol";
 import "./libraries/TransferHelper.sol";
 import "./libraries/SwapMath.sol";
 import "./libraries/FixedPoint128.sol";
@@ -44,6 +45,19 @@ contract Pool is IPool {
     /// @inheritdoc IPool
     uint256 public override feeGrowthGlobal1X128;
 
+    struct Position {
+        // 该 Position 拥有的流动性
+        uint128 liquidity;
+        // 可提取的 token0 数量
+        uint128 tokensOwed0;
+        // 可提取的 token1 数量
+        uint128 tokensOwed1;
+        // 上次提取手续费时的 feeGrowthGlobal0X128
+        uint256 feeGrowthInside0LastX128;
+        // 上次提取手续费是的 feeGrowthGlobal1X128
+        uint256 feeGrowthInside1LastX128;
+    }
+
     // 用一个 mapping 来存放所有 Position 的信息
     mapping(address => Position) public positions;
 
@@ -58,8 +72,9 @@ contract Pool is IPool {
     }
 
     function initialize(uint160 sqrtPriceX96_) external override {
+        require(sqrtPriceX96 == 0, "INITIALIZED");
         // 通过价格获取 tick，判断 tick 是否在 tickLower 和 tickUpper 之间
-        tick = TickMath.getTickAtSqrtRatio(sqrtPriceX96_);
+        tick = TickMath.getTickAtSqrtPrice(sqrtPriceX96_);
         require(
             tick >= tickLower && tick < tickUpper,
             "sqrtPriceX96 should be within the range of [tickLower, tickUpper)"
@@ -80,17 +95,18 @@ contract Pool is IPool {
     ) private returns (int256 amount0, int256 amount1) {
         // 通过新增的流动性计算 amount0 和 amount1
         // 参考 UniswapV3 的代码
+
         amount0 = SqrtPriceMath.getAmount0Delta(
             sqrtPriceX96,
-            TickMath.getSqrtRatioAtTick(tickUpper),
-            params.liquidityDelta
-        );
-        amount1 = SqrtPriceMath.getAmount1Delta(
-            TickMath.getSqrtRatioAtTick(tickLower),
-            sqrtPriceX96,
+            TickMath.getSqrtPriceAtTick(tickUpper),
             params.liquidityDelta
         );
 
+        amount1 = SqrtPriceMath.getAmount1Delta(
+            TickMath.getSqrtPriceAtTick(tickLower),
+            sqrtPriceX96,
+            params.liquidityDelta
+        );
         Position memory position = positions[params.owner];
 
         // 提取手续费，计算从上一次提取到当前的手续费
@@ -267,9 +283,9 @@ contract Pool is IPool {
         require(
             zeroForOne
                 ? sqrtPriceLimitX96 < sqrtPriceX96 &&
-                    sqrtPriceLimitX96 > TickMath.MIN_SQRT_RATIO
+                    sqrtPriceLimitX96 > TickMath.MIN_SQRT_PRICE
                 : sqrtPriceLimitX96 > sqrtPriceX96 &&
-                    sqrtPriceLimitX96 < TickMath.MAX_SQRT_RATIO,
+                    sqrtPriceLimitX96 < TickMath.MAX_SQRT_PRICE,
             "SPL"
         );
 
@@ -289,8 +305,8 @@ contract Pool is IPool {
         });
 
         // 计算交易的上下限，基于 tick 计算价格
-        uint160 sqrtPriceX96Lower = TickMath.getSqrtRatioAtTick(tickLower);
-        uint160 sqrtPriceX96Upper = TickMath.getSqrtRatioAtTick(tickUpper);
+        uint160 sqrtPriceX96Lower = TickMath.getSqrtPriceAtTick(tickLower);
+        uint160 sqrtPriceX96Upper = TickMath.getSqrtPriceAtTick(tickUpper);
         // 计算用户交易价格的限制，如果是 zeroForOne 是 true，说明用户会换入 token0，会压低 token0 的价格（也就是池子的价格），所以要限制最低价格不能超过 sqrtPriceX96Lower
         uint160 sqrtPriceX96PoolLimit = zeroForOne
             ? sqrtPriceX96Lower
@@ -318,10 +334,9 @@ contract Pool is IPool {
 
         // 更新新的价格
         sqrtPriceX96 = state.sqrtPriceX96;
-        tick = TickMath.getTickAtSqrtRatio(state.sqrtPriceX96);
+        tick = TickMath.getTickAtSqrtPrice(state.sqrtPriceX96);
 
-        // 因为手续费的注入，流动性会变化，更新流动性
-        // 先计算手续费
+        // 计算手续费
         state.feeGrowthGlobalX128 += FullMath.mulDiv(
             state.feeAmount,
             FixedPoint128.Q128,

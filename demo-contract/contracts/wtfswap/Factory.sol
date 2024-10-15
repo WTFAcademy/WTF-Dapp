@@ -69,8 +69,8 @@ contract Factory is IFactory {
         // save pool info
         parameters = Parameters(
             address(this),
-            tokenA,
-            tokenB,
+            token0,
+            token1,
             tickLower,
             tickUpper,
             fee

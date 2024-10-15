@@ -9,6 +9,7 @@ interface IPoolManager is IFactory {
         address token0;
         address token1;
         uint32 index;
+        uint24 fee;
         uint8 feeProtocol;
         int24 tickLower;
         int24 tickUpper;
@@ -26,8 +27,8 @@ interface IPoolManager is IFactory {
     function getAllPools() external view returns (PoolInfo[] memory poolsInfo);
 
     struct CreateAndInitializeParams {
-        address token0;
-        address token1;
+        address tokenA;
+        address tokenB;
         uint24 fee;
         int24 tickLower;
         int24 tickUpper;

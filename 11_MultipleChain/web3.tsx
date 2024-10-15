@@ -1,10 +1,10 @@
 import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
-import { mainnet, goerli, polygon } from "wagmi/chains";
+import { mainnet, sepolia, polygon } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
-  Goerli,
-  Polygon
+  Sepolia,
+  Polygon,
 } from "@ant-design/web3-wagmi";
 import {
   Address,
@@ -12,17 +12,17 @@ import {
   Connector,
   ConnectButton,
   useAccount,
-  useProvider
+  useProvider,
 } from "@ant-design/web3";
 import { injected } from "wagmi/connectors";
 import { Button, message } from "antd";
 import { parseEther } from "viem";
 
 const config = createConfig({
-  chains: [mainnet, goerli, polygon],
+  chains: [mainnet, sepolia, polygon],
   transports: {
     [mainnet.id]: http(),
-    [goerli.id]: http(),
+    [sepolia.id]: http(),
     [polygon.id]: http(),
   },
   connectors: [
@@ -34,23 +34,25 @@ const config = createConfig({
 
 const contractInfo = [
   {
-    id:1,
+    id: 1,
     name: "Ethereum",
-    contractAddress: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
-  }, {
-    id:5,
-    name: "Goerli",
-    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c"
-  }, {
-    id:137,
+    contractAddress: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
+  },
+  {
+    id: 5,
+    name: "Sepolia",
+    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
+  },
+  {
+    id: 137,
     name: "Polygon",
-    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c"
-  }
-]
+    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
+  },
+];
 
 const CallTest = () => {
   const { account } = useAccount();
-  const {chain} = useProvider();
+  const { chain } = useProvider();
   const result = useReadContract({
     abi: [
       {
@@ -61,7 +63,8 @@ const CallTest = () => {
         outputs: [{ type: "uint256" }],
       },
     ],
-    address: contractInfo.find((item) => item.id === chain?.id)?.contractAddress as `0x${string}`,
+    address: contractInfo.find((item) => item.id === chain?.id)
+      ?.contractAddress as `0x${string}`,
     functionName: "balanceOf",
     args: [account?.address as `0x${string}`],
   });
@@ -89,7 +92,8 @@ const CallTest = () => {
                   outputs: [],
                 },
               ],
-              address: contractInfo.find((item) => item.id === chain?.id)?.contractAddress as `0x${string}`,
+              address: contractInfo.find((item) => item.id === chain?.id)
+                ?.contractAddress as `0x${string}`,
               functionName: "mint",
               args: [1],
               value: parseEther("0.01"),
@@ -115,7 +119,7 @@ export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider
       config={config}
-      chains={[Goerli, Polygon]}
+      chains={[Sepolia, Polygon]}
       wallets={[MetaMask()]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />

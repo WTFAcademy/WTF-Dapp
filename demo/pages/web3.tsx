@@ -1,8 +1,8 @@
-import { mainnet, goerli, polygon, hardhat } from "wagmi/chains";
+import { mainnet, sepolia, polygon, hardhat } from "wagmi/chains";
 import {
   WagmiWeb3ConfigProvider,
   MetaMask,
-  Goerli,
+  Sepolia,
   Polygon,
   Hardhat,
   WalletConnect,
@@ -25,10 +25,10 @@ import {
 } from "@/utils/contracts";
 
 const config = createConfig({
-  chains: [mainnet, goerli, polygon, hardhat],
+  chains: [mainnet, sepolia, polygon, hardhat],
   transports: {
     [mainnet.id]: http(),
-    [goerli.id]: http(),
+    [sepolia.id]: http(),
     [polygon.id]: http(),
     [hardhat.id]: http("http://127.0.0.1:8545/"),
   },
@@ -51,7 +51,7 @@ const contractInfo = [
   },
   {
     id: 5,
-    name: "Goerli",
+    name: "Sepolia",
     contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
   },
   {
@@ -142,7 +142,7 @@ export default function Web3() {
       eip6963={{
         autoAddInjectedWallets: true,
       }}
-      chains={[Goerli, Polygon, Hardhat]}
+      chains={[Sepolia, Polygon, Hardhat]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard
