@@ -72,6 +72,7 @@ contract Pool is IPool {
     }
 
     function initialize(uint160 sqrtPriceX96_) external override {
+        require(sqrtPriceX96 == 0, "INITIALIZED");
         // 通过价格获取 tick，判断 tick 是否在 tickLower 和 tickUpper 之间
         tick = TickMath.getTickAtSqrtPrice(sqrtPriceX96_);
         require(
