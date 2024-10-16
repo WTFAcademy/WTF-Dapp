@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./libraries/LiquidityAmounts.sol";
 import "./libraries/TickMath.sol";
+import "./libraries/FixedPoint128.sol";
 
 import "./interfaces/IPositionManager.sol";
 import "./interfaces/IPool.sol";
@@ -95,6 +96,14 @@ contract PositionManager is IPositionManager, ERC721 {
 
         _mint(params.recipient, (positionId = _nextId++));
 
+        (
+            ,
+            uint256 feeGrowthInside0LastX128,
+            uint256 feeGrowthInside1LastX128,
+            ,
+
+        ) = pool.getPosition(address(this));
+
         positions[positionId] = PositionInfo({
             owner: params.recipient,
             token0: params.token0,
@@ -105,7 +114,9 @@ contract PositionManager is IPositionManager, ERC721 {
             tickLower: pool.tickLower(),
             tickUpper: pool.tickUpper(),
             tokensOwed0: 0,
-            tokensOwed1: 0
+            tokensOwed1: 0,
+            feeGrowthInside0LastX128: feeGrowthInside0LastX128,
+            feeGrowthInside1LastX128: feeGrowthInside1LastX128
         });
     }
 
@@ -123,22 +134,55 @@ contract PositionManager is IPositionManager, ERC721 {
         isAuthorizedForToken(positionId)
         returns (uint256 amount0, uint256 amount1)
     {
+        PositionInfo storage position = positions[positionId];
         // 通过 isAuthorizedForToken 检查 positionId 是否有权限
         // 移除流动性，但是 token 还是保留在 pool 中，需要再调用 collect 方法才能取回 token
         // 通过 positionId 获取对应 LP 的流动性
-        uint128 _liquidity = positions[positionId].liquidity;
+        uint128 _liquidity = position.liquidity;
         // 调用 Pool 的方法给 LP 退流动性
         address _pool = poolManager.getPool(
-            positions[positionId].token0,
-            positions[positionId].token1,
-            positions[positionId].index
+            position.token0,
+            position.token1,
+            position.index
         );
         IPool pool = IPool(_pool);
         (amount0, amount1) = pool.burn(_liquidity);
-        // 修改 positionInfo 中的信息
-        positions[positionId].liquidity = 0;
-        positions[positionId].tokensOwed0 = amount0;
-        positions[positionId].tokensOwed1 = amount1;
+
+        // 计算这部分流动性产生的手续费
+        (
+            ,
+            uint256 feeGrowthInside0LastX128,
+            uint256 feeGrowthInside1LastX128,
+            ,
+
+        ) = pool.getPosition(address(this));
+
+        position.tokensOwed0 +=
+            uint128(amount0) +
+            uint128(
+                FullMath.mulDiv(
+                    feeGrowthInside0LastX128 -
+                        position.feeGrowthInside0LastX128,
+                    position.liquidity,
+                    FixedPoint128.Q128
+                )
+            );
+
+        position.tokensOwed1 +=
+            uint128(amount1) +
+            uint128(
+                FullMath.mulDiv(
+                    feeGrowthInside1LastX128 -
+                        position.feeGrowthInside1LastX128,
+                    position.liquidity,
+                    FixedPoint128.Q128
+                )
+            );
+
+        // 更新 position 的信息
+        position.feeGrowthInside0LastX128 = feeGrowthInside0LastX128;
+        position.feeGrowthInside1LastX128 = feeGrowthInside1LastX128;
+        position.liquidity = 0;
     }
 
     function collect(
@@ -158,10 +202,14 @@ contract PositionManager is IPositionManager, ERC721 {
             positions[positionId].index
         );
         IPool pool = IPool(_pool);
-        (amount0, amount1) = pool.collect(recipient);
-        // 修改 positionInfo 中的信息
-        positions[positionId].tokensOwed0 = 0;
-        positions[positionId].tokensOwed1 = 0;
+        (amount0, amount1) = pool.collect(
+            recipient,
+            positions[positionId].tokensOwed0,
+            positions[positionId].tokensOwed1
+        );
+
+        // position 已经彻底没用了，销毁
+        _burn(positionId);
     }
 
     function mintCallback(

@@ -48,6 +48,19 @@ interface IPool {
     /// @dev This value can overflow the uint256
     function feeGrowthGlobal1X128() external view returns (uint256);
 
+    function getPosition(
+        address owner
+    )
+        external
+        view
+        returns (
+            uint128 _liquidity,
+            uint256 feeGrowthInside0LastX128,
+            uint256 feeGrowthInside1LastX128,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        );
+
     event Mint(
         address sender,
         address indexed owner,
@@ -70,7 +83,9 @@ interface IPool {
     );
 
     function collect(
-        address recipient
+        address recipient,
+        uint128 amount0Requested,
+        uint128 amount1Requested
     ) external returns (uint128 amount0, uint128 amount1);
 
     event Burn(

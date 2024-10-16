@@ -29,7 +29,13 @@ contract TestLP is IMintCallback {
         address recipient,
         address pool
     ) external returns (uint256 amount0, uint256 amount1) {
-        (amount0, amount1) = IPool(pool).collect(recipient);
+        (, , , uint128 tokensOwed0, uint128 tokensOwed1) = IPool(pool)
+            .getPosition(address(this));
+        (amount0, amount1) = IPool(pool).collect(
+            recipient,
+            tokensOwed0,
+            tokensOwed1
+        );
     }
 
     function mintCallback(
