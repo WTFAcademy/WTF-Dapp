@@ -231,7 +231,7 @@ describe("Pool", function () {
     // 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费，并且有交易换入了 token0
     // 初始的 token0 是 const initBalanceValue = 100000000000n * 10n ** 18n;
     expect(await token0.read.balanceOf([testLP.address])).to.equal(
-      100000000099699999999999999999n
+      100000000099999999999999999998n
     );
   });
 });

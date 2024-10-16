@@ -49,7 +49,7 @@ struct Position {
 mapping(address => Position) public positions;
 ```
 
-然后实现 `_modifyPosition` 方法用来在 `mint`、`burn` 等时修改 `positions` 中的信息：
+然后实现 `_modifyPosition` 方法用来在 `mint`、`burn` 时修改 `positions` 中的信息：
 
 ```solidity
 function _modifyPosition(
@@ -57,21 +57,24 @@ function _modifyPosition(
 ) private returns (int256 amount0, int256 amount1) {
     // 通过新增的流动性计算 amount0 和 amount1
     // 参考 UniswapV3 的代码
+
     amount0 = SqrtPriceMath.getAmount0Delta(
         sqrtPriceX96,
         TickMath.getSqrtPriceAtTick(tickUpper),
         params.liquidityDelta
     );
+
     amount1 = SqrtPriceMath.getAmount1Delta(
         TickMath.getSqrtPriceAtTick(tickLower),
         sqrtPriceX96,
         params.liquidityDelta
     );
+    Position storage position = positions[params.owner];
 
     // 修改 liquidity
-    uint128 liquidityBefore = liquidity;
-    liquidity = LiquidityMath.addDelta(
-        liquidityBefore,
+    liquidity = LiquidityMath.addDelta(liquidity, params.liquidityDelta);
+    position.liquidity = LiquidityMath.addDelta(
+        position.liquidity,
         params.liquidityDelta
     );
 }
@@ -135,8 +138,6 @@ function mint(
     );
     amount0 = uint256(amount0Int);
     amount1 = uint256(amount1Int);
-    // 把流动性记录到对应的 position 中
-    positions[recipient].liquidity += amount;
 
     uint256 balance0Before;
     uint256 balance1Before;
@@ -154,7 +155,7 @@ function mint(
 }
 ```
 
-我们将不同的 LP 的流动性记录在 `positions` 中，另外需要在最后检查一下对应的 token 是否到账，确认后触发一个 `Mint` 事件。
+我们需要在最后检查一下对应的 token 是否到账，确认后触发一个 `Mint` 事件。
 
 这里需要注意的是，我们还需要添加 `balance0` 和 `balance1` 两个方法，它们也是参考了 [Uniswap V3 的代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L140)，不过我们做了一点小的调整，把 V3 中定义的 `IERC20Minimal` 改为使用 `@openzeppelin/contracts/token/ERC20/IERC20.sol`，当然，真实的项目中使用 `IERC20Minimal` 会一定程度上降低合约的大小，但是我们课程中直接使用 `@openzeppelin` 下的合约会更简单，也让大家可以借此来了解 [OpenZeppelin](https://www.openzeppelin.com/solidity-contracts) 相关的库。
 
@@ -242,21 +243,30 @@ function burn(
 
 ```solidity
 function collect(
-    address recipient
+    address recipient,
+    uint128 amount0Requested,
+    uint128 amount1Requested
 ) external returns (uint128 amount0, uint128 amount1);
 ```
 
-和 Uniswap V3 的[代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L490)不同，我们简化是实现，只支持全部提取。完整的代码如下：
+和 Uniswap V3 的[代码](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L490)逻辑类似，完整的代码如下：
 
 ```solidity
 function collect(
-    address recipient
+    address recipient,
+    uint128 amount0Requested,
+    uint128 amount1Requested
 ) external override returns (uint128 amount0, uint128 amount1) {
     // 获取当前用户的 position
     Position storage position = positions[msg.sender];
-    // 把钱退给用户 recipient，只支持全部退还
-    amount0 = position.tokensOwed0;
-    amount1 = position.tokensOwed1;
+
+    // 把钱退给用户 recipient
+    amount0 = amount0Requested > position.tokensOwed0
+        ? position.tokensOwed0
+        : amount0Requested;
+    amount1 = amount1Requested > position.tokensOwed1
+        ? position.tokensOwed1
+        : amount1Requested;
 
     if (amount0 > 0) {
         position.tokensOwed0 -= amount0;

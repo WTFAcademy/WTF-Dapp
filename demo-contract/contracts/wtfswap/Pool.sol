@@ -130,7 +130,7 @@ contract Pool is IPool {
             sqrtPriceX96,
             params.liquidityDelta
         );
-        Position memory position = positions[params.owner];
+        Position storage position = positions[params.owner];
 
         // 提取手续费，计算从上一次提取到当前的手续费
         uint128 tokensOwed0 = uint128(
@@ -203,8 +203,6 @@ contract Pool is IPool {
         );
         amount0 = uint256(amount0Int);
         amount1 = uint256(amount1Int);
-        // 把流动性记录到对应的 position 中
-        positions[recipient].liquidity += amount;
 
         uint256 balance0Before;
         uint256 balance1Before;
