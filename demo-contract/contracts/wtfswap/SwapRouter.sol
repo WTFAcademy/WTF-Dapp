@@ -53,8 +53,8 @@ contract SwapRouter is ISwapRouter {
             );
 
             // 更新 amountIn 和 amountOut
-            amountIn = uint256(zeroForOne ? amount0 : amount1);
-            amountOut += uint256(zeroForOne ? amount1 : amount0);
+            amountIn = uint256(zeroForOne ? -amount0 : -amount1);
+            amountOut += uint256(zeroForOne ? -amount1 : -amount0);
 
             // 如果 amountIn 为 0，表示交换完成，跳出循环
             if (amountIn == 0) {
@@ -68,8 +68,8 @@ contract SwapRouter is ISwapRouter {
         // 发射 Swap 事件
         emit Swap(msg.sender, zeroForOne, params.amountIn, amountIn, amountOut);
 
-        // 返回 amountIn
-        return amountIn;
+        // 返回 amountOut
+        return amountOut;
     }
 
     function exactOutput(
@@ -112,8 +112,8 @@ contract SwapRouter is ISwapRouter {
             );
 
             // 更新 amountOut 和 amountIn
-            amountOut = uint256(zeroForOne ? amount1 : amount0);
-            amountIn += uint256(zeroForOne ? amount0 : amount1);
+            amountOut = uint256(zeroForOne ? -amount1 : -amount0);
+            amountIn += uint256(zeroForOne ? -amount0 : -amount1);
 
             // 如果 amountOut 为 0，表示交换完成，跳出循环
             if (amountOut == 0) {
