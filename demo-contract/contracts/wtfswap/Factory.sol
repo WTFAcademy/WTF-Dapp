@@ -30,7 +30,7 @@ contract Factory is IFactory {
 
         (token0, token1) = sortToken(tokenA, tokenB);
 
-        return pools[tokenA][tokenB][index];
+        return pools[token0][token1][index];
     }
 
     function createPool(
