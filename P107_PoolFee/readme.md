@@ -134,6 +134,8 @@ function _modifyPosition(
 
 这样，当 LP 调用 `collect` 方法时，就可以将 `Position` 中的 `tokensOwed0` 和 `tokensOwed1` 转给用户了。
 
+有一点提一下，为什么我们是在 `burn` 或者 `mint` 调用的 `_modifyPosition` 中计算手续费，而不是在用户 `swap` 的时候就把每个池子应该收到的手续费都记录上呢？因为一个池子中的流动性可能会很多，如果在交易的时候记录的话会产生大量的运算，会导致 Gas 太高。在这个计算中，LP 持有的流动性算是 LP 的“持股”份额，通过“持股”（Share）来计算 Token 也是很多 Defi 场景都会用到的方法。
+
 ## 合约测试
 
 我们尝试继续在上一讲课程中的 `test/wtfswap/Pool.ts` 的 `swap` 样例中补充测试代码：
@@ -147,12 +149,14 @@ expect(await token0.read.balanceOf([testLP.address])).to.equal(
 );
 // 提取 token
 await testLP.write.collect([testLP.address, pool.address]);
-// 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费
+// 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费，并且有交易换入了 token0
 // 初始的 token0 是 const initBalanceValue = 100000000000n * 10n ** 18n;
 expect(await token0.read.balanceOf([testLP.address])).to.equal(
-  100000000099699999999999999999n
+  100000000099999999999999999998n
 );
 ```
+
+仔细看上面的测试样例你会发现，LP 的 token 0 的数量从原来的 `100000000000n * 10n ** 18n` 变成了 `(100000000000n + 100n) * 10n ** 18n;`（不完全相等，计算上会因为取整问题有一点点损耗）。因为中间的交易换入了 `100n * 10n ** 18n` 的 token0，其中包含了手续费。
 
 至此，我们完成了全部 `Pool` 合约逻辑的开发。🎉
 
