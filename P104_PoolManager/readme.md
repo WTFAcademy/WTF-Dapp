@@ -42,6 +42,7 @@ contract PoolManager is Factory, IPoolManager {
 
 ```solidity
 import "./IFactory.sol";
+
 interface IPoolManager is IFactory {
   // ...
 
@@ -60,7 +61,7 @@ interface IPoolManager is IFactory {
 }
 ```
 
-现在我们考虑具体的功能实现，在 `Factory` 合约里面对外暴露了一个 `createPool` 的方法，我们可以调用该方法去创建池子。需要注意的是，对于重复创建的情况，并不在 PoolManager 中处理，而是在 Factory 处理。
+现在我们考虑具体的功能实现，在 `Factory` 合约里面对外暴露了一个 `createPool` 的方法，我们可以调用该方法去创建池子。需要注意的是，对于重复创建的情况，并不在 `PoolManager` 中处理，而是在 `Factory` 处理。
 
 
 ```solidity
@@ -88,9 +89,9 @@ contract PoolManager is Factory, IPoolManager {
 
 在创建完成池子之后，我们需要维护 DEX 整体池子的信息，该信息包含两部份，DEX 支持的交易对种类以及交易对的具体信息。前者主要是为了提供我们的 DEX 支持哪些 Token 间进行交易，后者主要是提供完整的池子信息。
 
-在 Factory 合约中，每次创建完成一个池子，都会记录下它的信息，因此这个信息我们不需要再记录，我们需要记录的是交易对的种类。
+在 `Factory` 合约中，每次创建完成一个池子，都会记录下它的信息，因此这个信息我们不需要再记录，我们需要记录的是交易对的种类。
 
-由于我们继承了 Factory，因此我们可以轻松拿到 Factory 中的 pools，因此记录信息的逻辑可以如下实现：
+由于我们继承了 `Factory`，因此我们可以轻松拿到 `Factory` 中的 `pools`，因此记录信息的逻辑可以如下实现：
 
 ```solidity
 import "./Factory.sol";
@@ -138,7 +139,7 @@ contract PoolManager is Factory, IPoolManager {
 
 ### 3. 返回全部池子信息
 
-由于池子的信息是在 Factory 合约中保存的，因此我们在返回全部池子信息的时候，还需要对 Factory 保存的信息进行处理，处理成我们想要的数据格式。
+由于池子的信息是在 `Factory` 合约中保存的，因此我们在返回全部池子信息的时候，还需要对 `Factory` 保存的信息进行处理，处理成我们想要的数据格式。
 
 这部分的逻辑比较清晰，通过遍历全部的池子信息，做一些数据转换就行。
 
@@ -186,11 +187,11 @@ contract PoolManager is Factory, IPoolManager {
 }
 ```
 
-在这里需要注意的是，我们首先计算了返回池子的大小，然后再往里面添加数据。这么做看起来非常的不合理，但是在合约方法中，memory 数组是无法进行动态地添加数据的，这个限制是出于对合约方法调用 gas 费的一种保护。
+在这里需要注意的是，我们首先计算了返回池子的大小，然后再往里面添加数据。这么做看起来非常的不合理，但是在合约方法中，memory 数组是无法进行动态地添加数据的，这个限制是出于对合约方法调用 gas 费的一种保护。因此这是一个无奈之举。
 
 ### 4. 返回 pairs 数据
 
-pairs 数据主要是用于查询我们 DEX 是否支持某一交易对的交易，我们在创建池子的时候就已经维护了 pairs，因此我们只需要将其返回出去就好。
+`pairs` 数据主要是用于查询我们 DEX 是否支持某一交易对的交易，我们在创建池子的时候就已经维护了 `pairs`，因此我们只需要将其返回出去就好。
 
 ```solidity
 import "./Factory.sol";
@@ -207,7 +208,7 @@ contract PoolManager is Factory, IPoolManager {
 }
 ```
 
-可以看到我们设计了一个 getPairs 方法用于返回数据。可能会有一些同学有这样的疑问，为什么要设计一个函数方法用于返回，合约里面的变量不是会自动生成对应的 getter 方法用于获取其值的吗？
+可以看到我们设计了一个 `getPairs` 方法用于返回数据。可能会有一些同学有这样的疑问，为什么要设计一个函数方法用于返回，合约里面的变量不是会自动生成对应的 getter 方法用于获取其值的吗？
 
 是的没有错，solidity 是会自动给合约里面定义的 public 变量生成对应的 getter 方法，开发者可以不用再额外设计获取值的方法，但是对于变量是数组这个特殊情况，solidity 生成的 getter 方法并不会返回整个数据，而是需要调用者指定索引，只返回索引对应的值。这么设计的原因是避免一次返回过多的数据，在别的合约使用这份数据时产生不可控的 gas 费。
 
@@ -247,7 +248,7 @@ describe("PoolManager", function () {
       },
     ]);
 
-    // 创建 tokenB-tokenA，由于和前一个参数一样，会被合并
+    // 创建 tokenB-tokenA，由于和前一个参数一样，不会额外创建
     await manager.write.createAndInitializePoolIfNecessary([
       {
         tokenA: tokenB,
