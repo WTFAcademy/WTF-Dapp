@@ -73,7 +73,7 @@ if (zeroForOne) {
 
 其中 `FullMath.mulDiv` 方法接收三个参数，结果返回第一个参数和第二个参数的乘积再除以第三个参数。
 
-然后在 `_modifyPosition` 中补充相关逻辑，每次 LP 调用 `mint` 或者 `burn` 方法时更新头寸（`Position`）中的 `tokensOwed0` 和 `tokensOwed1`。
+然后在 `_modifyPosition` 中补充相关逻辑，每次 LP 调用 `mint` 或者 `burn` 方法时更新头寸（`Position`）中的 `tokensOwed0` 和 `tokensOwed1`，将之前累计的手续费记录上，并重新开始记录手续费。
 
 ```diff
 function _modifyPosition(
@@ -93,7 +93,7 @@ function _modifyPosition(
         sqrtPriceX96,
         params.liquidityDelta
     );
-    Position memory position = positions[params.owner];
+    Position storage position = positions[params.owner];
 
 +    // 提取手续费，计算从上一次提取到当前的手续费
 +    uint128 tokensOwed0 = uint128(

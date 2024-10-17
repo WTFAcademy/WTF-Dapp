@@ -78,7 +78,7 @@
 
 **第 P107 讲：Pool 合约交易手续费逻辑开发**：[教程](./P107_PoolFee/readme.md) | [代码](./demo-contract/contracts/wtfswap/Pool.sol)
 
-**第 P108 讲：PositionManager 合约开发**
+**第 P108 讲：PositionManager 合约开发**：[教程](./P108_PositionManager/readme.md) | [代码](./demo-contract/contracts/wtfswap/PositionManager.sol)
 
 **第 P109 讲：SwapRouter 合约开发**
 
