@@ -2,6 +2,8 @@
 pragma solidity ^0.8.24;
 pragma abicoder v2;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "./interfaces/ISwapRouter.sol";
 import "./interfaces/IPool.sol";
 import "./interfaces/IPoolManager.sol";
@@ -11,6 +13,20 @@ contract SwapRouter is ISwapRouter {
 
     constructor(address _poolManager) {
         poolManager = IPoolManager(_poolManager);
+    }
+
+    /// @dev Parses a revert reason that should contain the numeric quote
+    function parseRevertReason(
+        bytes memory reason
+    ) private pure returns (uint256) {
+        if (reason.length != 32) {
+            if (reason.length < 68) revert("Unexpected error");
+            assembly {
+                reason := add(reason, 0x04)
+            }
+            revert(abi.decode(reason, (string)));
+        }
+        return abi.decode(reason, (uint256));
     }
 
     function exactInput(
@@ -137,11 +153,66 @@ contract SwapRouter is ISwapRouter {
         return amountIn;
     }
 
+    // 报价，指定 tokenIn 的数量和 tokenOut 的最小值，返回 tokenOut 的实际数量
     function quoteExactInput(
-        QuoteExactInputParams memory params
-    ) external view override returns (uint256 amountOut) {}
+        QuoteExactInputParams calldata params
+    ) external override returns (uint256 amountOut) {
+        // 因为没有实际 approve，所以这里交易会报错，我们捕获错误信息，解析需要多少 token
+        try
+            this.exactInput(
+                ExactInputParams({
+                    tokenIn: params.tokenIn,
+                    tokenOut: params.tokenOut,
+                    indexPath: params.indexPath,
+                    recipient: msg.sender,
+                    deadline: block.timestamp + 1 hours,
+                    amountIn: params.amountIn,
+                    amountOutMinimum: 0,
+                    sqrtPriceLimitX96: params.sqrtPriceLimitX96
+                })
+            )
+        {} catch (bytes memory reason) {
+            return parseRevertReason(reason);
+        }
+    }
 
+    // 报价，指定 tokenOut 的数量和 tokenIn 的最大值，返回 tokenIn 的实际数量
     function quoteExactOutput(
-        QuoteExactOutputParams memory params
-    ) external view override returns (uint256 amountIn) {}
+        QuoteExactOutputParams calldata params
+    ) external override returns (uint256 amountIn) {
+        try
+            this.exactOutput(
+                ExactOutputParams({
+                    tokenIn: params.tokenIn,
+                    tokenOut: params.tokenOut,
+                    indexPath: params.indexPath,
+                    recipient: msg.sender,
+                    deadline: block.timestamp + 1 hours,
+                    amountOut: params.amountOut,
+                    amountInMaximum: type(uint256).max,
+                    sqrtPriceLimitX96: params.sqrtPriceLimitX96
+                })
+            )
+        {} catch (bytes memory reason) {
+            return parseRevertReason(reason);
+        }
+    }
+
+    function swapCallback(
+        int256 amount0Delta,
+        int256 amount1Delta,
+        bytes calldata data
+    ) external override {
+        // transfer token
+        (address payer, address token0, address token1) = abi.decode(
+            data,
+            (address, address, address)
+        );
+        if (amount0Delta > 0) {
+            IERC20(token0).transfer(payer, uint(amount0Delta));
+        }
+        if (amount1Delta > 0) {
+            IERC20(token1).transfer(payer, uint(amount1Delta));
+        }
+    }
 }

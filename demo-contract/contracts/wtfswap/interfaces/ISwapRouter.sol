@@ -2,7 +2,9 @@
 pragma solidity ^0.8.24;
 pragma abicoder v2;
 
-interface ISwapRouter {
+import "./IPool.sol";
+
+interface ISwapRouter is ISwapCallback {
     event Swap(
         address indexed sender,
         bool zeroForOne,
@@ -50,18 +52,18 @@ interface ISwapRouter {
     }
 
     function quoteExactInput(
-        QuoteExactInputParams memory params
+        QuoteExactInputParams calldata params
     ) external returns (uint256 amountOut);
 
     struct QuoteExactOutputParams {
         address tokenIn;
         address tokenOut;
         uint32[] indexPath;
-        uint256 amount;
+        uint256 amountOut;
         uint160 sqrtPriceLimitX96;
     }
 
     function quoteExactOutput(
-        QuoteExactOutputParams memory params
+        QuoteExactOutputParams calldata params
     ) external returns (uint256 amountIn);
 }
