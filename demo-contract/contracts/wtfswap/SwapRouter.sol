@@ -52,11 +52,12 @@ contract SwapRouter is ISwapRouter {
             // 获取 pool 实例
             IPool pool = IPool(poolAddress);
 
-            // 构造 swap 函数需要的参数
+            // 构造 swapCallback 函数需要的参数
             bytes memory data = abi.encode(
-                msg.sender,
                 params.tokenIn,
-                params.tokenOut
+                params.tokenOut,
+                params.indexPath[i],
+                msg.sender
             );
 
             // 调用 pool 的 swap 函数，进行交换，并拿到返回的 token0 和 token1 的数量
@@ -111,11 +112,12 @@ contract SwapRouter is ISwapRouter {
             // 获取 pool 实例
             IPool pool = IPool(poolAddress);
 
-            // 构造 swap 函数需要的参数
+            // 构造 swapCallback 函数需要的参数
             bytes memory data = abi.encode(
-                msg.sender,
                 params.tokenIn,
-                params.tokenOut
+                params.tokenOut,
+                params.indexPath[i],
+                msg.sender
             );
 
             // 调用 pool 的 swap 函数，进行交换，并拿到返回的 token0 和 token1 的数量
@@ -204,15 +206,25 @@ contract SwapRouter is ISwapRouter {
         bytes calldata data
     ) external override {
         // transfer token
-        (address payer, address token0, address token1) = abi.decode(
-            data,
-            (address, address, address)
-        );
+        (address tokenIn, address tokenOut, uint32 index, address payer) = abi
+            .decode(data, (address, address, uint32, address));
+        address _pool = poolManager.getPool(tokenIn, tokenOut, index);
+
+        // 检查 callback 的合约地址是否是 Pool
+        require(_pool == msg.sender, "Invalid callback caller");
+
+        bool zeroForOne = tokenIn < tokenOut;
         if (amount0Delta > 0) {
-            IERC20(token0).transfer(payer, uint(amount0Delta));
+            IERC20(zeroForOne ? tokenIn : tokenOut).transfer(
+                payer,
+                uint(amount0Delta)
+            );
         }
         if (amount1Delta > 0) {
-            IERC20(token1).transfer(payer, uint(amount1Delta));
+            IERC20(zeroForOne ? tokenOut : tokenIn).transfer(
+                payer,
+                uint(amount1Delta)
+            );
         }
     }
 }
