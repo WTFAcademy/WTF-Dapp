@@ -1,4 +1,4 @@
-本节作者：[@LCJove](https://github.com/LCJove)
+本节作者：[@yeezo](https://warpcast.com/yeezo)
 
 这一讲我们将引导大家完成 `PoolManager.sol` 合约的开发。
 
@@ -20,6 +20,8 @@
 > 完整的代码在 [demo-contract/contracts/wtfswap/PoolManager.sol](../demo-contract/contracts/wtfswap/PoolManager.sol) 中。
 
 在开始写合约之前，我们可以先停下来想一下，我们合约的功能应该需要包含哪些方法。在前端页面，我们有一个表格用于展示池子的一些信息，因此我们需要一个返回池子信息的方法。另外，在 position 前端页面有添加池子功能，因此我们还需要设计一个添加池子的方法。
+
+当然，这个合约并不是必须的，它只是为了给前端提供数据，本教程将数据保存在服务端只是为了教学。实际开发中，更加推荐将这些数据存储在服务端（Uniswap 的做法），通过调用服务端的接口来保存、获取这些数据，这样的话既可以提高操作数据的响应速度，又可以减少合约存储数据的 gas 开销。
 
 ### 1. 合约继承
 
@@ -187,11 +189,11 @@ contract PoolManager is Factory, IPoolManager {
 }
 ```
 
-在这里需要注意的是，我们首先计算了返回池子的大小，然后再往里面添加数据。这么做看起来非常的不合理，但是在合约方法中，memory 数组是无法进行动态地添加数据的，这个限制是出于对合约方法调用 gas 费的一种保护。因此这是一个无奈之举。
+在这里需要注意的是，我们首先计算了返回池子的大小，然后再往里面添加数据。这么做看起来非常的不合理，但是在合约方法中，memory 数组是无法进行动态地添加数据的，这个是 Solidity 语法上的限制，为了性能上的优化，memory 定义的数组需要提前分配好内存。因此这是一个无奈之举。
 
 ### 4. 返回 pairs 数据
 
-`pairs` 数据主要是用于查询我们 DEX 是否支持某一交易对的交易，我们在创建池子的时候就已经维护了 `pairs`，因此我们只需要将其返回出去就好。
+`pairs` 数据主要是用于查询我们 DEX 是否支持某一交易对的交易，我们在介绍 2.创建池子 章节的时候就已经维护了 `pairs`，因此我们只需要将其返回出去就好。
 
 ```solidity
 import "./Factory.sol";
@@ -291,3 +293,5 @@ describe("PoolManager", function () {
   });
 });
 ```
+
+完整的单测代码在 [demo-contract/test/wtfswap/PoolManager.ts](../demo-contract/test/wtfswap/PoolManager.ts) 中，在实际项目中，你的单测应该覆盖到所有的逻辑分支，以保证合约的安全。
