@@ -1,4 +1,4 @@
-本节作者：[@愚指导](https://x.com/yudao1024)
+本节作者：[@愚指导](https://x.com/yudao1024)、[@小符](https://x.com/smallfu666)
 
 这一讲，我们会引导你快速创建一个 React 项目，并在其中展示一个 NFT 的图片。
 
@@ -106,7 +106,7 @@ body {
 
 ## 配置适配器
 
-适配器可以连接 `Ant Design Web3 UI` 组件和区块链，让这些 UI 组件可以快速连接上区块链。比如，当你使用了 `@ant-design/web3-wagmi` 后，Connector、NFTCard 等组件就可以直接连接上以太坊了。 适配器的配置可以参考[以太坊推荐配置](https://web3.ant.design/components/ethereum-cn#%E6%8E%A8%E8%8D%90%E9%85%8D%E7%BD%AE)，在该课程中，我们会先采用最简单的配置，再逐步引导你了解你实际项目中所需要的配置。
+适配器可以连接 Ant Design Web3 的 UI 组件和区块链，让这些 UI 组件可以快速连接上区块链。比如，当你使用了 `@ant-design/web3-wagmi` 后，Connector、NFTCard 等组件就可以直接连接上以太坊了。 适配器的配置可以参考[以太坊推荐配置](https://web3.ant.design/components/ethereum-cn#%E6%8E%A8%E8%8D%90%E9%85%8D%E7%BD%AE)，在该课程中，我们会先采用最简单的配置，再逐步引导你了解你实际项目中所需要的配置。
 
 首先，请继续编辑 `pages/web3.tsx` 文件，引入所需要的内容：
 
