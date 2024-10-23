@@ -1,0 +1,15 @@
+.swapcard {
+  width: 600px;
+  margin: 0 auto;           
+  position: absolute;       
+  top: 50%;                
+  left: 50%;
+  transform: translate(-50%, -50%); 
+}
+
+.swapselect {
+  border-radius: 25px; 
+  background-color: #f4f2f2;
+  padding-left: 10px;
+  padding-right: 10px;
+}
