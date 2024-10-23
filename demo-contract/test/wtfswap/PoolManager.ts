@@ -20,6 +20,7 @@ describe("PoolManager", function () {
     const tokenC: `0x${string}` = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
     const tokenD: `0x${string}` = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 
+    // 创建 tokenA-tokenB，但是会因为 Factory 的创建逻辑，会变成 tokenB-tokenA
     await manager.write.createAndInitializePoolIfNecessary([
       {
         tokenA: tokenA,
@@ -31,6 +32,7 @@ describe("PoolManager", function () {
       },
     ]);
 
+    // 创建 tokenB-tokenA，由于和前一个参数一样，会被合并
     await manager.write.createAndInitializePoolIfNecessary([
       {
         tokenA: tokenB,
@@ -53,9 +55,11 @@ describe("PoolManager", function () {
       },
     ]);
 
+    // 判断返回的 pairs 的数量是否正确
     const pairs = await manager.read.getPairs();
     expect(pairs.length).to.equal(2);
 
+    // 判断返回的 pools 的数量、参数是否正确
     const pools = await manager.read.getAllPools();
     expect(pools.length).to.equal(2);
     expect(pools[0].token0).to.equal(tokenB);
