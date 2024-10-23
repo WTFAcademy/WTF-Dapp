@@ -125,7 +125,7 @@ export default function Web3() {
 其中引入的内容说明如下：
 
 - http：wagmi 用来创建 [HTTP JSON RPC](https://wagmi.sh/core/api/transports/http) 连接的方法，通过它你可以通过 HTTP 请求访问区块链。
-- Mainnet：代表以太坊主网，除了 `Mainnet` 以外还支持 `Sepolia` 和 `Goerli` 测试网以及 `BSC` 和 `Arbitrum` 等 L2 链；支持的链参考[这里](https://github.com/ant-design/ant-design-web3/blob/main/packages/wagmi/src/chains.ts)。
+- Mainnet：代表以太坊主网，除了 `Mainnet` 以外还支持 `Sepolia` 测试网以及 `BSC` 和 `Arbitrum` 等 L2 链；支持的链参考[这里](https://github.com/ant-design/ant-design-web3/blob/main/packages/wagmi/src/chains.ts)。
 - [WagmiWeb3ConfigProvider](https://web3.ant.design/components/web3-config-provider-cn)：Ant Design Web3 用来接收 wagmi 配置的 Provider。
 
 接着创建配置：
