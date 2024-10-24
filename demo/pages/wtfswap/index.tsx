@@ -1,44 +1,43 @@
 import React, { useState } from 'react';
-import { Card, Select, Input, Button, Row, Col, Typography, Space, Avatar } from 'antd';
+import { TokenSelect, type Token } from '@ant-design/web3';
+import { ETH, USDT } from '@ant-design/web3-assets/tokens';
+import { Card, Input, Button, Row, Col, Space, Typography } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 
 import WtfLayout from "@/components/WtfLayout";
 import styles from "./styles.module.css";
 
-const { Option } = Select;
 const { Text } = Typography;
 
+
 export default function Wtfswap() {
-  const [token1, setToken1] = useState('ETH');
-  const [token2, setToken2] = useState('XRP');
+  const [token1, setToken1] = useState<Token>(ETH);
+  const [token2, setToken2] = useState<Token>(USDT);
   const [amount1, setAmount1] = useState(0);
   const [amount2, setAmount2] = useState(0);
 
-  const tokenList = [
-    { symbol: 'ETH', balance: 23491 },
-    { symbol: 'XRP', balance: 0 },
-    { symbol: 'USDT', balance: 10000 },
-    { symbol: 'DAI', balance: 5000 },
-  ];
 
-  const handleSwap = () => {
+  const handleAmount1Change = (e: any) => {
+    setAmount1(parseFloat(e.target.value));
+    // todo: setAmount2
+    // const a2 = amount1 * 20;
+    // setAmount1(a2);
+  };
+
+  const handleSwitch = () => {
     setToken1(token2);
     setToken2(token1);
-    setAmount1(0);
-    setAmount2(0);
+    setAmount1(amount2);
+    setAmount2(amount1);
   };
 
   const handleMax = () => {
-    const selectedToken = tokenList.find((token) => token.symbol === token1);
-    if (selectedToken) {
-      setAmount1(selectedToken.balance);
-      setAmount2(selectedToken.balance); 
-    };
+    // max 
   };
 
 
-  return (<WtfLayout>
-    <div>
+  return (
+    <WtfLayout>
       <Card title="Swap" className={styles.swapcard}>
         <Row gutter={[16, 16]}>
           <Col span={24}>
@@ -49,18 +48,10 @@ export default function Wtfswap() {
                   placeholder="0"
                   variant="borderless"
                   value={amount1}
-                  // onChange={(e) => setAmount1(e.target.value)}
+                  type="number"
+                  onChange={(e) => handleAmount1Change(e)}
                   addonAfter={
-                    <Select className={styles.swapselect} variant="borderless" defaultValue="ETH" value={token1} onChange={(value) => setToken1(value)}>
-                      {tokenList.map((token) => (
-                        <Option className={styles.swapoption} key={token.symbol} value={token.symbol}>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar src="https://coin-images.coingecko.com/coins/images/6319/large/usdc.png?1696506694" size="small" style={{ marginRight: '8px' }} />
-                            {token.symbol}
-                          </div>
-                        </Option>
-                      ))}
-                    </Select>
+                    <TokenSelect value={token1} onChange={setToken1} options={[ETH, USDT]} />
                   }
                 />
 
@@ -73,7 +64,7 @@ export default function Wtfswap() {
                   <Col>
                     <Space style={{ justifyContent: 'flex-end' }}>
                       <Text type="secondary">
-                        Balance: {tokenList.find((token) => token.symbol === token1)?.balance}
+                        Balance: 0
                       </Text>
                       <Button size="small" onClick={handleMax} type="link">
                         Max
@@ -89,7 +80,7 @@ export default function Wtfswap() {
             <Button
               shape="circle"
               icon={<SwapOutlined />}
-              onClick={handleSwap}
+              onClick={handleSwitch}
               style={{ fontSize: '20px' }}
             />
           </Col>
@@ -104,16 +95,7 @@ export default function Wtfswap() {
                   readOnly
                   variant="borderless"
                   addonAfter={
-                    <Select className={styles.swapselect} defaultValue="XRP" value={token2} onChange={(value) => setToken2(value)}>
-                     {tokenList.map((token) => (
-                        <Option key={token.symbol} value={token.symbol}>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar src="https://coin-images.coingecko.com/coins/images/6319/large/usdc.png?1696506694" size="small" style={{ marginRight: '8px' }} />
-                            {token.symbol}
-                          </div>
-                        </Option>
-                      ))}
-                    </Select>
+                    <TokenSelect value={token2} onChange={setToken2} options={[ETH, USDT]} />
                   }
                 />
                 <Row style={{ width: '100%' }} align="middle">
@@ -125,7 +107,7 @@ export default function Wtfswap() {
                   <Col>
                     <Space style={{ justifyContent: 'flex-end' }}>
                       <Text type="secondary">
-                        Balance: {tokenList.find((token) => token.symbol === token1)?.balance}
+                        Balance: 0
                       </Text>
                     </Space>
                   </Col>
@@ -142,6 +124,6 @@ export default function Wtfswap() {
           </Col>
         </Row>
       </Card>
-    </div>
-  </WtfLayout>);
+    </WtfLayout>
+  );
 }
