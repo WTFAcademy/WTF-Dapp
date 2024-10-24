@@ -30,8 +30,10 @@ export default function Wtfswap() {
 
   const handleMax = () => {
     const selectedToken = tokenList.find((token) => token.symbol === token1);
-    setAmount1(selectedToken.balance);
-    setAmount2(selectedToken.balance); 
+    if (selectedToken) {
+      setAmount1(selectedToken.balance);
+      setAmount2(selectedToken.balance); 
+    };
   };
 
 
