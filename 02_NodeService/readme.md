@@ -21,18 +21,18 @@
 选择以太坊主网的节点服务地址，并将复制的地址添加到 `WagmiWeb3ConfigProvider`  的 `http()` 方法中。，如下：
 
 ```diff
-<WagmiWeb3ConfigProvider
+ <WagmiWeb3ConfigProvider
   chains={[Mainnet]}
   transports={{
 -   [mainnet.id]: http(),
 +   [Mainnet.id]: http('https://api.zan.top/node/v1/eth/mainnet/{YourZANApiKey}'),
   }}
->
+ >
 ```
 
 上面代码中的 `YourZANApiKey` 需要替换成你自己的 Key。另外在实际的项目中，为了避免你的 Key 被滥用，建议你将 Key 放到后端服务中，然后通过后端服务来调用节点服务，或者在 ZAN 的控制台中设置域名白名单来降低被滥用的风险。当然，在教程中你也可以继续直接使用 `http()`，使用 wagmi 内置的默认的实验性的节点服务。
 
-同样，如果你使用的是 Infura 或者 Alchemy 的节点服务，你也可以将它们的节点服务地址添加到 wagmi 的 `http()` 方法中。
+同样，如果你使用的是 Infura 或者 Alchemy 的节点服务，你也可以将它们的节点服务地址添加到 `WagmiWeb3ConfigProvider` 的 `http()` 方法中。
 
 ## 从水龙头获取测试网 ETH
 
