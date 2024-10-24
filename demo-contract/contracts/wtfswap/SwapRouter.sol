@@ -215,14 +215,16 @@ contract SwapRouter is ISwapRouter {
 
         bool zeroForOne = tokenIn < tokenOut;
         if (amount0Delta > 0) {
-            IERC20(zeroForOne ? tokenIn : tokenOut).transfer(
+            IERC20(zeroForOne ? tokenIn : tokenOut).transferFrom(
                 payer,
+                _pool,
                 uint(amount0Delta)
             );
         }
         if (amount1Delta > 0) {
-            IERC20(zeroForOne ? tokenOut : tokenIn).transfer(
+            IERC20(zeroForOne ? tokenOut : tokenIn).transferFrom(
                 payer,
+                _pool,
                 uint(amount1Delta)
             );
         }
