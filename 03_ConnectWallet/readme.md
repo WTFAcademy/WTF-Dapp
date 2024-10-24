@@ -17,46 +17,43 @@
 我们以 [MetaMask](https://metamask.io/) 为例，看一下如何和 MetaMask 钱包建立连接。
 
 ```diff
-
-import { createConfig, http } from "wagmi";
-import { mainnet } from "wagmi/chains";
-- import { WagmiWeb3ConfigProvider } from "@ant-design/web3-wagmi";
-+ import { WagmiWeb3ConfigProvider, MetaMask } from "@ant-design/web3-wagmi";
+import { http } from "wagmi";
+- import { Mainnet, WagmiWeb3ConfigProvider } from '@ant-design/web3-wagmi';
++ import { Mainnet, WagmiWeb3ConfigProvider, MetaMask } from '@ant-design/web3-wagmi';
 - import { Address, NFTCard } from "@ant-design/web3";
 + import { Address, NFTCard, Connector, ConnectButton } from "@ant-design/web3";
-+ import { injected } from "wagmi/connectors";
-
-const config = createConfig({
-  chains: [mainnet],
-  transports: {
-    [mainnet.id]: http(),
-  },
-+   connectors: [
-+     injected({
-+       target: "metaMask",
-+     }),
-+   ],
-});
 
 export default function Web3() {
   return (
--   <WagmiWeb3ConfigProvider config={config}>
-+    <WagmiWeb3ConfigProvider config={config} wallets={[MetaMask()]}>
+    <WagmiWeb3ConfigProvider
+      chains={[Mainnet]}
+      transports={{
+        [Mainnet.id]: http(),
+      }}
++	  wallets={[MetaMask()]}
+    >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard
         address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
         tokenId={641}
       />
-+       <Connector>
-+         <ConnectButton />
-+       </Connector>
++	  <Connector>
++	    <ConnectButton />
++	  </Connector>
     </WagmiWeb3ConfigProvider>
   );
 };
-
-
 ```
 
-可以得到如下的效果：
+其中引入的内容说明如下：
+
+- MetaMask：代表小狐狸钱包，Ant Design Web3 支持多款[钱包](https://github.com/ant-design/ant-design-web3/blob/main/packages/wagmi/src/wallets/index.ts)，方便根据需要进行配置。
+- [Connector](https://web3.ant.design/components/connector-cn)：连接器，Connector 提供了一个完整的连接钱包的 UI 。
+- [ConnectButton](https://web3.ant.design/components/connect-button-cn)：连接区块链钱包的按钮，配合 `Connector` 组件一起使用。
+
+这样就完成了连接钱包的功能，可以看到如下的页面：
 
 ![](./img/connect.png)
+
+使用 Ant Design Web3 提供的组件可以快速的实现 DApp 的基础功能，恭喜你，我们已经实现了连接钱包的功能。
+
