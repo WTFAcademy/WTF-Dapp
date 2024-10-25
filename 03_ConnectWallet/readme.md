@@ -30,16 +30,16 @@ export default function Web3() {
       transports={{
         [Mainnet.id]: http(),
       }}
-+	  wallets={[MetaMask()]}
++     wallets={[MetaMask()]}
     >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard
         address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
         tokenId={641}
       />
-+	  <Connector>
-+	    <ConnectButton />
-+	  </Connector>
++     <Connector>
++       <ConnectButton />
++     </Connector>
     </WagmiWeb3ConfigProvider>
   );
 };
