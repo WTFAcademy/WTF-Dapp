@@ -14,7 +14,6 @@
 
 `PoolManager` 合约主要需要的功能比较简单，但是我们可以在里面学到一些有趣的细节知识。
 
-
 ## 合约开发
 
 > 完整的代码在 [demo-contract/contracts/wtfswap/PoolManager.sol](../demo-contract/contracts/wtfswap/PoolManager.sol) 中。
@@ -49,8 +48,8 @@ interface IPoolManager is IFactory {
   // ...
 
   struct CreateAndInitializeParams {
-    address tokenA;
-    address tokenB;
+    address token0;
+    address token1;
     uint24 fee;
     int24 tickLower;
     int24 tickUpper;
@@ -65,7 +64,6 @@ interface IPoolManager is IFactory {
 
 现在我们考虑具体的功能实现，在 `Factory` 合约里面对外暴露了一个 `createPool` 的方法，我们可以调用该方法去创建池子。需要注意的是，对于重复创建的情况，并不在 `PoolManager` 中处理，而是在 `Factory` 处理。
 
-
 ```solidity
 import "./Factory.sol";
 import "./interfaces/IPoolManager.sol";
@@ -76,9 +74,11 @@ contract PoolManager is Factory, IPoolManager {
   function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address poolAddress) {
+        require(params.token0 < params.token1);
+
         poolAddress = this.createPool(
-            params.tokenA,
-            params.tokenB,
+            params.token0,
+            params.token1,
             params.tickLower,
             params.tickUpper,
             params.fee
@@ -107,10 +107,11 @@ contract PoolManager is Factory, IPoolManager {
   function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address poolAddress) {
+        require(params.token0 < params.token1);
 
         poolAddress = this.createPool(
-            params.tokenA,
-            params.tokenB,
+            params.token0,
+            params.token1,
             params.tickLower,
             params.tickUpper,
             params.fee
@@ -118,7 +119,7 @@ contract PoolManager is Factory, IPoolManager {
 
         // 获取池子合约
         IPool pool = IPool(poolAddress);
-        
+
         // 获取同一交易对的数量
         uint256 index = pools[pool.token0()][pool.token1()].length;
 
@@ -136,6 +137,8 @@ contract PoolManager is Factory, IPoolManager {
     }
 }
 ```
+
+需要注意的是，虽然 `createPool` 的入参 `tokenA` 和 `tokenB` 没有顺序要求，但是在 `createAndInitializePoolIfNecessary` 中我们创建的时候要求 `token0 < token1`。因为在这个方法中需要传入初始化的价格，而在交易池中价格是按照 `token0/token1` 的方式计算的，做这个限制可以避免 LP 不小心初始化错误的价格。在后续的代码和测试中，我们也约定了 `tokenA` 和 `tokenB` 是未排序的，而 `token0` 和 `token1` 是排序的，这样也便于我们理解代码。
 
 至此，创建池子的方法我们就算是实现完成了。
 
@@ -221,6 +224,11 @@ contract PoolManager is Factory, IPoolManager {
 我们需要测试是否成功创建以及返回的池子信息是否正确，代码如下：
 
 ```typescript
+import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import { expect } from "chai";
+import hre from "hardhat";
+import { TickMath, encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
+
 describe("PoolManager", function () {
   async function deployFixture() {
     const manager = await hre.viem.deployContract("PoolManager");
@@ -233,16 +241,16 @@ describe("PoolManager", function () {
 
   it("getPairs & getAllPools", async function () {
     const { manager } = await loadFixture(deployFixture);
-    const tokenA: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
-    const tokenB: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+    const tokenA: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+    const tokenB: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
     const tokenC: `0x${string}` = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
     const tokenD: `0x${string}` = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 
-    // 创建 tokenA-tokenB，但是会因为 Factory 的创建逻辑，会变成 tokenB-tokenA
+    // 创建 tokenA-tokenB
     await manager.write.createAndInitializePoolIfNecessary([
       {
-        tokenA: tokenA,
-        tokenB: tokenB,
+        token0: tokenA,
+        token1: tokenB,
         fee: 3000,
         tickLower: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1)),
         tickUpper: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(10000, 1)),
@@ -250,11 +258,11 @@ describe("PoolManager", function () {
       },
     ]);
 
-    // 创建 tokenB-tokenA，由于和前一个参数一样，不会额外创建
+    // 由于和前一个参数一样，会被合并
     await manager.write.createAndInitializePoolIfNecessary([
       {
-        tokenA: tokenB,
-        tokenB: tokenA,
+        token0: tokenA,
+        token1: tokenB,
         fee: 3000,
         tickLower: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1)),
         tickUpper: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(10000, 1)),
@@ -264,8 +272,8 @@ describe("PoolManager", function () {
 
     await manager.write.createAndInitializePoolIfNecessary([
       {
-        tokenA: tokenC,
-        tokenB: tokenD,
+        token0: tokenC,
+        token1: tokenD,
         fee: 2000,
         tickLower: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(100, 1)),
         tickUpper: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(5000, 1)),
@@ -280,8 +288,8 @@ describe("PoolManager", function () {
     // 判断返回的 pools 的数量、参数是否正确
     const pools = await manager.read.getAllPools();
     expect(pools.length).to.equal(2);
-    expect(pools[0].token0).to.equal(tokenB);
-    expect(pools[0].token1).to.equal(tokenA);
+    expect(pools[0].token0).to.equal(tokenA);
+    expect(pools[0].token1).to.equal(tokenB);
     expect(pools[0].sqrtPriceX96).to.equal(
       BigInt(encodeSqrtRatioX96(100, 1).toString())
     );
@@ -291,6 +299,29 @@ describe("PoolManager", function () {
       BigInt(encodeSqrtRatioX96(200, 1).toString())
     );
   });
+});
+```
+
+你可以再补充一个异常情况的测试样例：
+
+```typescript
+it("require token0 < token1", async function () {
+  const { manager } = await loadFixture(deployFixture);
+  const tokenA: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
+  const tokenB: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
+
+  await expect(
+    manager.write.createAndInitializePoolIfNecessary([
+      {
+        token0: tokenB,
+        token1: tokenA,
+        fee: 3000,
+        tickLower: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1)),
+        tickUpper: TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(10000, 1)),
+        sqrtPriceX96: BigInt(encodeSqrtRatioX96(100, 1).toString()),
+      },
+    ])
+  ).to.be.rejected;
 });
 ```
 

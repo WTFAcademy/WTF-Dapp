@@ -52,9 +52,11 @@ contract PoolManager is Factory, IPoolManager {
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address poolAddress) {
+        require(params.token0 < params.token1);
+
         poolAddress = this.createPool(
-            params.tokenA,
-            params.tokenB,
+            params.token0,
+            params.token1,
             params.tickLower,
             params.tickUpper,
             params.fee
