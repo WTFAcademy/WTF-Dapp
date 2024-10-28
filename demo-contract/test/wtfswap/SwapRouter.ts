@@ -6,8 +6,10 @@ import { encodeSqrtRatioX96, TickMath } from "@uniswap/v3-sdk";
 describe("SwapRouter", function () {
   async function deployFixture() {
     // 部署两个测试代币
-    const tokenA = await viem.deployContract("TestToken");
-    const tokenB = await viem.deployContract("TestToken");
+    const tokenA = await hre.viem.deployContract("TestToken");
+    const tokenB = await hre.viem.deployContract("TestToken");
+    const token0 = tokenA.address < tokenB.address ? tokenA : tokenB;
+    const token1 = tokenA.address < tokenB.address ? tokenB : tokenA;
 
     // 部署一个 PoolManager 合约
     const poolManager = await viem.deployContract("PoolManager");
@@ -17,11 +19,11 @@ describe("SwapRouter", function () {
     const tickUpper = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(40000, 1));
     const sqrtPriceX96 = BigInt(encodeSqrtRatioX96(10000, 1).toString());
 
-    // 建立池子，同样的 tokenA 和 tokenB，两种不同的费率
+    // 建立池子，同样的 token0 和 token1，两种不同的费率
     await poolManager.write.createAndInitializePoolIfNecessary([
       {
-        tokenA: tokenA.address,
-        tokenB: tokenB.address,
+        token0: token0.address,
+        token1: token1.address,
         tickLower: tickLower,
         tickUpper: tickUpper,
         fee: 3000,
@@ -31,8 +33,8 @@ describe("SwapRouter", function () {
 
     await poolManager.write.createAndInitializePoolIfNecessary([
       {
-        tokenA: tokenA.address,
-        tokenB: tokenB.address,
+        token0: token0.address,
+        token1: token1.address,
         tickLower: tickLower,
         tickUpper: tickUpper,
         fee: 10000,
@@ -50,42 +52,42 @@ describe("SwapRouter", function () {
     const testLP = await viem.deployContract("TestLP");
     // 给 testLP 发 token
     const initBalanceValue = 1000000000000n * 10n ** 18n;
-    await tokenA.write.mint([testLP.address, initBalanceValue]);
-    await tokenB.write.mint([testLP.address, initBalanceValue]);
+    await token0.write.mint([testLP.address, initBalanceValue]);
+    await token1.write.mint([testLP.address, initBalanceValue]);
     // 给池子1注入流动性
     // 获取池子1的地址
     const pool1Address = await poolManager.read.getPool([
-      tokenA.address,
-      tokenB.address,
+      token0.address,
+      token1.address,
       0,
     ]);
     // 给池子1注入流动性
-    await tokenA.write.approve([pool1Address, initBalanceValue]);
-    await tokenB.write.approve([pool1Address, initBalanceValue]);
+    await token0.write.approve([pool1Address, initBalanceValue]);
+    await token1.write.approve([pool1Address, initBalanceValue]);
     await testLP.write.mint([
       testLP.address,
       50000n * 10n ** 18n,
       pool1Address,
-      tokenA.address,
-      tokenB.address,
+      token0.address,
+      token1.address,
     ]);
 
     // 给池子2注入流动性
     // 获取池子2的地址
     const pool2Address = await poolManager.read.getPool([
-      tokenA.address,
-      tokenB.address,
+      token0.address,
+      token1.address,
       1,
     ]);
     // 给池子2注入流动性
-    await tokenA.write.approve([pool2Address, initBalanceValue]);
-    await tokenB.write.approve([pool2Address, initBalanceValue]);
+    await token0.write.approve([pool2Address, initBalanceValue]);
+    await token1.write.approve([pool2Address, initBalanceValue]);
     await testLP.write.mint([
       testLP.address,
       50000n * 10n ** 18n,
       pool2Address,
-      tokenA.address,
-      tokenB.address,
+      token0.address,
+      token1.address,
     ]);
 
     const [owner] = await hre.viem.getWalletClients();
@@ -93,9 +95,8 @@ describe("SwapRouter", function () {
 
     return {
       swapRouter,
-      // 对 token 进行排序，方便后面测试样例使用（token 交换会影响价格，是 0 交换 1 还是 1 交换 0 对价格影响不一样）
-      token0: tokenA.address < tokenB.address ? tokenA : tokenB,
-      token1: tokenA.address < tokenB.address ? tokenB : tokenA,
+      token0,
+      token1,
       sender,
     };
   }
