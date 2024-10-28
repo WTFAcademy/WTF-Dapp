@@ -57,7 +57,8 @@ contract SwapRouter is ISwapRouter {
                 params.tokenIn,
                 params.tokenOut,
                 params.indexPath[i],
-                msg.sender
+                params.recipient == address(0) ? address(0) : msg.sender,
+                true
             );
 
             // 调用 pool 的 swap 函数，进行交换，并拿到返回的 token0 和 token1 的数量
@@ -70,7 +71,7 @@ contract SwapRouter is ISwapRouter {
             );
 
             // 更新 amountIn 和 amountOut
-            amountIn = uint256(zeroForOne ? -amount0 : -amount1);
+            amountIn -= uint256(zeroForOne ? amount0 : amount1);
             amountOut += uint256(zeroForOne ? -amount1 : -amount0);
 
             // 如果 amountIn 为 0，表示交换完成，跳出循环
@@ -117,12 +118,13 @@ contract SwapRouter is ISwapRouter {
                 params.tokenIn,
                 params.tokenOut,
                 params.indexPath[i],
-                msg.sender
+                params.recipient == address(0) ? address(0) : msg.sender,
+                false
             );
 
             // 调用 pool 的 swap 函数，进行交换，并拿到返回的 token0 和 token1 的数量
             (int256 amount0, int256 amount1) = pool.swap(
-                msg.sender,
+                params.recipient,
                 zeroForOne,
                 -int256(amountOut),
                 params.sqrtPriceLimitX96,
@@ -130,8 +132,8 @@ contract SwapRouter is ISwapRouter {
             );
 
             // 更新 amountOut 和 amountIn
-            amountOut = uint256(zeroForOne ? -amount1 : -amount0);
-            amountIn += uint256(zeroForOne ? -amount0 : -amount1);
+            amountOut -= uint256(zeroForOne ? -amount1 : -amount0);
+            amountIn += uint256(zeroForOne ? amount0 : amount1);
 
             // 如果 amountOut 为 0，表示交换完成，跳出循环
             if (amountOut == 0) {
@@ -166,7 +168,7 @@ contract SwapRouter is ISwapRouter {
                     tokenIn: params.tokenIn,
                     tokenOut: params.tokenOut,
                     indexPath: params.indexPath,
-                    recipient: msg.sender,
+                    recipient: address(0),
                     deadline: block.timestamp + 1 hours,
                     amountIn: params.amountIn,
                     amountOutMinimum: 0,
@@ -188,7 +190,7 @@ contract SwapRouter is ISwapRouter {
                     tokenIn: params.tokenIn,
                     tokenOut: params.tokenOut,
                     indexPath: params.indexPath,
-                    recipient: msg.sender,
+                    recipient: address(0),
                     deadline: block.timestamp + 1 hours,
                     amountOut: params.amountOut,
                     amountInMaximum: type(uint256).max,
@@ -206,27 +208,44 @@ contract SwapRouter is ISwapRouter {
         bytes calldata data
     ) external override {
         // transfer token
-        (address tokenIn, address tokenOut, uint32 index, address payer) = abi
-            .decode(data, (address, address, uint32, address));
+        (
+            address tokenIn,
+            address tokenOut,
+            uint32 index,
+            address payer,
+            bool isExactInput
+        ) = abi.decode(data, (address, address, uint32, address, bool));
         address _pool = poolManager.getPool(tokenIn, tokenOut, index);
 
         // 检查 callback 的合约地址是否是 Pool
         require(_pool == msg.sender, "Invalid callback caller");
 
-        bool zeroForOne = tokenIn < tokenOut;
-        if (amount0Delta > 0) {
-            IERC20(zeroForOne ? tokenIn : tokenOut).transferFrom(
-                payer,
-                _pool,
-                uint(amount0Delta)
-            );
+        (uint256 amountToPay, uint256 amountReceived) = amount0Delta > 0
+            ? (uint256(amount0Delta), uint256(-amount1Delta))
+            : (uint256(amount1Delta), uint256(-amount0Delta));
+        // payer 是 address(0)，这是一个用于预估 token 的请求（quoteExactInput or quoteExactOutput）
+        // 参考代码 https://github.com/Uniswap/v3-periphery/blob/main/contracts/lens/Quoter.sol#L38
+        if (payer == address(0)) {
+            if (isExactInput) {
+                // 指定输入情况下，抛出可以接收多少 token
+                assembly {
+                    let ptr := mload(0x40)
+                    mstore(ptr, amountReceived)
+                    revert(ptr, 32)
+                }
+            } else {
+                // 指定输出情况下，抛出需要转入多少 token
+                assembly {
+                    let ptr := mload(0x40)
+                    mstore(ptr, amountToPay)
+                    revert(ptr, 32)
+                }
+            }
         }
-        if (amount1Delta > 0) {
-            IERC20(zeroForOne ? tokenOut : tokenIn).transferFrom(
-                payer,
-                _pool,
-                uint(amount1Delta)
-            );
+
+        // 正常交易，转账给交易池
+        if (amountToPay > 0) {
+            IERC20(tokenIn).transferFrom(payer, _pool, amountToPay);
         }
     }
 }

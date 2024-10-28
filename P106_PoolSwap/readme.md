@@ -171,29 +171,33 @@ if (exactInput) {
         amountSpecified - state.amountSpecifiedRemaining
     );
 
-// 转 Token 给用户
+
 if (zeroForOne) {
+    // callback 中需要给 Pool 转入 token
+    uint256 balance0Before = balance0();
+    ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
+    require(balance0Before.add(uint256(amount0)) <= balance0(), "IIA");
+
+    // 转 Token 给用户
     if (amount1 < 0)
         TransferHelper.safeTransfer(
             token1,
             recipient,
             uint256(-amount1)
         );
-
-    uint256 balance0Before = balance0();
-    ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
-    require(balance0Before.add(uint256(amount0)) <= balance0(), "IIA");
 } else {
+    // callback 中需要给 Pool 转入 token
+    uint256 balance1Before = balance1();
+    ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
+    require(balance1Before.add(uint256(amount1)) <= balance1(), "IIA");
+
+    // 转 Token 给用户
     if (amount0 < 0)
         TransferHelper.safeTransfer(
             token0,
             recipient,
             uint256(-amount0)
         );
-
-    uint256 balance1Before = balance1();
-    ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
-    require(balance1Before.add(uint256(amount1)) <= balance1(), "IIA");
 }
 
 emit Swap(

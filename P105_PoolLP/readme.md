@@ -413,18 +413,28 @@ it("mint and burn and collect", async function () {
 
 ```solidity
 // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 import "../interfaces/IPool.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract TestLP is IMintCallback {
+    function sortToken(
+        address tokenA,
+        address tokenB
+    ) private pure returns (address, address) {
+        return tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+    }
+
     function mint(
         address recipient,
         uint128 amount,
         address pool,
-        address token0,
-        address token1
+        address tokenA,
+        address tokenB
     ) external returns (uint256 amount0, uint256 amount1) {
+        (address token0, address token1) = sortToken(tokenA, tokenB);
+
         (amount0, amount1) = IPool(pool).mint(
             recipient,
             amount,
@@ -443,7 +453,13 @@ contract TestLP is IMintCallback {
         address recipient,
         address pool
     ) external returns (uint256 amount0, uint256 amount1) {
-        (amount0, amount1) = IPool(pool).collect(recipient);
+        (, , , uint128 tokensOwed0, uint128 tokensOwed1) = IPool(pool)
+            .getPosition(address(this));
+        (amount0, amount1) = IPool(pool).collect(
+            recipient,
+            tokensOwed0,
+            tokensOwed1
+        );
     }
 
     function mintCallback(
