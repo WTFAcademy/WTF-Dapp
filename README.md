@@ -80,7 +80,7 @@
 
 **第 P108 讲：PositionManager 合约开发**：[教程](./P108_PositionManager/readme.md) | [代码](./demo-contract/contracts/wtfswap/PositionManager.sol)
 
-**第 P109 讲：SwapRouter 合约开发**
+**第 P109 讲：SwapRouter 合约开发**：[教程](./P109_SwapRouter/readme.md) | [代码](./demo-contract/contracts/wtfswap/SwapRouter.sol)
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 

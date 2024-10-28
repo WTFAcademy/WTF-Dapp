@@ -106,7 +106,7 @@ body {
 
 ## 配置适配器
 
-适配器可以连接 Ant Design Web3 的 UI 组件和区块链，让这些 UI 组件可以快速连接上区块链。比如，当你使用了 `@ant-design/web3-wagmi` 后，Connector、NFTCard 等组件就可以直接连接上以太坊了。 适配器的配置可以参考[以太坊推荐配置](https://web3.ant.design/components/ethereum-cn#%E6%8E%A8%E8%8D%90%E9%85%8D%E7%BD%AE)，在该课程中，我们会先采用最简单的配置，再逐步引导你了解你实际项目中所需要的配置。
+适配器可以让 Ant Design Web3 的 UI 组件快速连接上区块链。比如，当你使用了 `@ant-design/web3-wagmi` 后，Connector、NFTCard 等组件就可以直接连接上以太坊了。 适配器的配置可以参考[以太坊推荐配置](https://web3.ant.design/components/ethereum-cn#%E6%8E%A8%E8%8D%90%E9%85%8D%E7%BD%AE)，在该课程中，我们会先采用最简单的配置，再逐步引导你了解你实际项目中所需要的配置。
 
 首先，请继续编辑 `pages/web3.tsx` 文件，引入所需要的内容：
 
@@ -125,7 +125,7 @@ export default function Web3() {
 其中引入的内容说明如下：
 
 - http：wagmi 用来创建 [HTTP JSON RPC](https://wagmi.sh/core/api/transports/http) 连接的方法，通过它你可以通过 HTTP 请求访问区块链。
-- Mainnet：代表以太坊主网，除了 `Mainnet` 以外还支持 `Sepolia` 测试网以及 `BSC` 和 `Arbitrum` 等 L2 链；支持的链参考[这里](https://github.com/ant-design/ant-design-web3/blob/main/packages/wagmi/src/chains.ts)。
+- Mainnet：代表以太坊主网，除了 `Mainnet` 以外还支持 `Sepolia` 测试网以及 `BSC` 和 `Arbitrum` 等多个链；支持的链参考[这里](https://github.com/ant-design/ant-design-web3/blob/main/packages/wagmi/src/chains.ts)。
 - [WagmiWeb3ConfigProvider](https://web3.ant.design/components/web3-config-provider-cn)：Ant Design Web3 用来接收 wagmi 配置的 Provider。
 
 接着创建配置：
@@ -144,7 +144,7 @@ export default function Web3() {
 +      }}
 +    >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
-+	 </WagmiWeb3ConfigProvider>
++    </WagmiWeb3ConfigProvider>
   );
 };
 
