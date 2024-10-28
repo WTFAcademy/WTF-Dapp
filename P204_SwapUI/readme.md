@@ -19,13 +19,13 @@ import WtfLayout from "@/components/WtfLayout";
 
 export default function Wtfswap() {
 -    return <WtfLayout>Wtfswap</WtfLayout>;
-+  	 return (
-+		<WtfLayout>
-+		 <Card title="Swap">
-+		     <Card></Card>
-+			 <Card></Card>
-+	     </Card>
-+       </WtfLayout>
++      return (
++        <WtfLayout>
++	   <Card title="Swap">
++            <Card></Card>
++	     <Card></Card>
++	   </Card>
++        </WtfLayout>
 +    );
 }
 ```
@@ -52,15 +52,15 @@ import WtfLayout from "@/components/WtfLayout";
 + import styles from './swap.module.css';
 
 export default function Wtfswap() {
-  	 return (
-		<WtfLayout>
--		 <Card title="Swap">
-+		 <Card title="Swap" className={styles.swapCard}>
-		     <Card></Card>
-			 <Card></Card>
-	     </Card>
-       </WtfLayout>
-    );
+  return (
+    <WtfLayout>
+-     <Card title="Swap">
++     <Card title="Swap" className={styles.swapCard}>
+        <Card></Card>
+        <Card></Card>
+      </Card>
+    </WtfLayout>
+  );
 }
 ```
 
@@ -192,7 +192,7 @@ export default function Wtfswap() {
 
 现在，为 `Input` 组件和 `Button` 组件添加函数：
 1. **handleAmountAChange**： Input 组件的输入值改变时，同步更新 `AmountA`。其他的功能在后续章节实现。
-2. **handleSwitch**：点击切换按钮时，调换 `TokenA：TokenB` 代币对，以及对应的值 `AmounA：AmountB`。
+2. **handleSwitch**：点击切换按钮时，调换 `TokenA：TokenB` 代币对，以及对应的值 `AmountA：AmountB`。
 
 ```diff
 ......
