@@ -11,24 +11,24 @@ const { Text } = Typography;
 
 
 export default function Wtfswap() {
-  const [token1, setToken1] = useState<Token>(ETH);
-  const [token2, setToken2] = useState<Token>(USDT);
-  const [amount1, setAmount1] = useState(0);
-  const [amount2, setAmount2] = useState(0);
-  const [options1, setOptions1] = useState<Token[]>([ETH, USDT, USDC]);;
-  const [options2, setOptions2] = useState<Token[]>([USDT, ETH, USDC]);;
+  const [tokenA, setTokenA] = useState<Token>(ETH);
+  const [tokenB, setTokenB] = useState<Token>(USDT);
+  const [amountA, setAmountA] = useState(0);
+  const [amountB, setAmountB] = useState(0);
+  const [optionsA, setOptionsA] = useState<Token[]>([ETH, USDT, USDC]);;
+  const [optionsB, setOptionsB] = useState<Token[]>([USDT, ETH, USDC]);;
 
-  const handleAmount1Change = (e: any) => {
-    setAmount1(parseFloat(e.target.value));
-    // todo: setAmount2
+  const handleAmountAChange = (e: any) => {
+    setAmountA(parseFloat(e.target.value));
+    // todo: setAmountB
   };
 
 
   const handleSwitch = () => {
-    setToken1(token2);
-    setToken2(token1);
-    setAmount1(amount2);
-    setAmount2(amount1);
+    setTokenA(tokenB);
+    setTokenB(tokenA);
+    setAmountA(amountB);
+    setAmountB(amountA);
   };
 
   const handleMax = () => {
@@ -41,11 +41,11 @@ export default function Wtfswap() {
         <Card>
           <Input
             variant="borderless"
-            value={amount1}
+            value={amountA}
             type="number"
-            onChange={(e) => handleAmount1Change(e)}
+            onChange={(e) => handleAmountAChange(e)}
             addonAfter={
-              <TokenSelect value={token1} onChange={setToken1} options={options1} />
+              <TokenSelect value={tokenA} onChange={setTokenA} options={optionsA} />
             }
           />
           <Space className={styles.swapSpace}>
@@ -71,11 +71,11 @@ export default function Wtfswap() {
         </Space>
         <Card>
           <Input
-            value={amount2}
+            value={amountB}
             variant="borderless"
             type="number"
             addonAfter={
-              <TokenSelect value={token2} onChange={setToken2} options={options2} />
+              <TokenSelect value={tokenB} onChange={setTokenB} options={optionsB} />
             }
           />
           <Space className={styles.swapSpace}>
@@ -87,7 +87,7 @@ export default function Wtfswap() {
             </Text>
           </Space>
         </Card>
-        <Button type="primary" size="large" block>
+        <Button type="primary" size="large" block className={styles.swapBtn}>
           Swap
         </Button>
       </Card>

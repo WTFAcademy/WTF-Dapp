@@ -18,3 +18,7 @@
   width: 100%;
   justify-content: space-between;
 }
+
+.swapBtn {
+  margin-top: 10px;
+}
