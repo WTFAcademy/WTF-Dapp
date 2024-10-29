@@ -8,7 +8,7 @@
 
 ![ui](./img/ui.png)
 
-Swap 页面是 Wtfswap 的核心页面，先来拆分下 Swap 页面，Swap 页面首先引入了 [Layout 的头部](../P202_HeadUI/readme.md)，然后在页面中间实现了 Swap UI；搭建 Swap 页面需要多个组件， 主要使用 [Card](https://ant.design/components/card-cn) 组件完成整个框架的搭建。
+Swap 页面是 Wtfswap 的核心页面，先来拆分下 Swap 页面，Swap 页面首先引入了 [Layout 的头部](../P202_HeadUI/readme.md)，然后在页面中间实现了 Swap UI；搭建 Swap 页面需要多个组件， 主要使用 [Card](https://ant.design/components/card-cn) 组件完成整个框架的搭建。这一讲课完整的代码可以在[这里](./code)获取。
 
 修改 `pages/wtfswap/index.tsx` , 先引入 `Card` 组件搭建基础框架：
 
@@ -384,4 +384,5 @@ export default function Wtfswap() {
 
 ![swap4](./img/swap4.png)
 
-这样，我们就实现了 Swap 部分的 UI 开发，页面样式使用了 [CSSModules](https://nextjs.org/docs/app/building-your-application/styling/css-modules#css-modules) 实现，你也可以使用自己熟悉的方案；本节的要点主要是使用了 Antd Design Web3 提供的 `TokenSelect` 组件，方便我们快速集成 `Token` 到选择器中。
+这样，我们就实现了 Swap 部分的 UI 开发，为了简化教程，有的细节并没有完全按照设计稿实现。页面样式使用了 [CSSModules](https://nextjs.org/docs/app/building-your-application/styling/css-modules#css-modules) 实现，你也可以使用自己熟悉的方案。本节的要点主要是使用了 Antd Design Web3 提供的 `TokenSelect` 组件，方便我们快速集成 `Token` 到选择器中。
+
