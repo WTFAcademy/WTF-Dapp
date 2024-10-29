@@ -1,0 +1,24 @@
+.swapCard {
+  width: 600px;
+  margin: 0 auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.switchBtn {
+  font-size: '20px';
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.swapSpace {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.swapBtn {
+  margin-top: 10px;
+}

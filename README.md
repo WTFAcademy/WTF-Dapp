@@ -88,7 +88,7 @@
 
 **第 P203 讲：支持连接链**：[教程](./P203_Connect/) | [代码](./P203_Connect/code/)
 
-**第 P204 讲：Swap 页面 UI 开发**
+**第 P204 讲：Swap 页面 UI 开发**：[教程](./P204_SwapUI/) | [代码](./P204_SwapUI/code/)
 
 **第 P206 讲：Pool 页面 UI 开发**
 
