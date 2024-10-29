@@ -8,6 +8,6 @@
 npx wagmi generate
 ```
 
-它会按照我们的配置更新 `utils/contracts.ts` 文件，生成我们调用我们在之前课程中实现的合约。比如在这一讲中你就会用到 `useReadPoolManagerGetAllPools` 查看交易池和 `useWritePoolManagerCreateAndInitializePoolIfNecessary` 创建交易池。
+它会按照我们的配置更新 `utils/contracts.ts` 文件，然后生成代码来调用我们在之前课程中实现的合约。比如在这一讲中可以用 `useReadPoolManagerGetAllPools` 查看交易池和 `useWritePoolManagerCreateAndInitializePoolIfNecessary` 创建交易池。
 
 > 课程编写中......
