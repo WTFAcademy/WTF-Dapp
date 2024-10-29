@@ -1,5 +1,6 @@
 import React from "react";
 import Header from "./Header";
+import styles from "./styles.module.css";
 import {
   MetaMask,
   OkxWallet,
@@ -53,8 +54,10 @@ const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
       config={config}
       queryClient={queryClient}
     >
-      <Header />
-      {children}
+      <div className={styles.layout}>
+        <Header />
+        {children}
+      </div>
     </WagmiWeb3ConfigProvider>
   );
 };
