@@ -1,4 +1,4 @@
-本节作者：[@愚指导](https://x.com/yudao1024)
+本节作者：[@愚指导](https://x.com/yudao1024)、[@小符](https://x.com/smallfu666)
 
 节点服务是 DApp 开发必不可少的服务。这一讲，我们介绍节点服务的概念，并引导你在项目中配置好节点服务，以及通过水龙头准备好一些 Sepolia 测试网的 ETH。
 
@@ -18,7 +18,7 @@
 
 ![](./img/zan-service.png)
 
-选择以太坊主网的节点服务地址，并将复制的地址添加到 `WagmiWeb3ConfigProvider`  的 `http()` 方法中。，如下：
+选择以太坊主网的节点服务地址，并将复制的地址添加到 `WagmiWeb3ConfigProvider`  的 `http()` 方法中。如下：
 
 ```diff
  <WagmiWeb3ConfigProvider
