@@ -9,6 +9,8 @@ describe("PositionManager", function () {
     const poolManager = await hre.viem.deployContract("PoolManager");
     const tokenA = await hre.viem.deployContract("TestToken");
     const tokenB = await hre.viem.deployContract("TestToken");
+    const token0 = tokenA.address < tokenB.address ? tokenA : tokenB;
+    const token1 = tokenA.address < tokenB.address ? tokenB : tokenA;
     const tickLower = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1));
     const tickUpper = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(40000, 1));
     const fee = 3000;
@@ -18,8 +20,8 @@ describe("PositionManager", function () {
 
     await poolManager.write.createAndInitializePoolIfNecessary([
       {
-        tokenA: tokenA.address,
-        tokenB: tokenB.address,
+        token0: token0.address,
+        token1: token1.address,
         tickLower: tickLower,
         tickUpper: tickUpper,
         fee,
@@ -36,8 +38,8 @@ describe("PositionManager", function () {
     ]);
     const publicClient = await hre.viem.getPublicClient();
     return {
-      token0: tokenA.address > tokenB.address ? tokenB : tokenA,
-      token1: tokenA.address > tokenB.address ? tokenA : tokenB,
+      token0,
+      token1,
       manager,
       publicClient,
       poolManager,

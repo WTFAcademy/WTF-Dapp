@@ -57,6 +57,7 @@ export default function WtfHeader() {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  border-bottom: 1px solid #d7e1eb;
 }
 
 .title {
@@ -119,6 +120,37 @@ export default function WtfHeader() {
   font-weight: bold;
   opacity: 1;
 }
+```
+
+除了头部样式外，我们再补充一下布局的背景颜色。修改 `WtfLayout/index.tsx` 如下：
+
+```diff
+import React from "react";
+import Header from "./Header";
++ import styles from "./styles.module.css";
+
+interface WtfLayoutProps {
+  children: React.ReactNode;
+}
+
+const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
+  return (
+-    <div>
++    <div className={styles.layout}>
+      <Header />
+      {children}
+    </div>
+  );
+};
+
+export default WtfLayout;
+```
+
+然后在 `styles.module.css` 中添加：
+
+```css
+min-height: 100vh;
+background: linear-gradient(to bottom, #e8f1ff, #f6f7f9);
 ```
 
 至此，布局头部的 UI 样式我们就完成了。

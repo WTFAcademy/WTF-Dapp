@@ -320,8 +320,10 @@ describe("Pool", function () {
   async function deployFixture() {
     // 初始化一个池子，价格上限是 40000，下限是 1，初始化价格是 10000，费率是 0.3%
     const factory = await hre.viem.deployContract("Factory");
-    const token0 = await hre.viem.deployContract("TestToken");
-    const token1 = await hre.viem.deployContract("TestToken");
+    const tokenA = await hre.viem.deployContract("TestToken");
+    const tokenB = await hre.viem.deployContract("TestToken");
+    const token0 = tokenA.address < tokenB.address ? tokenA : tokenB;
+    const token1 = tokenA.address < tokenB.address ? tokenB : tokenA;
     const tickLower = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1));
     const tickUpper = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(40000, 1));
     // 以 1,000,000 为基底的手续费费率，Uniswap v3 前端界面支持四种手续费费率（0.01%，0.05%、0.30%、1.00%），对于一般的交易对推荐 0.30%，fee 取值即 3000；
@@ -413,18 +415,28 @@ it("mint and burn and collect", async function () {
 
 ```solidity
 // SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 import "../interfaces/IPool.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract TestLP is IMintCallback {
+    function sortToken(
+        address tokenA,
+        address tokenB
+    ) private pure returns (address, address) {
+        return tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
+    }
+
     function mint(
         address recipient,
         uint128 amount,
         address pool,
-        address token0,
-        address token1
+        address tokenA,
+        address tokenB
     ) external returns (uint256 amount0, uint256 amount1) {
+        (address token0, address token1) = sortToken(tokenA, tokenB);
+
         (amount0, amount1) = IPool(pool).mint(
             recipient,
             amount,
@@ -443,7 +455,13 @@ contract TestLP is IMintCallback {
         address recipient,
         address pool
     ) external returns (uint256 amount0, uint256 amount1) {
-        (amount0, amount1) = IPool(pool).collect(recipient);
+        (, , , uint128 tokensOwed0, uint128 tokensOwed1) = IPool(pool)
+            .getPosition(address(this));
+        (amount0, amount1) = IPool(pool).collect(
+            recipient,
+            tokensOwed0,
+            tokensOwed1
+        );
     }
 
     function mintCallback(
