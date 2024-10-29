@@ -25,15 +25,15 @@ Swap 页面，用于交易代币：
 
 ![swap](./img/swap.png)
 
-Pool 页面，用于查看当前已经有的交易池：
+Pool 页面，用于查看当前已经有的交易池和创建交易池。如下图，点击 `Add Pool` 弹窗创建交易池，点击 `My Positions` 查看跳转到 Positions 页面查看自己的头寸：
 
 ![pool](./img/pool.png)
 
-Positions 页面，用于查看和移除流动性：
+Positions 页面，用于查看和移除流动性（头寸）：
 
 ![pool](./img/positions.png)
 
-Positions 页面创建流动性弹窗，用于创建新的流动性（如果没有对应的交易池，会先创建交易池）：
+Positions 页面创建流动性弹窗，用于创建新的流动性：
 
 ![add](./img/add.png)
 
