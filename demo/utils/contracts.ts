@@ -20,6 +20,167 @@ export const erc165Abi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ERC20
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const erc20Abi = [
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC721
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -293,8 +454,8 @@ export const factoryAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -306,8 +467,8 @@ export const factoryAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'index', internalType: 'uint32', type: 'uint32' },
     ],
     name: 'getPool',
@@ -320,8 +481,8 @@ export const factoryAbi = [
     name: 'parameters',
     outputs: [
       { name: 'factory', internalType: 'address', type: 'address' },
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -409,6 +570,108 @@ export const ierc165Abi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IERC20
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ierc20Abi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC20Errors
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -450,6 +713,129 @@ export const ierc20ErrorsAbi = [
     type: 'error',
     inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
     name: 'ERC20InvalidSpender',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IERC20Metadata
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ierc20MetadataAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
   },
 ] as const
 
@@ -912,8 +1298,8 @@ export const iFactoryAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -925,8 +1311,8 @@ export const iFactoryAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'index', internalType: 'uint32', type: 'uint32' },
     ],
     name: 'getPool',
@@ -939,8 +1325,8 @@ export const iFactoryAbi = [
     name: 'parameters',
     outputs: [
       { name: 'factory', internalType: 'address', type: 'address' },
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -1127,7 +1513,11 @@ export const iPoolAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'recipient', internalType: 'address', type: 'address' }],
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'amount0Requested', internalType: 'uint128', type: 'uint128' },
+      { name: 'amount1Requested', internalType: 'uint128', type: 'uint128' },
+    ],
     name: 'collect',
     outputs: [
       { name: 'amount0', internalType: 'uint128', type: 'uint128' },
@@ -1147,6 +1537,41 @@ export const iPoolAbi = [
     inputs: [],
     name: 'fee',
     outputs: [{ name: '', internalType: 'uint24', type: 'uint24' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'feeGrowthGlobal0X128',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'feeGrowthGlobal1X128',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'getPosition',
+    outputs: [
+      { name: '_liquidity', internalType: 'uint128', type: 'uint128' },
+      {
+        name: 'feeGrowthInside0LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      {
+        name: 'feeGrowthInside1LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
+      { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' },
+    ],
     stateMutability: 'view',
   },
   {
@@ -1307,8 +1732,8 @@ export const iPoolManagerAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -1330,6 +1755,7 @@ export const iPoolManagerAbi = [
           { name: 'token0', internalType: 'address', type: 'address' },
           { name: 'token1', internalType: 'address', type: 'address' },
           { name: 'index', internalType: 'uint32', type: 'uint32' },
+          { name: 'fee', internalType: 'uint24', type: 'uint24' },
           { name: 'feeProtocol', internalType: 'uint8', type: 'uint8' },
           { name: 'tickLower', internalType: 'int24', type: 'int24' },
           { name: 'tickUpper', internalType: 'int24', type: 'int24' },
@@ -1360,8 +1786,8 @@ export const iPoolManagerAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'index', internalType: 'uint32', type: 'uint32' },
     ],
     name: 'getPool',
@@ -1374,8 +1800,8 @@ export const iPoolManagerAbi = [
     name: 'parameters',
     outputs: [
       { name: 'factory', internalType: 'address', type: 'address' },
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -1516,8 +1942,18 @@ export const iPositionManagerAbi = [
           { name: 'liquidity', internalType: 'uint128', type: 'uint128' },
           { name: 'tickLower', internalType: 'int24', type: 'int24' },
           { name: 'tickUpper', internalType: 'int24', type: 'int24' },
-          { name: 'tokensOwed0', internalType: 'uint256', type: 'uint256' },
-          { name: 'tokensOwed1', internalType: 'uint256', type: 'uint256' },
+          { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
+          { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' },
+          {
+            name: 'feeGrowthInside0LastX128',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'feeGrowthInside1LastX128',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
         ],
       },
     ],
@@ -1655,6 +2091,43 @@ export const iSwapCallbackAbi = [
 
 export const iSwapRouterAbi = [
   {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'sender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'zeroForOne',
+        internalType: 'bool',
+        type: 'bool',
+        indexed: false,
+      },
+      {
+        name: 'amountIn',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amountInRemaining',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amountOut',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Swap',
+  },
+  {
     type: 'function',
     inputs: [
       {
@@ -1747,7 +2220,7 @@ export const iSwapRouterAbi = [
           { name: 'tokenIn', internalType: 'address', type: 'address' },
           { name: 'tokenOut', internalType: 'address', type: 'address' },
           { name: 'indexPath', internalType: 'uint32[]', type: 'uint32[]' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+          { name: 'amountOut', internalType: 'uint256', type: 'uint256' },
           {
             name: 'sqrtPriceLimitX96',
             internalType: 'uint160',
@@ -1763,8 +2236,8 @@ export const iSwapRouterAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'amount0In', internalType: 'uint256', type: 'uint256' },
-      { name: 'amount1In', internalType: 'uint256', type: 'uint256' },
+      { name: 'amount0Delta', internalType: 'int256', type: 'int256' },
+      { name: 'amount1Delta', internalType: 'int256', type: 'int256' },
       { name: 'data', internalType: 'bytes', type: 'bytes' },
     ],
     name: 'swapCallback',
@@ -2336,7 +2809,11 @@ export const poolAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'recipient', internalType: 'address', type: 'address' }],
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'amount0Requested', internalType: 'uint128', type: 'uint128' },
+      { name: 'amount1Requested', internalType: 'uint128', type: 'uint128' },
+    ],
     name: 'collect',
     outputs: [
       { name: 'amount0', internalType: 'uint128', type: 'uint128' },
@@ -2356,6 +2833,41 @@ export const poolAbi = [
     inputs: [],
     name: 'fee',
     outputs: [{ name: '', internalType: 'uint24', type: 'uint24' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'feeGrowthGlobal0X128',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'feeGrowthGlobal1X128',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'getPosition',
+    outputs: [
+      { name: '_liquidity', internalType: 'uint128', type: 'uint128' },
+      {
+        name: 'feeGrowthInside0LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      {
+        name: 'feeGrowthInside1LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
+      { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' },
+    ],
     stateMutability: 'view',
   },
   {
@@ -2394,8 +2906,18 @@ export const poolAbi = [
     name: 'positions',
     outputs: [
       { name: 'liquidity', internalType: 'uint128', type: 'uint128' },
-      { name: 'tokensOwed0', internalType: 'uint256', type: 'uint256' },
-      { name: 'tokensOwed1', internalType: 'uint256', type: 'uint256' },
+      { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
+      { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' },
+      {
+        name: 'feeGrowthInside0LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      {
+        name: 'feeGrowthInside1LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
     ],
     stateMutability: 'view',
   },
@@ -2521,14 +3043,16 @@ export const poolManagerAbi = [
       },
     ],
     name: 'createAndInitializePoolIfNecessary',
-    outputs: [{ name: 'pool', internalType: 'address', type: 'address' }],
+    outputs: [
+      { name: 'poolAddress', internalType: 'address', type: 'address' },
+    ],
     stateMutability: 'payable',
   },
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -2550,6 +3074,7 @@ export const poolManagerAbi = [
           { name: 'token0', internalType: 'address', type: 'address' },
           { name: 'token1', internalType: 'address', type: 'address' },
           { name: 'index', internalType: 'uint32', type: 'uint32' },
+          { name: 'fee', internalType: 'uint24', type: 'uint24' },
           { name: 'feeProtocol', internalType: 'uint8', type: 'uint8' },
           { name: 'tickLower', internalType: 'int24', type: 'int24' },
           { name: 'tickUpper', internalType: 'int24', type: 'int24' },
@@ -2580,8 +3105,8 @@ export const poolManagerAbi = [
   {
     type: 'function',
     inputs: [
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'index', internalType: 'uint32', type: 'uint32' },
     ],
     name: 'getPool',
@@ -2604,8 +3129,8 @@ export const poolManagerAbi = [
     name: 'parameters',
     outputs: [
       { name: 'factory', internalType: 'address', type: 'address' },
-      { name: 'token0', internalType: 'address', type: 'address' },
-      { name: 'token1', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
       { name: 'fee', internalType: 'uint24', type: 'uint24' },
@@ -2809,11 +3334,28 @@ export const positionManagerAbi = [
           { name: 'liquidity', internalType: 'uint128', type: 'uint128' },
           { name: 'tickLower', internalType: 'int24', type: 'int24' },
           { name: 'tickUpper', internalType: 'int24', type: 'int24' },
-          { name: 'tokensOwed0', internalType: 'uint256', type: 'uint256' },
-          { name: 'tokensOwed1', internalType: 'uint256', type: 'uint256' },
+          { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
+          { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' },
+          {
+            name: 'feeGrowthInside0LastX128',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
+          {
+            name: 'feeGrowthInside1LastX128',
+            internalType: 'uint256',
+            type: 'uint256',
+          },
         ],
       },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'getSender',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -2900,8 +3442,18 @@ export const positionManagerAbi = [
       { name: 'liquidity', internalType: 'uint128', type: 'uint128' },
       { name: 'tickLower', internalType: 'int24', type: 'int24' },
       { name: 'tickUpper', internalType: 'int24', type: 'int24' },
-      { name: 'tokensOwed0', internalType: 'uint256', type: 'uint256' },
-      { name: 'tokensOwed1', internalType: 'uint256', type: 'uint256' },
+      { name: 'tokensOwed0', internalType: 'uint128', type: 'uint128' },
+      { name: 'tokensOwed1', internalType: 'uint128', type: 'uint128' },
+      {
+        name: 'feeGrowthInside0LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
+      {
+        name: 'feeGrowthInside1LastX128',
+        internalType: 'uint256',
+        type: 'uint256',
+      },
     ],
     stateMutability: 'view',
   },
@@ -3000,6 +3552,43 @@ export const swapRouterAbi = [
     stateMutability: 'nonpayable',
   },
   {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'sender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'zeroForOne',
+        internalType: 'bool',
+        type: 'bool',
+        indexed: false,
+      },
+      {
+        name: 'amountIn',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amountInRemaining',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'amountOut',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Swap',
+  },
+  {
     type: 'function',
     inputs: [
       {
@@ -3088,7 +3677,7 @@ export const swapRouterAbi = [
     ],
     name: 'quoteExactInput',
     outputs: [{ name: 'amountOut', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
@@ -3101,7 +3690,7 @@ export const swapRouterAbi = [
           { name: 'tokenIn', internalType: 'address', type: 'address' },
           { name: 'tokenOut', internalType: 'address', type: 'address' },
           { name: 'indexPath', internalType: 'uint32[]', type: 'uint32[]' },
-          { name: 'amount', internalType: 'uint256', type: 'uint256' },
+          { name: 'amountOut', internalType: 'uint256', type: 'uint256' },
           {
             name: 'sqrtPriceLimitX96',
             internalType: 'uint160',
@@ -3112,18 +3701,304 @@ export const swapRouterAbi = [
     ],
     name: 'quoteExactOutput',
     outputs: [{ name: 'amountIn', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
   },
   {
     type: 'function',
     inputs: [
-      { name: 'amount0In', internalType: 'uint256', type: 'uint256' },
-      { name: 'amount1In', internalType: 'uint256', type: 'uint256' },
+      { name: 'amount0Delta', internalType: 'int256', type: 'int256' },
+      { name: 'amount1Delta', internalType: 'int256', type: 'int256' },
       { name: 'data', internalType: 'bytes', type: 'bytes' },
     ],
     name: 'swapCallback',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TestLP
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const testLpAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint128', type: 'uint128' },
+      { name: 'pool', internalType: 'address', type: 'address' },
+    ],
+    name: 'burn',
+    outputs: [
+      { name: 'amount0', internalType: 'uint256', type: 'uint256' },
+      { name: 'amount1', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'pool', internalType: 'address', type: 'address' },
+    ],
+    name: 'collect',
+    outputs: [
+      { name: 'amount0', internalType: 'uint256', type: 'uint256' },
+      { name: 'amount1', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'uint128', type: 'uint128' },
+      { name: 'pool', internalType: 'address', type: 'address' },
+      { name: 'tokenA', internalType: 'address', type: 'address' },
+      { name: 'tokenB', internalType: 'address', type: 'address' },
+    ],
+    name: 'mint',
+    outputs: [
+      { name: 'amount0', internalType: 'uint256', type: 'uint256' },
+      { name: 'amount1', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount0Owed', internalType: 'uint256', type: 'uint256' },
+      { name: 'amount1Owed', internalType: 'uint256', type: 'uint256' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'mintCallback',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TestSwap
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const testSwapAbi = [
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount0Delta', internalType: 'int256', type: 'int256' },
+      { name: 'amount1Delta', internalType: 'int256', type: 'int256' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'swapCallback',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'amount', internalType: 'int256', type: 'int256' },
+      { name: 'sqrtPriceLimitX96', internalType: 'uint160', type: 'uint160' },
+      { name: 'pool', internalType: 'address', type: 'address' },
+      { name: 'token0', internalType: 'address', type: 'address' },
+      { name: 'token1', internalType: 'address', type: 'address' },
+    ],
+    name: 'testSwap',
+    outputs: [
+      { name: 'amount0', internalType: 'int256', type: 'int256' },
+      { name: 'amount1', internalType: 'int256', type: 'int256' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TestToken
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const testTokenAbi = [
+  { type: 'constructor', inputs: [], stateMutability: 'nonpayable' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'quantity', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TickMath
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const tickMathAbi = [
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
+    ],
+    name: 'InvalidSqrtPrice',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'tick', internalType: 'int24', type: 'int24' }],
+    name: 'InvalidTick',
   },
 ] as const
 
@@ -3145,6 +4020,148 @@ export const useReadErc165SupportsInterface =
   /*#__PURE__*/ createUseReadContract({
     abi: erc165Abi,
     functionName: 'supportsInterface',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__
+ */
+export const useReadErc20 = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadErc20Allowance = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadErc20BalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadErc20Decimals = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"name"`
+ */
+export const useReadErc20Name = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadErc20Symbol = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadErc20TotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: erc20Abi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__
+ */
+export const useWriteErc20 = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20Abi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteErc20Approve = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20Abi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteErc20Transfer = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20Abi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteErc20TransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: erc20Abi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20Abi}__
+ */
+export const useSimulateErc20 = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20Abi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateErc20Approve = /*#__PURE__*/ createUseSimulateContract({
+  abi: erc20Abi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateErc20Transfer = /*#__PURE__*/ createUseSimulateContract(
+  { abi: erc20Abi, functionName: 'transfer' },
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link erc20Abi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateErc20TransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: erc20Abi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20Abi}__
+ */
+export const useWatchErc20Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: erc20Abi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20Abi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchErc20ApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: erc20Abi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link erc20Abi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchErc20TransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: erc20Abi,
+    eventName: 'Transfer',
   })
 
 /**
@@ -3428,6 +4445,275 @@ export const useReadIerc165SupportsInterface =
   /*#__PURE__*/ createUseReadContract({
     abi: ierc165Abi,
     functionName: 'supportsInterface',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20Abi}__
+ */
+export const useReadIerc20 = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20Abi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadIerc20Allowance = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20Abi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadIerc20BalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20Abi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadIerc20TotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20Abi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20Abi}__
+ */
+export const useWriteIerc20 = /*#__PURE__*/ createUseWriteContract({
+  abi: ierc20Abi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteIerc20Approve = /*#__PURE__*/ createUseWriteContract({
+  abi: ierc20Abi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteIerc20Transfer = /*#__PURE__*/ createUseWriteContract({
+  abi: ierc20Abi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteIerc20TransferFrom = /*#__PURE__*/ createUseWriteContract({
+  abi: ierc20Abi,
+  functionName: 'transferFrom',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20Abi}__
+ */
+export const useSimulateIerc20 = /*#__PURE__*/ createUseSimulateContract({
+  abi: ierc20Abi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateIerc20Approve = /*#__PURE__*/ createUseSimulateContract(
+  { abi: ierc20Abi, functionName: 'approve' },
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateIerc20Transfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20Abi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20Abi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateIerc20TransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20Abi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20Abi}__
+ */
+export const useWatchIerc20Event = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: ierc20Abi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20Abi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchIerc20ApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: ierc20Abi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20Abi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchIerc20TransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: ierc20Abi,
+    eventName: 'Transfer',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__
+ */
+export const useReadIerc20Metadata = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20MetadataAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadIerc20MetadataAllowance =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'allowance',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadIerc20MetadataBalanceOf =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'balanceOf',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadIerc20MetadataDecimals =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'decimals',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadIerc20MetadataName = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20MetadataAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadIerc20MetadataSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20MetadataAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadIerc20MetadataTotalSupply =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'totalSupply',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MetadataAbi}__
+ */
+export const useWriteIerc20Metadata = /*#__PURE__*/ createUseWriteContract({
+  abi: ierc20MetadataAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteIerc20MetadataApprove =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteIerc20MetadataTransfer =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteIerc20MetadataTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MetadataAbi}__
+ */
+export const useSimulateIerc20Metadata =
+  /*#__PURE__*/ createUseSimulateContract({ abi: ierc20MetadataAbi })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateIerc20MetadataApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateIerc20MetadataTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateIerc20MetadataTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20MetadataAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20MetadataAbi}__
+ */
+export const useWatchIerc20MetadataEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: ierc20MetadataAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchIerc20MetadataApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: ierc20MetadataAbi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20MetadataAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchIerc20MetadataTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: ierc20MetadataAbi,
+    eventName: 'Transfer',
   })
 
 /**
@@ -3944,6 +5230,32 @@ export const useReadIPoolFactory = /*#__PURE__*/ createUseReadContract({
 export const useReadIPoolFee = /*#__PURE__*/ createUseReadContract({
   abi: iPoolAbi,
   functionName: 'fee',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iPoolAbi}__ and `functionName` set to `"feeGrowthGlobal0X128"`
+ */
+export const useReadIPoolFeeGrowthGlobal0X128 =
+  /*#__PURE__*/ createUseReadContract({
+    abi: iPoolAbi,
+    functionName: 'feeGrowthGlobal0X128',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iPoolAbi}__ and `functionName` set to `"feeGrowthGlobal1X128"`
+ */
+export const useReadIPoolFeeGrowthGlobal1X128 =
+  /*#__PURE__*/ createUseReadContract({
+    abi: iPoolAbi,
+    functionName: 'feeGrowthGlobal1X128',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iPoolAbi}__ and `functionName` set to `"getPosition"`
+ */
+export const useReadIPoolGetPosition = /*#__PURE__*/ createUseReadContract({
+  abi: iPoolAbi,
+  functionName: 'getPosition',
 })
 
 /**
@@ -4628,6 +5940,21 @@ export const useSimulateISwapRouterSwapCallback =
   })
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iSwapRouterAbi}__
+ */
+export const useWatchISwapRouterEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: iSwapRouterAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link iSwapRouterAbi}__ and `eventName` set to `"Swap"`
+ */
+export const useWatchISwapRouterSwapEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: iSwapRouterAbi,
+    eventName: 'Swap',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link lockAbi}__
  */
 export const useReadLock = /*#__PURE__*/ createUseReadContract({ abi: lockAbi })
@@ -5056,6 +6383,32 @@ export const useReadPoolFee = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link poolAbi}__ and `functionName` set to `"feeGrowthGlobal0X128"`
+ */
+export const useReadPoolFeeGrowthGlobal0X128 =
+  /*#__PURE__*/ createUseReadContract({
+    abi: poolAbi,
+    functionName: 'feeGrowthGlobal0X128',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link poolAbi}__ and `functionName` set to `"feeGrowthGlobal1X128"`
+ */
+export const useReadPoolFeeGrowthGlobal1X128 =
+  /*#__PURE__*/ createUseReadContract({
+    abi: poolAbi,
+    functionName: 'feeGrowthGlobal1X128',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link poolAbi}__ and `functionName` set to `"getPosition"`
+ */
+export const useReadPoolGetPosition = /*#__PURE__*/ createUseReadContract({
+  abi: poolAbi,
+  functionName: 'getPosition',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link poolAbi}__ and `functionName` set to `"liquidity"`
  */
 export const useReadPoolLiquidity = /*#__PURE__*/ createUseReadContract({
@@ -5409,6 +6762,15 @@ export const useReadPositionManagerGetPositionInfo =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link positionManagerAbi}__ and `functionName` set to `"getSender"`
+ */
+export const useReadPositionManagerGetSender =
+  /*#__PURE__*/ createUseReadContract({
+    abi: positionManagerAbi,
+    functionName: 'getSender',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link positionManagerAbi}__ and `functionName` set to `"isApprovedForAll"`
  */
 export const useReadPositionManagerIsApprovedForAll =
@@ -5678,24 +7040,6 @@ export const useReadSwapRouterPoolManager = /*#__PURE__*/ createUseReadContract(
 )
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"quoteExactInput"`
- */
-export const useReadSwapRouterQuoteExactInput =
-  /*#__PURE__*/ createUseReadContract({
-    abi: swapRouterAbi,
-    functionName: 'quoteExactInput',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"quoteExactOutput"`
- */
-export const useReadSwapRouterQuoteExactOutput =
-  /*#__PURE__*/ createUseReadContract({
-    abi: swapRouterAbi,
-    functionName: 'quoteExactOutput',
-  })
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link swapRouterAbi}__
  */
 export const useWriteSwapRouter = /*#__PURE__*/ createUseWriteContract({
@@ -5718,6 +7062,24 @@ export const useWriteSwapRouterExactOutput =
   /*#__PURE__*/ createUseWriteContract({
     abi: swapRouterAbi,
     functionName: 'exactOutput',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"quoteExactInput"`
+ */
+export const useWriteSwapRouterQuoteExactInput =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: swapRouterAbi,
+    functionName: 'quoteExactInput',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"quoteExactOutput"`
+ */
+export const useWriteSwapRouterQuoteExactOutput =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: swapRouterAbi,
+    functionName: 'quoteExactOutput',
   })
 
 /**
@@ -5755,10 +7117,331 @@ export const useSimulateSwapRouterExactOutput =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"quoteExactInput"`
+ */
+export const useSimulateSwapRouterQuoteExactInput =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: swapRouterAbi,
+    functionName: 'quoteExactInput',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"quoteExactOutput"`
+ */
+export const useSimulateSwapRouterQuoteExactOutput =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: swapRouterAbi,
+    functionName: 'quoteExactOutput',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"swapCallback"`
  */
 export const useSimulateSwapRouterSwapCallback =
   /*#__PURE__*/ createUseSimulateContract({
     abi: swapRouterAbi,
     functionName: 'swapCallback',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link swapRouterAbi}__
+ */
+export const useWatchSwapRouterEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: swapRouterAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link swapRouterAbi}__ and `eventName` set to `"Swap"`
+ */
+export const useWatchSwapRouterSwapEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: swapRouterAbi,
+    eventName: 'Swap',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testLpAbi}__
+ */
+export const useWriteTestLp = /*#__PURE__*/ createUseWriteContract({
+  abi: testLpAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"burn"`
+ */
+export const useWriteTestLpBurn = /*#__PURE__*/ createUseWriteContract({
+  abi: testLpAbi,
+  functionName: 'burn',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"collect"`
+ */
+export const useWriteTestLpCollect = /*#__PURE__*/ createUseWriteContract({
+  abi: testLpAbi,
+  functionName: 'collect',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"mint"`
+ */
+export const useWriteTestLpMint = /*#__PURE__*/ createUseWriteContract({
+  abi: testLpAbi,
+  functionName: 'mint',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"mintCallback"`
+ */
+export const useWriteTestLpMintCallback = /*#__PURE__*/ createUseWriteContract({
+  abi: testLpAbi,
+  functionName: 'mintCallback',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testLpAbi}__
+ */
+export const useSimulateTestLp = /*#__PURE__*/ createUseSimulateContract({
+  abi: testLpAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"burn"`
+ */
+export const useSimulateTestLpBurn = /*#__PURE__*/ createUseSimulateContract({
+  abi: testLpAbi,
+  functionName: 'burn',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"collect"`
+ */
+export const useSimulateTestLpCollect = /*#__PURE__*/ createUseSimulateContract(
+  { abi: testLpAbi, functionName: 'collect' },
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"mint"`
+ */
+export const useSimulateTestLpMint = /*#__PURE__*/ createUseSimulateContract({
+  abi: testLpAbi,
+  functionName: 'mint',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testLpAbi}__ and `functionName` set to `"mintCallback"`
+ */
+export const useSimulateTestLpMintCallback =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: testLpAbi,
+    functionName: 'mintCallback',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testSwapAbi}__
+ */
+export const useWriteTestSwap = /*#__PURE__*/ createUseWriteContract({
+  abi: testSwapAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testSwapAbi}__ and `functionName` set to `"swapCallback"`
+ */
+export const useWriteTestSwapSwapCallback =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: testSwapAbi,
+    functionName: 'swapCallback',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testSwapAbi}__ and `functionName` set to `"testSwap"`
+ */
+export const useWriteTestSwapTestSwap = /*#__PURE__*/ createUseWriteContract({
+  abi: testSwapAbi,
+  functionName: 'testSwap',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testSwapAbi}__
+ */
+export const useSimulateTestSwap = /*#__PURE__*/ createUseSimulateContract({
+  abi: testSwapAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testSwapAbi}__ and `functionName` set to `"swapCallback"`
+ */
+export const useSimulateTestSwapSwapCallback =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: testSwapAbi,
+    functionName: 'swapCallback',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testSwapAbi}__ and `functionName` set to `"testSwap"`
+ */
+export const useSimulateTestSwapTestSwap =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: testSwapAbi,
+    functionName: 'testSwap',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__
+ */
+export const useReadTestToken = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadTestTokenAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadTestTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadTestTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadTestTokenName = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadTestTokenSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadTestTokenTotalSupply = /*#__PURE__*/ createUseReadContract({
+  abi: testTokenAbi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testTokenAbi}__
+ */
+export const useWriteTestToken = /*#__PURE__*/ createUseWriteContract({
+  abi: testTokenAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteTestTokenApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: testTokenAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"mint"`
+ */
+export const useWriteTestTokenMint = /*#__PURE__*/ createUseWriteContract({
+  abi: testTokenAbi,
+  functionName: 'mint',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteTestTokenTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: testTokenAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteTestTokenTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: testTokenAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testTokenAbi}__
+ */
+export const useSimulateTestToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: testTokenAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateTestTokenApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: testTokenAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"mint"`
+ */
+export const useSimulateTestTokenMint = /*#__PURE__*/ createUseSimulateContract(
+  { abi: testTokenAbi, functionName: 'mint' },
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateTestTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: testTokenAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link testTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateTestTokenTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: testTokenAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link testTokenAbi}__
+ */
+export const useWatchTestTokenEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: testTokenAbi },
+)
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link testTokenAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchTestTokenApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: testTokenAbi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link testTokenAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchTestTokenTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: testTokenAbi,
+    eventName: 'Transfer',
   })
