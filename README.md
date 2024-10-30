@@ -98,7 +98,7 @@
 
 **第 P208 讲：添加流动性弹窗 UI 开发**
 
-**第 P209 讲：支持查看和创建交易池**：[教程](./P208_Pool/readme.md) | [代码](./demo/pages/wtfswap/pool.tsx)
+**第 P209 讲：支持查看和创建交易池**：[教程](./P209_Pool/readme.md) | [代码](./demo/pages/wtfswap/pool.tsx)
 
 **第 P210 讲：支持查看和添加流动性**
 
