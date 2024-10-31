@@ -151,7 +151,7 @@ import { Card, Input, Button, Space, Typography } from 'antd';
 + import { ETH, USDT, USDC } from '@ant-design/web3-assets/tokens';
 import { SwapOutlined } from '@ant-design/icons';
 
-......
+// ...
 
 export default function Wtfswap() {
 + const [tokenA, setTokenA] = useState<Token>(ETH);
@@ -161,7 +161,7 @@ export default function Wtfswap() {
 + const [optionsA, setOptionsA] = useState<Token[]>([ETH, USDT, USDC]);;
 + const [optionsB, setOptionsB] = useState<Token[]>([USDT, ETH, USDC]);;
 
-......
+// ...
 
 <Input
   variant="borderless"
@@ -173,7 +173,7 @@ export default function Wtfswap() {
   }
 />
 
-......
+// ...
 
 <Input
   variant="borderless"
@@ -185,7 +185,7 @@ export default function Wtfswap() {
   }
 />
 
-......
+// ...
 ```
 
 ![swap3](./img/swap3.png)
@@ -195,7 +195,7 @@ export default function Wtfswap() {
 2. **handleSwitch**：点击切换按钮时，调换 `TokenA：TokenB` 代币对，以及对应的值 `AmountA：AmountB`。
 
 ```diff
-......
+// ...
 
 + const handleAmountAChange = (e: any) => {
 +   setAmountA(parseFloat(e.target.value));
@@ -209,7 +209,7 @@ export default function Wtfswap() {
 +   setAmountB(amountA);
 + };
 
-......
+// ...
 
 <Input
   variant="borderless"
@@ -221,7 +221,7 @@ export default function Wtfswap() {
   }
 />
 
-......
+// ...
 
 <Space className={styles.switchBtn}>
   <Button
@@ -231,24 +231,24 @@ export default function Wtfswap() {
   />
 </Space>
 
-......
+// ...
 ```
 
 然后为 `Max` 按钮添加函数 `handleMax`，UI 阶段先不实现功能。
 
 ```diff
-......
+// ...
 + const handleMax = () => {
 + };
 
-......
+// ...
 
 - <Button size="small" type="link">
 + <Button size="small" onClick={handleMax} type="link">
   Max
 </Button>
 
-......
+// ...
 ```
 
 以上基本实现了 Swap 页面，接下来优化下样式，使其匹配设计稿的内容，编辑 `pages/wtfswap/swap.module.css` 文件：
@@ -379,7 +379,6 @@ export default function Wtfswap() {
     </WtfLayout>
   );
 }
-
 ```
 
 ![swap4](./img/swap4.png)
