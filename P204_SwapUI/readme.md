@@ -158,8 +158,8 @@ export default function Wtfswap() {
 + const [tokenB, setTokenB] = useState<Token>(USDT);
 + const [amountA, setAmountA] = useState(0);
 + const [amountB, setAmountB] = useState(0);
-+ const [optionsA, setOptionsA] = useState<Token[]>([ETH, USDT, USDC]);;
-+ const [optionsB, setOptionsB] = useState<Token[]>([USDT, ETH, USDC]);;
++ const [optionsA, setOptionsA] = useState<Token[]>([ETH, USDT, USDC]);
++ const [optionsB, setOptionsB] = useState<Token[]>([USDT, ETH, USDC]);
 
 // ...
 
