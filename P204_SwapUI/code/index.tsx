@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
+import { Card, Input, Button, Space, Typography } from 'antd';
 import { TokenSelect, type Token } from '@ant-design/web3';
 import { ETH, USDT, USDC } from '@ant-design/web3-assets/tokens';
-import { Card, Input, Button, Space, Typography } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 
 import WtfLayout from "@/components/WtfLayout";
 import styles from "./swap.module.css";
 
 const { Text } = Typography;
-
 
 export default function Wtfswap() {
   const [tokenA, setTokenA] = useState<Token>(ETH);
@@ -20,7 +19,6 @@ export default function Wtfswap() {
 
   const handleAmountAChange = (e: any) => {
     setAmountA(parseFloat(e.target.value));
-    // todo: setAmountB
   };
 
 
@@ -32,7 +30,6 @@ export default function Wtfswap() {
   };
 
   const handleMax = () => {
-    // max 
   };
 
   return (
@@ -71,8 +68,8 @@ export default function Wtfswap() {
         </Space>
         <Card>
           <Input
-            value={amountB}
             variant="borderless"
+            value={amountB}
             type="number"
             addonAfter={
               <TokenSelect value={tokenB} onChange={setTokenB} options={optionsB} />

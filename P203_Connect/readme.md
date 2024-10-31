@@ -19,6 +19,7 @@ npm install antd @ant-design/web3 @ant-design/web3-wagmi wagmi viem @tanstack/re
 ```diff
 import React from "react";
 import Header from "./Header";
+import styles from "./styles.module.css";
 + import {
 +   MetaMask,
 +   OkxWallet,
@@ -56,7 +57,6 @@ interface WtfLayoutProps {
 
 const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
   return (
--     <div>
 +     <WagmiWeb3ConfigProvider
 +       eip6963={{
 +         autoAddInjectedWallets: true,
@@ -74,9 +74,10 @@ const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
 +       config={config}
 +       queryClient={queryClient}
 +     >
-      <Header />
-      {children}
--     </div>
+      <div className={styles.layout}>
+        <Header />
+        {children}
+      </div>
 +     </WagmiWeb3ConfigProvider>
   );
 };

@@ -7,8 +7,10 @@ describe("Pool", function () {
   async function deployFixture() {
     // 初始化一个池子，价格上限是 40000，下限是 1，初始化价格是 10000，费率是 0.3%
     const factory = await hre.viem.deployContract("Factory");
-    const token0 = await hre.viem.deployContract("TestToken");
-    const token1 = await hre.viem.deployContract("TestToken");
+    const tokenA = await hre.viem.deployContract("TestToken");
+    const tokenB = await hre.viem.deployContract("TestToken");
+    const token0 = tokenA.address < tokenB.address ? tokenA : tokenB;
+    const token1 = tokenA.address < tokenB.address ? tokenB : tokenA;
     const tickLower = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1));
     const tickUpper = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(40000, 1));
     // 以 1,000,000 为基底的手续费费率，Uniswap v3 前端界面支持四种手续费费率（0.01%，0.05%、0.30%、1.00%），对于一般的交易对推荐 0.30%，fee 取值即 3000；
@@ -228,10 +230,10 @@ describe("Pool", function () {
     );
     // 提取 token
     await testLP.write.collect([testLP.address, pool.address]);
-    // 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费
+    // 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费，并且有交易换入了 token0
     // 初始的 token0 是 const initBalanceValue = 100000000000n * 10n ** 18n;
     expect(await token0.read.balanceOf([testLP.address])).to.equal(
-      100000000099699999999999999999n
+      100000000099999999999999999998n
     );
   });
 });

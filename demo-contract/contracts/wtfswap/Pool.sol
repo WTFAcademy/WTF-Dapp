@@ -61,6 +61,29 @@ contract Pool is IPool {
     // 用一个 mapping 来存放所有 Position 的信息
     mapping(address => Position) public positions;
 
+    function getPosition(
+        address owner
+    )
+        external
+        view
+        override
+        returns (
+            uint128 _liquidity,
+            uint256 feeGrowthInside0LastX128,
+            uint256 feeGrowthInside1LastX128,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        )
+    {
+        return (
+            positions[owner].liquidity,
+            positions[owner].feeGrowthInside0LastX128,
+            positions[owner].feeGrowthInside1LastX128,
+            positions[owner].tokensOwed0,
+            positions[owner].tokensOwed1
+        );
+    }
+
     constructor() {
         // constructor 中初始化 immutable 的常量
         // Factory 创建 Pool 时会通 new Pool{salt: salt}() 的方式创建 Pool 合约，通过 salt 指定 Pool 的地址，这样其他地方也可以推算出 Pool 的地址
@@ -107,7 +130,7 @@ contract Pool is IPool {
             sqrtPriceX96,
             params.liquidityDelta
         );
-        Position memory position = positions[params.owner];
+        Position storage position = positions[params.owner];
 
         // 提取手续费，计算从上一次提取到当前的手续费
         uint128 tokensOwed0 = uint128(
@@ -180,8 +203,6 @@ contract Pool is IPool {
         );
         amount0 = uint256(amount0Int);
         amount1 = uint256(amount1Int);
-        // 把流动性记录到对应的 position 中
-        positions[recipient].liquidity += amount;
 
         uint256 balance0Before;
         uint256 balance1Before;
@@ -199,13 +220,20 @@ contract Pool is IPool {
     }
 
     function collect(
-        address recipient
+        address recipient,
+        uint128 amount0Requested,
+        uint128 amount1Requested
     ) external override returns (uint128 amount0, uint128 amount1) {
         // 获取当前用户的 position
         Position storage position = positions[msg.sender];
-        // 把钱退给用户 recipient，只支持全部退还
-        amount0 = position.tokensOwed0;
-        amount1 = position.tokensOwed1;
+
+        // 把钱退给用户 recipient
+        amount0 = amount0Requested > position.tokensOwed0
+            ? position.tokensOwed0
+            : amount0Requested;
+        amount1 = amount1Requested > position.tokensOwed1
+            ? position.tokensOwed1
+            : amount1Requested;
 
         if (amount0 > 0) {
             position.tokensOwed0 -= amount0;
@@ -374,29 +402,32 @@ contract Pool is IPool {
                 amountSpecified - state.amountSpecifiedRemaining
             );
 
-        // 转 Token 给用户
         if (zeroForOne) {
+            // callback 中需要给 Pool 转入 token
+            uint256 balance0Before = balance0();
+            ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
+            require(balance0Before.add(uint256(amount0)) <= balance0(), "IIA");
+
+            // 转 Token 给用户
             if (amount1 < 0)
                 TransferHelper.safeTransfer(
                     token1,
                     recipient,
                     uint256(-amount1)
                 );
-
-            uint256 balance0Before = balance0();
-            ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
-            require(balance0Before.add(uint256(amount0)) <= balance0(), "IIA");
         } else {
+            // callback 中需要给 Pool 转入 token
+            uint256 balance1Before = balance1();
+            ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
+            require(balance1Before.add(uint256(amount1)) <= balance1(), "IIA");
+
+            // 转 Token 给用户
             if (amount0 < 0)
                 TransferHelper.safeTransfer(
                     token0,
                     recipient,
                     uint256(-amount0)
                 );
-
-            uint256 balance1Before = balance1();
-            ISwapCallback(msg.sender).swapCallback(amount0, amount1, data);
-            require(balance1Before.add(uint256(amount1)) <= balance1(), "IIA");
         }
 
         emit Swap(

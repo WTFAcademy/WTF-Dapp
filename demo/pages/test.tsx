@@ -1,4 +1,4 @@
-import { useReadSwapRouterQuoteExactInput } from "@/utils/contracts";
+import { useReadPoolManagerGetAllPools } from "@/utils/contracts";
 
 import { hardhat } from "wagmi/chains";
 import { WagmiWeb3ConfigProvider, Hardhat } from "@ant-design/web3-wagmi";
@@ -14,17 +14,8 @@ const config = createConfig({
 });
 
 const CallTest = () => {
-  const { data, refetch } = useReadSwapRouterQuoteExactInput({
-    address: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-    args: [
-      {
-        tokenIn: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-        tokenOut: "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
-        indexPath: [],
-        amountIn: BigInt(123),
-        sqrtPriceLimitX96: BigInt(123),
-      },
-    ],
+  const { data, refetch } = useReadPoolManagerGetAllPools({
+    address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
   });
   console.log("get data", data);
   return (

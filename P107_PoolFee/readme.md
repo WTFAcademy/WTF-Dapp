@@ -17,15 +17,15 @@ uint256 public override feeGrowthGlobal0X128;
 uint256 public override feeGrowthGlobal1X128;
 ```
 
-它们代表了从池子创建以来累计收取到的手续费（具体是每个流动性可以提取的手续费乘以 2 的 96 次方），为什么需要记录这两个值呢？因为 LP 是可以随时提取手续费的，而且每个 LP 提取的时间不一样，所以 LP 提取手续费时我们需要计算出他历史累计的手续费收益。
+它们代表了从池子创建以来累计收取到的手续费，为什么需要记录这两个值呢？因为 LP 是可以随时提取手续费的，而且每个 LP 提取的时间不一样，所以 LP 提取手续费时我们需要计算出他历史累计的手续费收益。
 
-其中 `feeGrowthGlobal0X128` 和 `feeGrowthGlobal1X128` 是通过手续费乘以 `FixedPoint128.Q128`（2 的 96 次方），然后除以流动性数量得到的，和上面交易类似，乘以 `FixedPoint128.Q128` 是为了避免精度问题。
+具体值的计算上 `feeGrowthGlobal0X128` 和 `feeGrowthGlobal1X128` 是通过手续费乘以 `FixedPoint128.Q128`（2 的 96 次方），然后除以流动性数量得到的。和上一讲课程中的交易类似，乘以 `FixedPoint128.Q128` 是为了避免精度问题，最终 LP 提取手续费时会计算回实际的 token 数量。
 
 ## 开发
 
 > 完整的代码在 [demo-contract/contracts/wtfswap/Pool.sol](../demo-contract/contracts/wtfswap/Pool.sol) 中。
 
-如上所说，在 `Pool.sol` 中需要添加如下定义：
+如简介中所说，在 `Pool.sol` 中需要添加如下定义：
 
 ```solidity
 /// @inheritdoc IPool
@@ -73,7 +73,7 @@ if (zeroForOne) {
 
 其中 `FullMath.mulDiv` 方法接收三个参数，结果返回第一个参数和第二个参数的乘积再除以第三个参数。
 
-然后在 `_modifyPosition` 中补充相关逻辑，每次 LP 调用 `mint` 或者 `burn` 方法时更新头寸（`Position`）中的 `tokensOwed0` 和 `tokensOwed1`。
+然后在 `_modifyPosition` 中补充相关逻辑，每次 LP 调用 `mint` 或者 `burn` 方法时更新头寸（`Position`）中的 `tokensOwed0` 和 `tokensOwed1`，将之前累计的手续费记录上，并重新开始记录手续费。
 
 ```diff
 function _modifyPosition(
@@ -93,7 +93,7 @@ function _modifyPosition(
         sqrtPriceX96,
         params.liquidityDelta
     );
-    Position memory position = positions[params.owner];
+    Position storage position = positions[params.owner];
 
 +    // 提取手续费，计算从上一次提取到当前的手续费
 +    uint128 tokensOwed0 = uint128(
@@ -134,6 +134,8 @@ function _modifyPosition(
 
 这样，当 LP 调用 `collect` 方法时，就可以将 `Position` 中的 `tokensOwed0` 和 `tokensOwed1` 转给用户了。
 
+有一点提一下，为什么我们是在 `burn` 或者 `mint` 调用的 `_modifyPosition` 中计算手续费，而不是在用户 `swap` 的时候就把每个池子应该收到的手续费都记录上呢？因为一个池子中的流动性可能会很多，如果在交易的时候记录的话会产生大量的运算，会导致 Gas 太高。在这个计算中，LP 持有的流动性算是 LP 的“持股”份额，通过“持股”（Share）来计算 Token 也是很多 Defi 场景都会用到的方法。
+
 ## 合约测试
 
 我们尝试继续在上一讲课程中的 `test/wtfswap/Pool.ts` 的 `swap` 样例中补充测试代码：
@@ -147,12 +149,14 @@ expect(await token0.read.balanceOf([testLP.address])).to.equal(
 );
 // 提取 token
 await testLP.write.collect([testLP.address, pool.address]);
-// 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费
+// 判断 token 是否返回给 testLP，并且大于原来的数量，因为收到了手续费，并且有交易换入了 token0
 // 初始的 token0 是 const initBalanceValue = 100000000000n * 10n ** 18n;
 expect(await token0.read.balanceOf([testLP.address])).to.equal(
-  100000000099699999999999999999n
+  100000000099999999999999999998n
 );
 ```
+
+仔细看上面的测试样例你会发现，LP 的 token 0 的数量从原来的 `100000000000n * 10n ** 18n` 变成了 `(100000000000n + 100n) * 10n ** 18n;`（不完全相等，计算上会因为取整问题有一点点损耗）。因为中间的交易换入了 `100n * 10n ** 18n` 的 token0，其中包含了手续费。
 
 至此，我们完成了全部 `Pool` 合约逻辑的开发。🎉
 

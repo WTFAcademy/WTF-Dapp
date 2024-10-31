@@ -1,3 +1,8 @@
+.layout {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #e8f1ff, #f6f7f9);
+}
+
 .header {
   height: 56px;
   line-height: 56px;
@@ -6,6 +11,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  border-bottom: 1px solid #d7e1eb;
 }
 
 .title {
