@@ -54,15 +54,19 @@
 
 **第 15 讲：使用 Wagmi CLI 调试本地合约**：[教程](./15_WagmiCli/readme.md) | [代码](./demo/wagmi.config.ts)
 
-## DEX 开发实战（开发中）
+## DEX 开发实战
 
 **第 P000 讲：为什么要做这个实战课程**：[教程](./P000_WhyDEX/readme.md)
+
+### 0. 准备工作
 
 **第 P001 讲：什么是去中心化交易所（DEX）**：[教程](./P001_WhatIsDEX/readme.md)
 
 **第 P002 讲：Uniswap 代码解析**：[教程](./P002_WhatIsUniswap/readme.md)
 
 **第 P003 讲：Wtfswap 整体设计**：[教程](./P003_OverallDesign/readme.md)
+
+### 1. 合约开发
 
 **第 P101 讲：Wtfswap 合约设计**：[教程](./P101_ContractsDesign/readme.md) | [代码](./demo-contract/contracts/wtfswap/interfaces/)
 
@@ -81,6 +85,8 @@
 **第 P108 讲：PositionManager 合约开发**：[教程](./P108_PositionManager/readme.md) | [代码](./demo-contract/contracts/wtfswap/PositionManager.sol)
 
 **第 P109 讲：SwapRouter 合约开发**：[教程](./P109_SwapRouter/readme.md) | [代码](./demo-contract/contracts/wtfswap/SwapRouter.sol)
+
+### 2. 前端开发（开发中）
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 
@@ -105,6 +111,8 @@
 **第 P211 讲：支持提取流动性**
 
 **第 P212 讲：支持 Swap**
+
+### 3. 部署和优化（开发中）
 
 **第 P301 讲：合约的优化和安全**
 
