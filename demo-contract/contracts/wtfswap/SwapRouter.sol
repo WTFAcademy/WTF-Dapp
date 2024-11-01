@@ -83,7 +83,7 @@ contract SwapRouter is ISwapRouter {
         // 如果交换到的 amountOut 小于指定的最少数量 amountOutMinimum，则抛出错误
         require(amountOut >= params.amountOutMinimum, "Slippage exceeded");
 
-        // 发射 Swap 事件
+        // 发送 Swap 事件
         emit Swap(msg.sender, zeroForOne, params.amountIn, amountIn, amountOut);
 
         // 返回 amountOut
