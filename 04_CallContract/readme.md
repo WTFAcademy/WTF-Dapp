@@ -12,9 +12,9 @@ DApp 的前端网站部分区别于传统 App 的地方在于，它需要和区�
 
 ### 通过 MetaMask 钱包
 
-[MetaMask](https://metamask.io/) 是目前以太坊生态中用户最多的钱包插件，它提供了一个简单的方式，让用户在浏览器中管理自己的以太坊资产，同时也是 DApp 与以太坊网络交互的桥梁。如果你还没有使用过，可以在[这里下载](https://metamask.io/download/)安装，并参考官网的教程完成初始的配置。当然，你也可以使用其它钱包。比如 [TokenPocket](https://www.tokenpocket.pro/)、[imToken](https://token.im/) 等。
+我们前面已安装完成 MetaMask 钱包，并领取了 0.01 SepoliaETH
 
-![metamask](./img/metamask.png)
+![metamask](./img/metamask3.png)
 
 MetaMask 钱包安装完成后，我们可以在浏览器的右上角看到 MetaMask 的图标，同时它也会给每一个页面注入 `window.ethereum` 对象，这个对象是 DApp 与以太坊网络交互的接口，我们可以通过它来调用以太坊的 API。比如我们可以可以发起一个 `eth_chainId` 的 RPC 请求，获取当前网络的 ID：
 

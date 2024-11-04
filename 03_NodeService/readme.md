@@ -42,4 +42,9 @@
 
 ![faucet](./img/faucet.png)
 
-请在上图示意的水龙头网页中领取适量的 Sepolia 测试网 ETH，我们在后面的课程中可能会用到。
+请在上图示意的水龙头网页中填入Sepolia测试网地址，领取适量的测试网SepoliaETH，我们在后面的课程中可能会用到。
+
+本次领取0.01SepoliaETH
+
+![faucet](./img/sepoliaeth.png)
+
