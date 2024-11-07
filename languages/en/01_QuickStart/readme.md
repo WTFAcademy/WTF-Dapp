@@ -32,13 +32,26 @@ Next, let's refer to the [Vite official documentation](https://vite.dev/guide/) 
 npm create vite@latest
 ```
 
-Please follow the prompts to create a new project. We will name it as follows `dApp_test`. For specific technology stack selection, you can refer to the figure below:
+Please follow the prompts to create a new project. We will name it as follows `dApp_test`. For technology stack:
 
-![img](./img/init-next.png) 
-<!-- replace with a ss of vite -->
+- Select the `React` framework
+- Select the `TypeScript` variant
 
+Open the new folder you just created with:
+```
+cd dApp_test
+```
+Initiate the folder to open in VS Code with: 
+```
+code .
+```
 
-## Install dependencies and start the project
+Open your VS Code terminal and install the dependencies:
+```
+npm install
+```
+
+## Install dApp dependencies and start the project
 
 After the creation is completed, enter the project directory to install the dependencies:
 
@@ -50,8 +63,6 @@ npm i
 After the installation is complete, execute `npm run dev` to start the Project. You can visit the browser `http://localhost:5173` to check whether the project has started successfully.
 
 ![img2](./img/vite-page.png)
-<!-- ?replace with the ss of the wallet address  -->
-
 
 ## Add Ant Design Web3
 
