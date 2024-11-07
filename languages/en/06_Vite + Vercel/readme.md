@@ -27,3 +27,21 @@ After logging in to Vercel, create a new project in its console:
 Next, select and import your Github project. During this process, you may need to authorize Vercel to access your Github repository:
 
 ![import](./img/import.png)
+
+Select the root directory of your Next.js project and then click Deploy.
+
+![editroot](./img/editroot.png)
+
+From this point forward, everything will be handled automatically:
+
+![deploy](./img/deploy.png)
+
+You can view the final demo of this tutorial at [https://wtf-dapp.vercel.app/web3](https://wtf-dapp.vercel.app/web3).
+
+## Custom Domain Name
+
+Vercel provides a default domain name for your projects, but it's common to use a custom domain name for a more professional appearance. To do this, locate your project in the Vercel console and navigate to the Domains section to add your custom domain.
+
+![domain](./img/domain.png)
+
+Once you've added your domain, follow the provided instructions to set up a CNAME record with your domain provider. This will ensure that your domain directs traffic to Vercel's servers.
