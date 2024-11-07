@@ -1,6 +1,6 @@
 This section offers a brief introduction on Vite and the basics of front-end deployment. If you're already experienced in front-end development, feel free to skip ahead.
 
-[Vite](https://vite.dev/) is a powerful framework that facilitates the rapid development of React applications. Once we build our application using React and Vite, the next step is to deploy it on a server, making it accessible to users.
+[Vite](https://vite.dev/) is a lightweight framework that facilitates the rapid development of React applications. Once we build our application using React and Vite, the next step is to deploy it on a server, making it accessible to users.
 
 Running `npm run build` in your project (which triggers `vite build` as defined in `package.json`) compiles your application into JavaScript, CSS, and other necessary files. These are designed to run in a browser, which natively supports JavaScript but not React. Therefore, we must compile the React code into browser-executable files. Furthermore, these JavaScript files can also be executed in a Node.js environment on the server, enabling server-side logic. While our previous courses haven't covered this, future courses will explore server-side functionalities, including tasks like signature verification.
 
@@ -37,6 +37,21 @@ From this point forward, everything will be handled automatically:
 ![deploy](./img/deploy.png)
 
 You can view the final demo of this tutorial at [https://wtf-dapp.vercel.app/web3](https://wtf-dapp.vercel.app/web3).
+
+Note: When you deploy using Vite, remember to add the `redirect` logic which routes the `/web3` page.
+
+In the root of your folder, create a vercel.json file and add the code below:
+
+```
+{
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
 
 ## Custom Domain Name
 
