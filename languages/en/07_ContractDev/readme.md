@@ -1,4 +1,4 @@
-This session will provide a brief overview of developing and testing smart contracts.
+# This session will provide a brief overview of developing and testing smart contracts.
 
 In this tutorial, we will be using `Remix` to execute `Solidity` smart contracts.
 
