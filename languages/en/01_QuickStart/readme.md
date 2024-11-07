@@ -4,10 +4,6 @@ In this lecture, we will guide you to quickly create a React project and display
 
 ---
 
-In this lecture, we will guide you to quickly create a React project and display an NFT image in it.
-
----
-
 This course is mainly aimed at students with a certain foundation in front-end development, helping you move from Web2 to Web3 and acquire the R&D capabilities of DApp (decentralized applications).
 
 The course will be based on Ant Design Web3 , so you can get started more easily. Of course, this will not affect your understanding of the basic concepts. We will explain the relevant concepts in the course to ensure that you can master the basic knowledge of DApp development after completing the course.
