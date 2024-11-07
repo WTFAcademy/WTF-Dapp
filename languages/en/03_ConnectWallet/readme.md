@@ -1,9 +1,3 @@
-Translated by：[@Mofasasi](https://x.com/mofasasi)
-
-In this lecture, we will guide you to quickly create a React project and display an NFT image in it.
-
----
-
 Connecting a wallet is a vital interaction in any decentralized application (DApp). In this session, we will walk you through the process of implementing a wallet connection feature using [wagmi](https://wagmi.sh) and [Ant Design Web3](https://web3.ant.design).
 
 ## How Wallets Connect in DApps
