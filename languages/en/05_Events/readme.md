@@ -1,9 +1,3 @@
-Translated by：[@Mofasasi](https://x.com/mofasasi)
-
-In this lecture, we will guide you to quickly create a React project and display an NFT image in it.
-
----
-
 This section will explain how to monitor contract events within a DApp and update its interface in real-time.
 
 ## Introduction
