@@ -1,9 +1,3 @@
-Translated by：[@Mofasasi](https://x.com/mofasasi)
-
-In this lecture, we will guide you to quickly create a React project and display an NFT image in it.
-
----
-
 ## Node Service: A Key Element in DApp Development
 
 In this session, we'll explore the concept of node services and demonstrate how to set them up in your project. We'll also guide you on obtaining Sepolia testnet ETH through a faucet.
