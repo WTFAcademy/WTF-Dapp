@@ -135,7 +135,10 @@ function App() {
 export default App;
 ```
 
-Now, you can go to http://localhost:5173/Web3 to see the address rendererd.
+Now, you can go to http://localhost:5173/Web3 to see the address renderers.
+
+![img3](./img/add-render.png)
+
 
 ## Adapter Configuration
 
