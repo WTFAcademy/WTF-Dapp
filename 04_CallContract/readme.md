@@ -1,4 +1,4 @@
-本节作者：[@愚指导](https://x.com/yudao1024)
+本节作者：[@愚指导](https://x.com/yudao1024)、[@小符](https://x.com/smallfu666)
 
 DApp 的前端网站部分区别于传统 App 的地方在于，它需要和区块链进行交互。而区块链的交互主要是通过调用智能合约来实现的。在这一讲中，我们将会学习如何调用智能合约。
 
@@ -64,30 +64,17 @@ await getAccount(); // 你的账户地址
 
 > 注：调用只读接口时，因为不需要向区块链写入数据，所以也不需要对交易签名，可以直接通过节点服务读取到链上数据。
 
-### 读的方式调用合约方法
+### 调用智能合约的读方法
 
 配置好节点服务后，我们就可以开始调用合约了。我们使用 wagmi 提供的 [useReadContract](https://wagmi.sh/react/api/hooks/useReadContract) Hook 来读取合约数据。示例代码如下：
 
 ```diff
-- import { createConfig, http } from "wagmi";
-+ import { createConfig, http, useReadContract } from "wagmi";
-import { mainnet } from "wagmi/chains";
-import { WagmiWeb3ConfigProvider, MetaMask } from "@ant-design/web3-wagmi";
-- import { Address, NFTCard, Connector, ConnectButton } from "@ant-design/web3";
-+ import { Address, NFTCard, Connector, ConnectButton, useAccount } from "@ant-design/web3";
-import { injected } from "wagmi/connectors";
+- import { http } from "wagmi";
++ import { http, useReadContract } from "wagmi";
+import { Mainnet, WagmiWeb3ConfigProvider, MetaMask } from '@ant-design/web3-wagmi';
+- import { Address, NFTCard, ConnectButton, Connector } from "@ant-design/web3";
++ import { Address, NFTCard, ConnectButton, Connector, useAccount } from "@ant-design/web3";
 
-const config = createConfig({
-  chains: [mainnet],
-  transports: {
-    [mainnet.id]: http(),
-  },
-  connectors: [
-    injected({
-      target: "metaMask",
-    }),
-  ],
-});
 
 + const CallTest = () => {
 +  const { account } = useAccount();
@@ -112,7 +99,13 @@ const config = createConfig({
 
 export default function Web3() {
   return (
-    <WagmiWeb3ConfigProvider config={config} wallets={[MetaMask()]}>
+    <WagmiWeb3ConfigProvider
+      chains={[Mainnet]}
+      transports={{
+        [Mainnet.id]: http(),
+      }}
+	  wallets={[MetaMask()]}
+    >
       <Address format address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9" />
       <NFTCard
         address="0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
@@ -121,11 +114,10 @@ export default function Web3() {
       <Connector>
         <ConnectButton />
       </Connector>
-+      <CallTest />
++     <CallTest />
     </WagmiWeb3ConfigProvider>
   );
-};
-
+}
 ```
 
 参考以上的代码添加调用合约的 `balanceOf` 方法，我们新建了一个 `CallTest` 组件，然后在 `WagmiWeb3ConfigProvider` 内添加了这个组件。
@@ -134,9 +126,11 @@ export default function Web3() {
 
 `balanceOf` 是用来获取某一个地址下有多少个这个合约 NFT 的方法。所以我们还需要用到 `@ant-design/web3` 提供的 `useAccount` Hook 来获取当前连接的账户地址。然后将账户地址作为 `balanceOf` 方法的参数传入，这样就可以获取到当前账户地址下有多少个 NFT 了。如果不出意外，你会得到 `0` 的结果。
 
+![](./img/call-read-contract.png)
+
 代码中的 abi 字段定义了方法的类型，这样 wagmi 才能知道如何处理方法的入参和返回，把 JavaScript 中的对象转换的区块链的交易信息。通常 abi 都是通过合约代码自动生成的，我们会在下一章讲到这一部分。
 
-### 写的方式调用合约方法
+### 调用智能合约的写方法
 
 仅仅是读取合约还不够，一个真正的 DApp，肯定会涉及到向智能合约写入数据。向智能合约写入数据通常都是通过在区块链上执行智能合约的方法，方法执行过程中会改写合约中的数据。
 
@@ -145,12 +139,12 @@ export default function Web3() {
 需要改动的代码如下：
 
 ```diff
-- import { createConfig, http, useReadContract } from "wagmi";
-+ import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
-+ import { Button, message } from "antd";
 + import { parseEther } from "viem";
-
-// ...
++ import { Button, message } from "antd";
+- import { http, useReadContract } from "wagmi";
++ import { http, useReadContract, useWriteContract } from "wagmi";
+import { Mainnet, WagmiWeb3ConfigProvider, MetaMask } from '@ant-design/web3-wagmi';
+import { Address, NFTCard, ConnectButton, Connector, useAccount } from "@ant-design/web3";
 
 const CallTest = () => {
 
@@ -202,7 +196,6 @@ const CallTest = () => {
 };
 
 // ...
-
 ```
 
 在上面的代码中，我们用到了 `viem` 这个库，它是 `wagmi` 底层依赖的一个库，你需要在项目中安装它：
