@@ -1,4 +1,4 @@
-本节作者：[@愚指导](https://x.com/yudao1024)、[@小符](https://x.com/smallfu666)
+本节作者：[@愚指导](https://x.com/yudao1024)、[@小符](https://x.com/smallfu666)、[@simple](https://x.com/0xsimpleth)
 
 连接钱包是 DApp 中最重要的交互，这一讲我们会引导你通过 [wagmi](https://wagmi.sh) 和 [Ant Design Web3](https://web3.ant.design) 来实现连接钱包的功能。
 
@@ -16,7 +16,7 @@
 
 [MetaMask](https://metamask.io/) 是目前以太坊生态中用户最多的钱包插件，它提供了一个简单的方式，让用户在浏览器中管理自己的以太坊资产，同时也是 DApp 与以太坊网络交互的桥梁。如果你还没有使用过，可以在[这里下载](https://metamask.io/download/)安装，并参考官网的教程完成初始的配置。当然，你也可以使用其它钱包。比如 [TokenPocket](https://www.tokenpocket.pro/)、[imToken](https://token.im/) 等。
 
-完成安装钱包后，切换到 Sepolia 测试网，可以看到如下的页面：
+完成安装钱包后，可以看到如下的页面：
 
 ![](./img/metamask.png)
 
