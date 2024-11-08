@@ -44,7 +44,7 @@ In this context, `relay-protocol` refers to the protocol being used, which is ty
 
 When you connect a wallet to a DApp using WalletConnect, you might notice that the browser sends requests to `wss://relay.walletconnect.com`.
 
-![wallet](./img/walletnetwork.png)
+![wallet](./img/walletconnect.png)
 
 These requests use the WebSocket protocol, which allows for two-way communication. The requests are routed through WalletConnect's relay server, establishing a connection between the wallet and the DApp. The address `wss://relay.walletconnect.com` is the default for the `irn` protocol. For those interested, WalletConnect's official documentation offers guidance on setting up your own relay server.
 
