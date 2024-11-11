@@ -1,4 +1,4 @@
-This lecture will explain how to make transfers and receive payments using blockchain technology.
+This lecture explains how to make transfers and receive payments using blockchain technology.
 
 ---
 
