@@ -98,7 +98,7 @@
 
 **第 P204 讲：Swap 页面 UI 开发**：[教程](./P204_SwapUI/) | [代码](./P204_SwapUI/code/)
 
-**第 P205 讲：Pool 列表页面 UI 开发**
+**第 P205 讲：Pool 列表页面 UI 开发**：[教程](./P205_PoolListUI/readme.md) | [代码](./P205_PoolListUI/code/pool.tsx)
 
 **第 P206 讲：添加 Pool 页面 UI 开发**
 
