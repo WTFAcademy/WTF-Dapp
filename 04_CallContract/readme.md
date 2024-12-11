@@ -14,6 +14,8 @@ DApp 的前端网站部分区别于传统 App 的地方在于，它需要和区�
 
 我们在前面的课程中已经安装完成 MetaMask 钱包，并领取了 0.01 SepoliaETH：
 
+这里需要把钱包的网络先切换到测试网络
+
 ![metamask](./img/metamask3.png)
 
 MetaMask 钱包安装完成后，我们可以在浏览器的右上角看到 MetaMask 的图标，同时它也会给每一个页面注入 `window.ethereum` 对象，这个对象是 DApp 与以太坊网络交互的接口，我们可以通过它来调用以太坊的 API。比如我们可以可以发起一个 `eth_chainId` 的 RPC 请求，获取当前网络的 ID：
