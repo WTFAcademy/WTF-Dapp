@@ -8,18 +8,18 @@
 
 首先我们来看一下设计稿：
 
-![pool](./img/position.png)
+![position](./img/position.png)
 
 和交易池列表页面类似，该页面主要是用来显示一个列表，展示出当前账号下的头寸，并包含添加头寸、移除头寸和收回头寸的操作入口。
 
-我们可以直接复制交易池列表页面的代码 [pool.tsx](../P205_PoolListUI/code/pool.tsx) 为 `position.tsx`，以及 [pool.module.css](../P205_PoolListUI/code/pool.tsx) 为 `position.module.css`，然后修改一下标题和按钮内容，`columns` 和 `data` 的内容可以先置空，后续再补充。
+我们可以直接复制交易池列表页面的代码 [pool.tsx](../P205_PoolListUI/code/pool.tsx) 为 `positions.tsx`，以及 [pool.module.css](../P205_PoolListUI/code/pool.tsx) 为 `positions.module.css`，然后修改一下标题和按钮内容，`columns` 和 `data` 的内容可以先置空，后续再补充。
 
 ```tsx
 import React from "react";
 import { Flex, Table, Space, Typography, Button } from "antd";
 import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
-import styles from "./position.module.css";
+import styles from "./positions.module.css";
 
 const columns: TableProps["columns"] = [];
 
@@ -181,6 +181,6 @@ const data = [
 
 ![position table 2](./img/position-2.png)
 
-完整的代码请参考：[position.tsx](./code/position.tsx)
+完整的代码请参考：[positions.tsx](./code/position.tsx)
 
 我们将在后面的课程中完善代码，添加和合约交互的相关逻辑。
