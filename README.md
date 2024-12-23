@@ -102,7 +102,7 @@
 
 **第 P206 讲：添加 Pool 页面 UI 开发**
 
-**第 P207 讲：查看流动性页面 UI 开发**
+**第 P207 讲：查看流动性页面 UI 开发**：[教程](./P207_PositionList/readme.md) | [代码](./P207_PositionList/code/)
 
 **第 P208 讲：添加流动性弹窗 UI 开发**
 
