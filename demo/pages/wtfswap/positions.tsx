@@ -83,6 +83,16 @@ const columns: TableProps["columns"] = [
       return value.toString();
     },
   },
+  {
+    title: "Actions",
+    key: "actions",
+    render: () => (
+      <Space className={styles.actions}>
+        <a>Remove</a>
+        <a>Collect</a>
+      </Space>
+    ),
+  },
 ];
 
 const PoolListTable: React.FC = () => {
