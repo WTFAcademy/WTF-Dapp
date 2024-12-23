@@ -20,7 +20,7 @@
 
 感谢 ZAN 对 WTF Dapp 课程的赞助 ❤️
 
-🔊 [ZAN](https://zan.top?chInfo=wtf) 是一家 Web3 技术服务提供商，提供[节点服务](https://zan.top/home/node-service?chInfo=wtf)、[测试网水龙头](https://zan.top/faucet?chInfo=wtf)、[智能合约审计](https://zan.top/home/ai-scan?chInfo=wtf)、[Web3 安全](https://zan.top/home/know-your-transaction?chInfo=wtf)等服务，为 DApp 开发者提供技术服务支持。
+🔊 [ZAN](https://zan.top?chInfo=wtf) 是一家 Web3 技术服务提供商，提供[节点服务](https://zan.top/home/node-service?chInfo=wtf)、[测试网水龙头](https://zan.top/faucet?chInfo=wtf)、[智能合约审计](https://zan.top/home/ai-scan?chInfo=wtf)等服务，为 DApp 开发者提供技术服务支持。
 
 欢迎加入 ZAN 的 [DApp 开发者学习频道](https://discord.gg/nAGcVn5wFh)，一起讨论学习 DApp 开发。
 
