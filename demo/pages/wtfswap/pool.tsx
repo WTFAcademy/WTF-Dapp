@@ -2,6 +2,7 @@ import React from "react";
 import { Flex, Table, Space, Typography, Button } from "antd";
 import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
+import AddPoolModal from "@/components/WtfLayout/AddPoolModal";
 import Link from "next/link";
 import styles from "./pool.module.css";
 
@@ -25,11 +26,6 @@ const columns: TableProps["columns"] = [
     title: "Fee",
     dataIndex: "fee",
     key: "fee",
-  },
-  {
-    title: "Fee Protocol",
-    dataIndex: "feeProtocol",
-    key: "feeProtocol",
   },
   {
     title: "Tick Lower",
@@ -57,13 +53,13 @@ const columns: TableProps["columns"] = [
 ];
 
 const PoolListTable: React.FC = () => {
+  const [openAddPoolModal, setOpenAddPoolModal] = React.useState(false);
   const data = [
     {
       token0: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
       token1: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
       index: 0,
       fee: 3000,
-      feeProtocol: 0,
       tickLower: -100000,
       tickUpper: 100000,
       tick: 1000,
@@ -71,21 +67,41 @@ const PoolListTable: React.FC = () => {
     },
   ];
   return (
-    <Table
-      title={() => (
-        <Flex justify="space-between">
-          <div>Pool List</div>
-          <Space>
-            <Link href="/wtfswap/positions">
-              <Button>My Positions</Button>
-            </Link>
-            <Button type="primary">Add Pool</Button>
-          </Space>
-        </Flex>
-      )}
-      columns={columns}
-      dataSource={data}
-    />
+    <>
+      <Table
+        rowKey="token0"
+        title={() => (
+          <Flex justify="space-between">
+            <div>Pool List</div>
+            <Space>
+              <Link href="/wtfswap/positions">
+                <Button>My Positions</Button>
+              </Link>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setOpenAddPoolModal(true);
+                }}
+              >
+                Add Pool
+              </Button>
+            </Space>
+          </Flex>
+        )}
+        columns={columns}
+        dataSource={data}
+      />
+      <AddPoolModal
+        open={openAddPoolModal}
+        onCancel={() => {
+          setOpenAddPoolModal(false);
+        }}
+        onCreatePool={(createPram) => {
+          console.log("get createPram", createPram);
+          setOpenAddPoolModal(false);
+        }}
+      />
+    </>
   );
 };
 
