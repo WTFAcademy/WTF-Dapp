@@ -186,4 +186,6 @@ export const SendEth: React.FC = () => {
 
 ### 二维码收款
 
-`ant-design-web3` 正在筹备一个收款的快捷组件，只需要传入选择链，选择钱包，输入金额就可以支持指定钱包的快捷扫码付款啦，尽情期待～
+`ant-design-web3` 提供了一个收款的快捷组件，只需要传入选择链，选择钱包，输入金额就可以支持指定钱包的快捷扫码付款啦。
+
+你可以在这里找到文档：[PayPanel - Ant Design Web3](https://web3.ant.design/components/pay-panel)
