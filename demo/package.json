@@ -17,7 +17,8 @@
     "react": "^18",
     "react-dom": "^18",
     "viem": "^2.21.15",
-    "wagmi": "^2.12.14"
+    "wagmi": "^2.12.14",
+    "@uniswap/v3-sdk": "^3.17.1"
   },
   "devDependencies": {
     "@types/node": "20.16.9",
