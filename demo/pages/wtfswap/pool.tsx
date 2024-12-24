@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Table, Space, Typography, Button } from "antd";
 import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
-import AddPoolModal from "@/components/WtfLayout/AddPoolModal";
+import AddPoolModal from "@/components/AddPoolModal";
 import Link from "next/link";
 import styles from "./pool.module.css";
 

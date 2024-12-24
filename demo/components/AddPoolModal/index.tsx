@@ -1,5 +1,5 @@
 import { Modal, Form, Input, InputNumber, Select } from "antd";
-import { encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
+import { parsePriceToSqrtPriceX96 } from "@/utils/common";
 
 interface CreatePoolParams {
   token0: string;
@@ -30,9 +30,7 @@ export default function AddPoolModal(props: AddPoolModalProps) {
         form.validateFields().then((values) => {
           onCreatePool({
             ...values,
-            sqrtPriceX96: BigInt(
-              encodeSqrtRatioX96(values.price, 1).toString()
-            ),
+            sqrtPriceX96: parsePriceToSqrtPriceX96(values.price),
           });
         });
       }}
@@ -58,7 +56,7 @@ export default function AddPoolModal(props: AddPoolModalProps) {
           <InputNumber />
         </Form.Item>
         <Form.Item required label="Init Price(token1/token0)" name="price">
-          <InputNumber />
+          <InputNumber min={0.000001} max={1000000} />
         </Form.Item>
       </Form>
     </Modal>
