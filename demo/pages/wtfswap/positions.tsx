@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Table, Space, Typography, Button } from "antd";
 import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
-import styles from "./position.module.css";
+import styles from "./positions.module.css";
 
 const columns: TableProps["columns"] = [
   {
