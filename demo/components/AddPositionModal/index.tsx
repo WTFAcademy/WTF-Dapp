@@ -10,13 +10,13 @@ interface CreatePositionParams {
   deadline: BigInt;
 }
 
-interface AddPoolModalProps {
+interface AddPositionModalProps {
   open: boolean;
   onCancel: () => void;
   onCreatePosition: (params: CreatePositionParams) => void;
 }
 
-export default function AddPoolModal(props: AddPoolModalProps) {
+export default function AddPositionModal(props: AddPositionModalProps) {
   const { open, onCancel, onCreatePosition } = props;
   const [form] = Form.useForm();
 

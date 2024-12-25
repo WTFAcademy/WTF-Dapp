@@ -69,7 +69,7 @@ const PoolListTable: React.FC = () => {
   return (
     <>
       <Table
-        rowKey="token0"
+        rowKey={(record) => `${record.token0}-${record.token1}-${record.index}`}
         title={() => (
           <Flex justify="space-between">
             <div>Pool List</div>

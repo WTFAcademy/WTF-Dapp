@@ -7,6 +7,11 @@ import styles from "./positions.module.css";
 
 const columns: TableProps["columns"] = [
   {
+    title: "positionId",
+    dataIndex: "positionId",
+    key: "positionId",
+  },
+  {
     title: "Owner",
     dataIndex: "owner",
     key: "owner",
@@ -100,6 +105,7 @@ const PoolListTable: React.FC = () => {
   const [openAddPositionModal, setOpenAddPositionModal] = React.useState(false);
   const data = [
     {
+      positionId: 1,
       owner: "0x1234567890abcdef1234567890abcdef12345678",
       token0: "0x1234567890abcdef1234567890abcdef12345678",
       token1: "0x1234567890abcdef1234567890abcdef12345678",
@@ -117,6 +123,7 @@ const PoolListTable: React.FC = () => {
   return (
     <>
       <Table
+        rowKey="positionId"
         title={() => (
           <Flex justify="space-between">
             <div>My Positions</div>
