@@ -100,7 +100,7 @@
 
 **第 P205 讲：Pool 列表页面 UI 开发**：[教程](./P205_PoolListUI/readme.md) | [代码](./P205_PoolListUI/code/pool.tsx)
 
-**第 P206 讲：添加 Pool 页面 UI 开发**
+**第 P206 讲：添加 Pool 页面 UI 开发**：[教程](./P206_AddPoolUI/readme.md) | [代码](./demo/components/AddPoolModal/index.tsx)
 
 **第 P207 讲：查看流动性页面 UI 开发**：[教程](./P207_PositionList/readme.md) | [代码](./P207_PositionList/code/)
 
