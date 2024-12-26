@@ -2,9 +2,15 @@ import React from "react";
 import { Flex, Table, Space, Typography, Button } from "antd";
 import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
-import styles from "./position.module.css";
+import AddPositionModal from "@/components/AddPositionModal";
+import styles from "./positions.module.css";
 
 const columns: TableProps["columns"] = [
+  {
+    title: "positionId",
+    dataIndex: "positionId",
+    key: "positionId",
+  },
   {
     title: "Owner",
     dataIndex: "owner",
@@ -96,8 +102,10 @@ const columns: TableProps["columns"] = [
 ];
 
 const PoolListTable: React.FC = () => {
+  const [openAddPositionModal, setOpenAddPositionModal] = React.useState(false);
   const data = [
     {
+      positionId: 1,
       owner: "0x1234567890abcdef1234567890abcdef12345678",
       token0: "0x1234567890abcdef1234567890abcdef12345678",
       token1: "0x1234567890abcdef1234567890abcdef12345678",
@@ -113,18 +121,38 @@ const PoolListTable: React.FC = () => {
     },
   ];
   return (
-    <Table
-      title={() => (
-        <Flex justify="space-between">
-          <div>My Positions</div>
-          <Space>
-            <Button type="primary">Add</Button>
-          </Space>
-        </Flex>
-      )}
-      columns={columns}
-      dataSource={data}
-    />
+    <>
+      <Table
+        rowKey="positionId"
+        title={() => (
+          <Flex justify="space-between">
+            <div>My Positions</div>
+            <Space>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setOpenAddPositionModal(true);
+                }}
+              >
+                Add
+              </Button>
+            </Space>
+          </Flex>
+        )}
+        columns={columns}
+        dataSource={data}
+      />
+      <AddPositionModal
+        open={openAddPositionModal}
+        onCancel={() => {
+          setOpenAddPositionModal(false);
+        }}
+        onCreatePosition={(createPram) => {
+          console.log("get createPram", createPram);
+          setOpenAddPositionModal(false);
+        }}
+      />
+    </>
   );
 };
 

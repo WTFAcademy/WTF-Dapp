@@ -181,6 +181,6 @@ const data = [
 
 ![position table 2](./img/position-2.png)
 
-完整的代码请参考：[positions.tsx](./code/position.tsx)
+完整的代码请参考：[positions.tsx](./code/positions.tsx)
 
 我们将在后面的课程中完善代码，添加和合约交互的相关逻辑。
