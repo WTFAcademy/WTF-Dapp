@@ -18,11 +18,13 @@ const columns: TableProps["columns"] = [
     title: "Token 0",
     dataIndex: "token0",
     key: "token0",
+    ellipsis: true,
   },
   {
     title: "Token 1",
     dataIndex: "token1",
     key: "token1",
+    ellipsis: true,
   },
   {
     title: "Index",
