@@ -6,6 +6,185 @@ import {
 } from 'wagmi/codegen'
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// DebugToken
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const debugTokenAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'symbol', internalType: 'string', type: 'string' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'allowance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientAllowance',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'sender', internalType: 'address', type: 'address' },
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'ERC20InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'approver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidApprover',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'receiver', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidReceiver',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'sender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSender',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'spender', internalType: 'address', type: 'address' }],
+    name: 'ERC20InvalidSpender',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'decimals',
+    outputs: [{ name: '', internalType: 'uint8', type: 'uint8' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'quantity', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'mint',
+    outputs: [],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'name',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'symbol',
+    outputs: [{ name: '', internalType: 'string', type: 'string' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ERC165
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -4005,6 +4184,167 @@ export const tickMathAbi = [
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // React
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__
+ */
+export const useReadDebugToken = /*#__PURE__*/ createUseReadContract({
+  abi: debugTokenAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadDebugTokenAllowance = /*#__PURE__*/ createUseReadContract({
+  abi: debugTokenAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadDebugTokenBalanceOf = /*#__PURE__*/ createUseReadContract({
+  abi: debugTokenAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"decimals"`
+ */
+export const useReadDebugTokenDecimals = /*#__PURE__*/ createUseReadContract({
+  abi: debugTokenAbi,
+  functionName: 'decimals',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"name"`
+ */
+export const useReadDebugTokenName = /*#__PURE__*/ createUseReadContract({
+  abi: debugTokenAbi,
+  functionName: 'name',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"symbol"`
+ */
+export const useReadDebugTokenSymbol = /*#__PURE__*/ createUseReadContract({
+  abi: debugTokenAbi,
+  functionName: 'symbol',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadDebugTokenTotalSupply = /*#__PURE__*/ createUseReadContract(
+  { abi: debugTokenAbi, functionName: 'totalSupply' },
+)
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link debugTokenAbi}__
+ */
+export const useWriteDebugToken = /*#__PURE__*/ createUseWriteContract({
+  abi: debugTokenAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteDebugTokenApprove = /*#__PURE__*/ createUseWriteContract({
+  abi: debugTokenAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"mint"`
+ */
+export const useWriteDebugTokenMint = /*#__PURE__*/ createUseWriteContract({
+  abi: debugTokenAbi,
+  functionName: 'mint',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteDebugTokenTransfer = /*#__PURE__*/ createUseWriteContract({
+  abi: debugTokenAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteDebugTokenTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: debugTokenAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link debugTokenAbi}__
+ */
+export const useSimulateDebugToken = /*#__PURE__*/ createUseSimulateContract({
+  abi: debugTokenAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateDebugTokenApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: debugTokenAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"mint"`
+ */
+export const useSimulateDebugTokenMint =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: debugTokenAbi,
+    functionName: 'mint',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateDebugTokenTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: debugTokenAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link debugTokenAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateDebugTokenTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: debugTokenAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link debugTokenAbi}__
+ */
+export const useWatchDebugTokenEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: debugTokenAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link debugTokenAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchDebugTokenApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: debugTokenAbi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link debugTokenAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchDebugTokenTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: debugTokenAbi,
+    eventName: 'Transfer',
+  })
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link erc165Abi}__

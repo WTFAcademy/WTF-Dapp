@@ -9,6 +9,7 @@ const nextConfig = {
     "rc-picker",
     "rc-table",
     "rc-tree",
+    "rc-input",
   ],
 };
 
