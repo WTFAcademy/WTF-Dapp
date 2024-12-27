@@ -5,7 +5,11 @@ const WtfswapModule = buildModule("Wtfswap", (m) => {
   const swapRouter = m.contract("SwapRouter", [poolManager]);
   const positionManager = m.contract("PositionManager", [poolManager]);
 
-  return { poolManager, swapRouter, positionManager };
+  return {
+    poolManager,
+    swapRouter,
+    positionManager,
+  };
 });
 
 export default WtfswapModule;

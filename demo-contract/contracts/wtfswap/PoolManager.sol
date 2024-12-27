@@ -33,7 +33,7 @@ contract PoolManager is Factory, IPoolManager {
             ];
             for (uint32 j = 0; j < addresses.length; j++) {
                 IPool pool = IPool(addresses[j]);
-                poolsInfo[i] = PoolInfo({
+                poolsInfo[i + j] = PoolInfo({
                     token0: pool.token0(),
                     token1: pool.token1(),
                     index: j,
@@ -52,7 +52,10 @@ contract PoolManager is Factory, IPoolManager {
     function createAndInitializePoolIfNecessary(
         CreateAndInitializeParams calldata params
     ) external payable override returns (address poolAddress) {
-        require(params.token0 < params.token1);
+        require(
+            params.token0 < params.token1,
+            "token0 must be less than token1"
+        );
 
         poolAddress = this.createPool(
             params.token0,

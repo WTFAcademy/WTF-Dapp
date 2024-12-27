@@ -1,9 +1,16 @@
 import React from "react";
-import { Flex, Table, Space, Typography, Button } from "antd";
+import { Flex, Table, Space, Typography, Button, message } from "antd";
 import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
 import AddPoolModal from "@/components/AddPoolModal";
 import Link from "next/link";
+
+import { getContractAddress } from "@/utils/common";
+import {
+  useReadPoolManagerGetAllPools,
+  useWritePoolManagerCreateAndInitializePoolIfNecessary,
+} from "@/utils/contracts";
+
 import styles from "./pool.module.css";
 
 const columns: TableProps["columns"] = [
@@ -11,11 +18,13 @@ const columns: TableProps["columns"] = [
     title: "Token 0",
     dataIndex: "token0",
     key: "token0",
+    ellipsis: true,
   },
   {
     title: "Token 1",
     dataIndex: "token1",
     key: "token1",
+    ellipsis: true,
   },
   {
     title: "Index",
@@ -54,18 +63,11 @@ const columns: TableProps["columns"] = [
 
 const PoolListTable: React.FC = () => {
   const [openAddPoolModal, setOpenAddPoolModal] = React.useState(false);
-  const data = [
-    {
-      token0: "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
-      token1: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
-      index: 0,
-      fee: 3000,
-      tickLower: -100000,
-      tickUpper: 100000,
-      tick: 1000,
-      sqrtPriceX96: BigInt("7922737261735934252089901697281"),
-    },
-  ];
+  const { data = [], refetch } = useReadPoolManagerGetAllPools({
+    address: getContractAddress("PoolManager"),
+  });
+  const { writeContractAsync } =
+    useWritePoolManagerCreateAndInitializePoolIfNecessary();
   return (
     <>
       <Table
@@ -96,8 +98,28 @@ const PoolListTable: React.FC = () => {
         onCancel={() => {
           setOpenAddPoolModal(false);
         }}
-        onCreatePool={(createPram) => {
-          console.log("get createPram", createPram);
+        onCreatePool={async (createParams) => {
+          console.log("get createParams", createParams);
+          try {
+            await writeContractAsync({
+              address: getContractAddress("PoolManager"),
+              args: [
+                {
+                  token0: createParams.token0,
+                  token1: createParams.token1,
+                  fee: createParams.fee,
+                  tickLower: createParams.tickLower,
+                  tickUpper: createParams.tickUpper,
+                  sqrtPriceX96: createParams.sqrtPriceX96,
+                },
+              ],
+            });
+            message.success("Create Pool Success");
+            refetch();
+          } catch (error: any) {
+            message.error(error.message);
+          }
+
           setOpenAddPoolModal(false);
         }}
       />
