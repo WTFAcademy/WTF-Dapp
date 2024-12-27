@@ -135,4 +135,14 @@ npx wagmi generate
 
 它会按照我们的配置更新 `utils/contracts.ts` 文件，然后生成代码来调用我们在之前课程中实现的合约。比如在下一讲中可以用 `useReadPoolManagerGetAllPools` 查看交易池和 `useWritePoolManagerCreateAndInitializePoolIfNecessary` 创建交易池。具体可以参考[《使用 Wagmi CLI 调试本地合约》](../15_WagmiCli/readme.md)的说明。
 
+## 测试代币水龙头页面
+
+另外为了方便后续的测试，我们还开发了一个测试页面用于获取测试代币。
+
+完整的代码在 [wtfswap/debug.tsx](../demo/pages/wtfswap/debug.tsx) 中，这个页面会调用我们的 DebugToken 合约，mint 一些代币到当前账户。
+
+启动项目后通过访问 [http://localhost:3000/wtfswap/debug](http://localhost:3000/wtfswap/debug) 即可通过该水龙头页面领取代币：
+
+![debugtoken](./img/debugtoken.png)
+
 至此我们就准备好了前端和链的联调准备，下一讲开始我们会添加相关代码，完善我们的 DEX 前端逻辑。
