@@ -61,10 +61,9 @@ const columns: TableProps["columns"] = [
 
 const PoolListTable: React.FC = () => {
   const [openAddPoolModal, setOpenAddPoolModal] = React.useState(false);
-  const result = useReadPoolManagerGetAllPools({
+  const { data = [], refetch } = useReadPoolManagerGetAllPools({
     address: getContractAddress("PoolManager"),
   });
-  console.log("get result", result);
   const { writeContractAsync } =
     useWritePoolManagerCreateAndInitializePoolIfNecessary();
   return (
@@ -90,7 +89,7 @@ const PoolListTable: React.FC = () => {
           </Flex>
         )}
         columns={columns}
-        dataSource={[]}
+        dataSource={data}
       />
       <AddPoolModal
         open={openAddPoolModal}
@@ -98,7 +97,7 @@ const PoolListTable: React.FC = () => {
           setOpenAddPoolModal(false);
         }}
         onCreatePool={async (createParams) => {
-          console.log("get createPram", createParams);
+          console.log("get createParams", createParams);
           try {
             await writeContractAsync({
               address: getContractAddress("PoolManager"),
@@ -114,6 +113,7 @@ const PoolListTable: React.FC = () => {
               ],
             });
             message.success("Create Pool Success");
+            refetch();
           } catch (error: any) {
             message.error(error.message);
           }
