@@ -106,13 +106,15 @@
 
 **第 P208 讲：添加流动性弹窗 UI 开发**：[教程](./P208_AddPositionUI/readme.md) | [代码](./demo/components/AddPositionModal/index.tsx)
 
-**第 P209 讲：支持查看和创建交易池**：[教程](./P209_Pool/readme.md) | [代码](./demo/pages/wtfswap/pool.tsx)
+**第 P209 讲：前端和链交互准备工作**：[教程](./P209_DebugWithChain/readme.md) | [代码](./demo/pages/wtfswap/debug.tsx)
 
-**第 P210 讲：支持查看和添加流动性**
+**第 P210 讲：支持查看和创建交易池**：[教程](./P210_DebugPool/readme.md) | [代码](./demo/pages/wtfswap/pool.tsx)
 
-**第 P211 讲：支持提取流动性**
+**第 P211 讲：支持查看和添加流动性**
 
-**第 P212 讲：支持 Swap**
+**第 P212 讲：支持提取流动性**
+
+**第 P213 讲：支持 Swap**
 
 ### 3. 部署和优化（开发中）
 
