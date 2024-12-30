@@ -44,8 +44,8 @@ export default function AddPoolModal(props: AddPoolModalProps) {
         form={form}
         initialValues={{
           fee: 3000,
-          tickLower: -1000000,
-          tickUpper: 1000000,
+          tickLower: -887272,
+          tickUpper: 887272,
           price: 1,
         }}
       >

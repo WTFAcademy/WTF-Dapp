@@ -15,16 +15,25 @@ import styles from "./pool.module.css";
 
 const columns: TableProps["columns"] = [
   {
+    title: "Pool",
+    dataIndex: "pool",
+    key: "pool",
+    ellipsis: true,
+    fixed: "left",
+  },
+  {
     title: "Token 0",
     dataIndex: "token0",
     key: "token0",
     ellipsis: true,
+    fixed: "left",
   },
   {
     title: "Token 1",
     dataIndex: "token1",
     key: "token1",
     ellipsis: true,
+    fixed: "left",
   },
   {
     title: "Index",
@@ -58,6 +67,7 @@ const columns: TableProps["columns"] = [
     render: (value: bigint) => {
       return value.toString();
     },
+    fixed: "right",
   },
 ];
 
@@ -72,7 +82,8 @@ const PoolListTable: React.FC = () => {
   return (
     <>
       <Table
-        rowKey={(record) => `${record.token0}-${record.token1}-${record.index}`}
+        rowKey="pool"
+        scroll={{ x: "max-content" }}
         title={() => (
           <Flex justify="space-between">
             <div>Pool List</div>

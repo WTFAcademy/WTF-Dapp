@@ -1,13 +1,13 @@
-import { Modal, Form, Input, InputNumber } from "antd";
+import { Modal, Form, Input, InputNumber, message } from "antd";
 
 interface CreatePositionParams {
-  token0: string;
-  token1: string;
+  token0: `0x${string}`;
+  token1: `0x${string}`;
   index: number;
-  amount0Desired: BigInt;
-  amount1Desired: BigInt;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
   recipient: string;
-  deadline: BigInt;
+  deadline: bigint;
 }
 
 interface AddPositionModalProps {
@@ -28,6 +28,10 @@ export default function AddPositionModal(props: AddPositionModalProps) {
       okText="Create"
       onOk={() => {
         form.validateFields().then((values) => {
+          if (values.token0 >= values.token1) {
+            message.error("Token0 must be less than Token1");
+            return;
+          }
           onCreatePosition({
             ...values,
             amount0Desired: BigInt(values.amount0Desired),

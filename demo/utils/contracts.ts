@@ -1931,6 +1931,7 @@ export const iPoolManagerAbi = [
         internalType: 'struct IPoolManager.PoolInfo[]',
         type: 'tuple[]',
         components: [
+          { name: 'pool', internalType: 'address', type: 'address' },
           { name: 'token0', internalType: 'address', type: 'address' },
           { name: 'token1', internalType: 'address', type: 'address' },
           { name: 'index', internalType: 'uint32', type: 'uint32' },
@@ -2096,23 +2097,15 @@ export const iPositionManagerAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
-    name: 'getApproved',
-    outputs: [{ name: 'operator', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'positionId', internalType: 'uint256[]', type: 'uint256[]' },
-    ],
-    name: 'getPositionInfo',
+    inputs: [],
+    name: 'getAllPositions',
     outputs: [
       {
         name: 'positionInfo',
         internalType: 'struct IPositionManager.PositionInfo[]',
         type: 'tuple[]',
         components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
           { name: 'owner', internalType: 'address', type: 'address' },
           { name: 'token0', internalType: 'address', type: 'address' },
           { name: 'token1', internalType: 'address', type: 'address' },
@@ -2136,6 +2129,13 @@ export const iPositionManagerAbi = [
         ],
       },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getApproved',
+    outputs: [{ name: 'operator', internalType: 'address', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -3250,6 +3250,7 @@ export const poolManagerAbi = [
         internalType: 'struct IPoolManager.PoolInfo[]',
         type: 'tuple[]',
         components: [
+          { name: 'pool', internalType: 'address', type: 'address' },
           { name: 'token0', internalType: 'address', type: 'address' },
           { name: 'token1', internalType: 'address', type: 'address' },
           { name: 'index', internalType: 'uint32', type: 'uint32' },
@@ -3488,23 +3489,15 @@ export const positionManagerAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
-    name: 'getApproved',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'positionId', internalType: 'uint256[]', type: 'uint256[]' },
-    ],
-    name: 'getPositionInfo',
+    inputs: [],
+    name: 'getAllPositions',
     outputs: [
       {
         name: 'positionInfo',
         internalType: 'struct IPositionManager.PositionInfo[]',
         type: 'tuple[]',
         components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
           { name: 'owner', internalType: 'address', type: 'address' },
           { name: 'token0', internalType: 'address', type: 'address' },
           { name: 'token1', internalType: 'address', type: 'address' },
@@ -3528,6 +3521,13 @@ export const positionManagerAbi = [
         ],
       },
     ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'tokenId', internalType: 'uint256', type: 'uint256' }],
+    name: 'getApproved',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'view',
   },
   {
@@ -3613,6 +3613,7 @@ export const positionManagerAbi = [
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     name: 'positions',
     outputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256' },
       { name: 'owner', internalType: 'address', type: 'address' },
       { name: 'token0', internalType: 'address', type: 'address' },
       { name: 'token1', internalType: 'address', type: 'address' },
@@ -5909,21 +5910,21 @@ export const useReadIPositionManagerBalanceOf =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link iPositionManagerAbi}__ and `functionName` set to `"getAllPositions"`
+ */
+export const useReadIPositionManagerGetAllPositions =
+  /*#__PURE__*/ createUseReadContract({
+    abi: iPositionManagerAbi,
+    functionName: 'getAllPositions',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link iPositionManagerAbi}__ and `functionName` set to `"getApproved"`
  */
 export const useReadIPositionManagerGetApproved =
   /*#__PURE__*/ createUseReadContract({
     abi: iPositionManagerAbi,
     functionName: 'getApproved',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link iPositionManagerAbi}__ and `functionName` set to `"getPositionInfo"`
- */
-export const useReadIPositionManagerGetPositionInfo =
-  /*#__PURE__*/ createUseReadContract({
-    abi: iPositionManagerAbi,
-    functionName: 'getPositionInfo',
   })
 
 /**
@@ -7084,21 +7085,21 @@ export const useReadPositionManagerBalanceOf =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link positionManagerAbi}__ and `functionName` set to `"getAllPositions"`
+ */
+export const useReadPositionManagerGetAllPositions =
+  /*#__PURE__*/ createUseReadContract({
+    abi: positionManagerAbi,
+    functionName: 'getAllPositions',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link positionManagerAbi}__ and `functionName` set to `"getApproved"`
  */
 export const useReadPositionManagerGetApproved =
   /*#__PURE__*/ createUseReadContract({
     abi: positionManagerAbi,
     functionName: 'getApproved',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link positionManagerAbi}__ and `functionName` set to `"getPositionInfo"`
- */
-export const useReadPositionManagerGetPositionInfo =
-  /*#__PURE__*/ createUseReadContract({
-    abi: positionManagerAbi,
-    functionName: 'getPositionInfo',
   })
 
 /**

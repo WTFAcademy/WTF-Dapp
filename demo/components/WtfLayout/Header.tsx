@@ -31,13 +31,15 @@ export default function WtfHeader() {
         </Link>
       </div>
       <div>
-        <Connector
-          modalProps={{
-            mode: "simple",
-          }}
-        >
-          {loading ? null : <ConnectButton type="text" />}
-        </Connector>
+        {loading ? null : (
+          <Connector
+            modalProps={{
+              mode: "simple",
+            }}
+          >
+            <ConnectButton type="text" />
+          </Connector>
+        )}
       </div>
     </div>
   );
