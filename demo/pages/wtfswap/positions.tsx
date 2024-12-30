@@ -9,6 +9,8 @@ import {
   useWritePositionManagerMint,
   useWriteErc20Approve,
   useReadPositionManagerGetAllPositions,
+  useWritePositionManagerBurn,
+  useWritePositionManagerCollect,
 } from "@/utils/contracts";
 import { getContractAddress } from "@/utils/common";
 import { useAccount } from "@ant-design/web3";
@@ -23,6 +25,10 @@ const PoolListTable: React.FC = () => {
 
   const { writeContractAsync } = useWritePositionManagerMint();
   const { writeContractAsync: writeErc20Approve } = useWriteErc20Approve();
+  const { writeContractAsync: writePositionManagerBurn } =
+    useWritePositionManagerBurn();
+  const { writeContractAsync: writePositionManagerCollect } =
+    useWritePositionManagerCollect();
 
   const columns: TableProps["columns"] = [
     {
@@ -123,8 +129,36 @@ const PoolListTable: React.FC = () => {
         }
         return (
           <Space className={styles.actions}>
-            <a>Remove</a>
-            <a>Collect</a>
+            <a
+              onClick={async () => {
+                try {
+                  await writePositionManagerBurn({
+                    address: getContractAddress("PositionManager"),
+                    args: [item.id],
+                  });
+                  refetch();
+                } catch (error: any) {
+                  message.error(error.message);
+                }
+              }}
+            >
+              Remove
+            </a>
+            <a
+              onClick={async () => {
+                try {
+                  await writePositionManagerCollect({
+                    address: getContractAddress("PositionManager"),
+                    args: [item.id, account?.address as `0x${string}`],
+                  });
+                  refetch();
+                } catch (error: any) {
+                  message.error(error.message);
+                }
+              }}
+            >
+              Collect
+            </a>
           </Space>
         );
       },
@@ -138,7 +172,7 @@ const PoolListTable: React.FC = () => {
         scroll={{ x: "max-content" }}
         title={() => (
           <Flex justify="space-between">
-            <div>My Positions</div>
+            <div>Positions</div>
             <Space>
               <Button
                 type="primary"

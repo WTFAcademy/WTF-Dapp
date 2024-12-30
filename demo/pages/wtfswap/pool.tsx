@@ -129,7 +129,7 @@ const PoolListTable: React.FC = () => {
                 },
               ],
             });
-            message.success("Create Pool Success");
+            message.success("Create Pool Success If Necessary");
             refetch();
           } catch (error: any) {
             message.error(error.message);

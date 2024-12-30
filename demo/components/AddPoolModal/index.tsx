@@ -1,5 +1,5 @@
 import { Modal, Form, Input, InputNumber, Select, message } from "antd";
-import { parsePriceToSqrtPriceX96 } from "@/utils/common";
+import { parsePriceToSqrtPriceX96, getContractAddress } from "@/utils/common";
 
 interface CreatePoolParams {
   token0: `0x${string}`;
@@ -43,6 +43,8 @@ export default function AddPoolModal(props: AddPoolModalProps) {
         layout="vertical"
         form={form}
         initialValues={{
+          token0: getContractAddress("DebugTokenA"),
+          token1: getContractAddress("DebugTokenB"),
           fee: 3000,
           tickLower: -887272,
           tickUpper: 887272,

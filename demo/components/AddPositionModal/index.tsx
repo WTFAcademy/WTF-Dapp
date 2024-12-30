@@ -1,4 +1,5 @@
 import { Modal, Form, Input, InputNumber, message } from "antd";
+import { getContractAddress } from "@/utils/common";
 
 interface CreatePositionParams {
   token0: `0x${string}`;
@@ -41,7 +42,17 @@ export default function AddPositionModal(props: AddPositionModalProps) {
         });
       }}
     >
-      <Form layout="vertical" form={form}>
+      <Form
+        layout="vertical"
+        form={form}
+        initialValues={{
+          token0: getContractAddress("DebugTokenA"),
+          token1: getContractAddress("DebugTokenB"),
+          index: 0,
+          amount0Desired: "1000000000000000000",
+          amount1Desired: "1000000000000000000",
+        }}
+      >
         <Form.Item required label="Token 0" name="token0">
           <Input />
         </Form.Item>
