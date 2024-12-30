@@ -1,7 +1,8 @@
 import type { Token } from "@ant-design/web3";
 import { CryptoPrice } from "@ant-design/web3";
 import { useReadErc20BalanceOf } from "@/utils/contracts";
-import { useAccount, useChainId } from "wagmi";
+import { useAccount } from "wagmi";
+import useTokenAddress from "@/hooks/useTokenAddress";
 
 interface Props {
   token?: Token;
@@ -9,19 +10,22 @@ interface Props {
 
 export default function Balance(props: Props) {
   const { address } = useAccount();
-  const chainId = useChainId();
+  const tokenAddress = useTokenAddress(props.token);
   const { data: balance } = useReadErc20BalanceOf({
-    address: props.token?.availableChains.find(
-      (item) => item.chain.id === chainId
-    )?.contract as `0x${string}`,
+    address: tokenAddress,
     args: [address as `0x${string}`],
     query: {
-      enabled: !!(address && chainId),
+      enabled: !!tokenAddress,
     },
   });
   return balance === undefined ? (
     "-"
   ) : (
-    <CryptoPrice value={balance} symbol={props.token?.symbol} />
+    <CryptoPrice
+      value={balance}
+      symbol={props.token?.symbol}
+      decimals={props.token?.decimal}
+      fixed={2}
+    />
   );
 }

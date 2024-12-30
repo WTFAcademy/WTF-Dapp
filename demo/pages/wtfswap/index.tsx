@@ -15,19 +15,53 @@ import {
   useSimulateSwapRouterQuoteExactInput,
   useSimulateSwapRouterQuoteExactOutput,
 } from "@/utils/contracts";
+import useTokenAddress from "@/hooks/useTokenAddress";
 import { getContractAddress, getTokenInfo } from "@/utils/common";
+import { TickMath } from "@uniswap/v3-sdk";
 
 const { Text } = Typography;
 
 function Swap() {
   const [tokenA, setTokenA] = useState<Token>();
   const [tokenB, setTokenB] = useState<Token>();
+  const tokenAddressA = useTokenAddress(tokenA);
+  const tokenAddressB = useTokenAddress(tokenB);
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
 
+  const { data: quoteAmountB, refetch: fetchQuoteAmountB } =
+    useSimulateSwapRouterQuoteExactInput({
+      address: getContractAddress("SwapRouter"),
+      args: [
+        {
+          tokenIn: tokenAddressA as `0x${string}`,
+          tokenOut: tokenAddressB as `0x${string}`,
+          indexPath: [0],
+          amountIn: isNaN(amountA)
+            ? BigInt(0)
+            : BigInt(amountA) * BigInt(10 ** (tokenA?.decimal || 18)),
+          sqrtPriceLimitX96:
+            BigInt(TickMath.MIN_SQRT_RATIO.toString()) + BigInt(1),
+        },
+      ],
+      query: {
+        enabled: false,
+      },
+    });
+
+  console.log("quoteAmountB", quoteAmountB?.result);
+
   const handleAmountAChange = (e: any) => {
-    setAmountA(parseFloat(e.target.value));
-    // todo: setAmountB
+    const value = parseFloat(e.target.value);
+    setAmountA(value);
+    if (!isNaN(value)) {
+      fetchQuoteAmountB();
+    }
+  };
+
+  const handleAmountBChange = (e: any) => {
+    const value = parseFloat(e.target.value);
+    setAmountB(value);
   };
 
   const handleSwitch = () => {
@@ -35,10 +69,6 @@ function Swap() {
     setTokenB(tokenA);
     setAmountA(amountB);
     setAmountB(amountA);
-  };
-
-  const handleMax = () => {
-    // max
   };
 
   const { data: pairs = [] } = useReadPoolManagerGetPairs({
@@ -67,14 +97,9 @@ function Swap() {
         />
         <Space className={styles.swapSpace}>
           <Text type="secondary"></Text>
-          <Space>
-            <Text type="secondary">
-              Balance: <Balance token={tokenA} />
-            </Text>
-            <Button size="small" onClick={handleMax} type="link">
-              Max
-            </Button>
-          </Space>
+          <Text type="secondary">
+            Balance: <Balance token={tokenA} />
+          </Text>
         </Space>
       </Card>
       <Space className={styles.switchBtn}>
@@ -85,6 +110,7 @@ function Swap() {
           value={amountB}
           variant="borderless"
           type="number"
+          onChange={(e) => handleAmountBChange(e)}
           addonAfter={
             <TokenSelect
               value={tokenB}
