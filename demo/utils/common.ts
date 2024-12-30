@@ -1,4 +1,6 @@
 import { encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
+import type { Token } from "@ant-design/web3";
+import { Hardhat, Sepolia } from "@ant-design/web3-wagmi";
 
 export const parsePriceToSqrtPriceX96 = (price: number): BigInt => {
   return BigInt(encodeSqrtRatioX96(price * 1000000, 1000000).toString());
@@ -45,4 +47,65 @@ export const getContractAddress = (
       : "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
   }
   throw new Error("Invalid contract");
+};
+
+const builtInTokens: Record<string, Token> = {
+  "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9": {
+    icon: null,
+    symbol: "DTA",
+    decimal: 18,
+    name: "DebugTokenA",
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      },
+    ],
+  },
+  "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9": {
+    icon: null,
+    symbol: "DTB",
+    decimal: 18,
+    name: "DebugTokenB",
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      },
+    ],
+  },
+  "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707": {
+    icon: null,
+    symbol: "DTC",
+    decimal: 18,
+    name: "DebugTokenC",
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      },
+    ],
+  },
+};
+
+export const getTokenInfo = (address: string): Token => {
+  if (builtInTokens[address]) {
+    return builtInTokens[address];
+  }
+  return {
+    icon: null,
+    symbol: address.slice(-3).toUpperCase(),
+    decimal: 18,
+    name: address,
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: address,
+      },
+      {
+        chain: Sepolia,
+        contract: address,
+      },
+    ],
+  };
 };

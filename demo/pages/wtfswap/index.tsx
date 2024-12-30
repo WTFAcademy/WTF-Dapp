@@ -1,24 +1,29 @@
 import React, { useState } from "react";
 import { TokenSelect, type Token } from "@ant-design/web3";
-import { ETH, USDT, USDC } from "@ant-design/web3-assets/tokens";
 import { Card, Input, Button, Space, Typography } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
+import { uniq } from "lodash-es";
 
 import WtfLayout from "@/components/WtfLayout";
+import Balance from "@/components/Balance";
 import styles from "./swap.module.css";
 
-import { useReadPoolManagerGetPairs } from "@/utils/contracts";
-import { getContractAddress } from "@/utils/common";
+import {
+  useReadPoolManagerGetPairs,
+  useWriteSwapRouterExactInput,
+  useWriteSwapRouterQuoteExactOutput,
+  useSimulateSwapRouterQuoteExactInput,
+  useSimulateSwapRouterQuoteExactOutput,
+} from "@/utils/contracts";
+import { getContractAddress, getTokenInfo } from "@/utils/common";
 
 const { Text } = Typography;
 
 function Swap() {
-  const [tokenA, setTokenA] = useState<Token>(ETH);
-  const [tokenB, setTokenB] = useState<Token>(USDT);
+  const [tokenA, setTokenA] = useState<Token>();
+  const [tokenB, setTokenB] = useState<Token>();
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
-  const [optionsA, setOptionsA] = useState<Token[]>([ETH, USDT, USDC]);
-  const [optionsB, setOptionsB] = useState<Token[]>([USDT, ETH, USDC]);
 
   const handleAmountAChange = (e: any) => {
     setAmountA(parseFloat(e.target.value));
@@ -36,9 +41,13 @@ function Swap() {
     // max
   };
 
-  const { data: pairs = [] } = useReadPoolManagerGetPairs();
+  const { data: pairs = [] } = useReadPoolManagerGetPairs({
+    address: getContractAddress("PoolManager"),
+  });
 
-  console.log("get pairs", pairs);
+  const options: Token[] = uniq(
+    pairs.map((pair) => [pair.token0, pair.token1]).flat()
+  ).map(getTokenInfo);
 
   return (
     <Card title="Swap" className={styles.swapCard}>
@@ -52,14 +61,16 @@ function Swap() {
             <TokenSelect
               value={tokenA}
               onChange={setTokenA}
-              options={optionsA}
+              options={options}
             />
           }
         />
         <Space className={styles.swapSpace}>
-          <Text type="secondary">$ 0.0</Text>
+          <Text type="secondary"></Text>
           <Space>
-            <Text type="secondary">Balance: 0</Text>
+            <Text type="secondary">
+              Balance: <Balance token={tokenA} />
+            </Text>
             <Button size="small" onClick={handleMax} type="link">
               Max
             </Button>
@@ -78,16 +89,24 @@ function Swap() {
             <TokenSelect
               value={tokenB}
               onChange={setTokenB}
-              options={optionsB}
+              options={options}
             />
           }
         />
         <Space className={styles.swapSpace}>
-          <Text type="secondary">$ 0.0</Text>
-          <Text type="secondary">Balance: 0</Text>
+          <Text type="secondary"></Text>
+          <Text type="secondary">
+            Balance: <Balance token={tokenB} />
+          </Text>
         </Space>
       </Card>
-      <Button type="primary" size="large" block className={styles.swapBtn}>
+      <Button
+        type="primary"
+        size="large"
+        block
+        className={styles.swapBtn}
+        onClick={() => {}}
+      >
         Swap
       </Button>
     </Card>
