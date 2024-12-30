@@ -63,6 +63,7 @@ const columns: TableProps["columns"] = [
 
 const PoolListTable: React.FC = () => {
   const [openAddPoolModal, setOpenAddPoolModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const { data = [], refetch } = useReadPoolManagerGetAllPools({
     address: getContractAddress("PoolManager"),
   });
@@ -81,6 +82,7 @@ const PoolListTable: React.FC = () => {
               </Link>
               <Button
                 type="primary"
+                loading={loading}
                 onClick={() => {
                   setOpenAddPoolModal(true);
                 }}
@@ -100,6 +102,8 @@ const PoolListTable: React.FC = () => {
         }}
         onCreatePool={async (createParams) => {
           console.log("get createParams", createParams);
+          setLoading(true);
+          setOpenAddPoolModal(false);
           try {
             await writeContractAsync({
               address: getContractAddress("PoolManager"),
@@ -118,9 +122,9 @@ const PoolListTable: React.FC = () => {
             refetch();
           } catch (error: any) {
             message.error(error.message);
+          } finally {
+            setLoading(false);
           }
-
-          setOpenAddPoolModal(false);
         }}
       />
     </>

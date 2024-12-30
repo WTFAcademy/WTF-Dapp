@@ -1,4 +1,4 @@
-import { Modal, Form, Input, InputNumber, Select } from "antd";
+import { Modal, Form, Input, InputNumber, Select, message } from "antd";
 import { parsePriceToSqrtPriceX96 } from "@/utils/common";
 
 interface CreatePoolParams {
@@ -28,6 +28,10 @@ export default function AddPoolModal(props: AddPoolModalProps) {
       okText="Create"
       onOk={async () => {
         const values = await form.validateFields().then((values) => {
+          if (values.token0 >= values.token1) {
+            message.error("Token0 should be less than Token1");
+            return false;
+          }
           onCreatePool({
             ...values,
             sqrtPriceX96: parsePriceToSqrtPriceX96(values.price),
