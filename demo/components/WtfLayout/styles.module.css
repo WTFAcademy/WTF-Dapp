@@ -22,6 +22,7 @@
 .nav {
   display: flex;
   gap: 64px;
+  margin-left: 180px;
 }
 
 .nav a {
@@ -32,4 +33,9 @@
 .nav a.active {
   font-weight: bold;
   opacity: 1;
+}
+
+.connectTip {
+  padding: 24px;
+  text-align: center;
 }

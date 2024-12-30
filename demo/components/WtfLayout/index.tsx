@@ -11,7 +11,7 @@ import {
   Mainnet,
 } from "@ant-design/web3-wagmi";
 import { QueryClient } from "@tanstack/react-query";
-import { createConfig, http } from "wagmi";
+import { createConfig, http, useAccount } from "wagmi";
 import { mainnet, hardhat } from "wagmi/chains";
 import { walletConnect } from "wagmi/connectors";
 
@@ -35,6 +35,20 @@ interface WtfLayoutProps {
   children: React.ReactNode;
 }
 
+const LayoutContent: React.FC<WtfLayoutProps> = ({ children }) => {
+  const { address } = useAccount();
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  if (loading || !address) {
+    return <div className={styles.connectTip}>Please Connect First.</div>;
+  }
+  return children;
+};
+
 const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
   return (
     <WagmiWeb3ConfigProvider
@@ -56,7 +70,7 @@ const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
     >
       <div className={styles.layout}>
         <Header />
-        {children}
+        <LayoutContent>{children}</LayoutContent>
       </div>
     </WagmiWeb3ConfigProvider>
   );
