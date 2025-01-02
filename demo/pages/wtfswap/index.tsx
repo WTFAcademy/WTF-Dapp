@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TokenSelect, type Token } from "@ant-design/web3";
+import { TokenSelect, useAccount, type Token } from "@ant-design/web3";
 import { Card, Input, Button, Space, Typography, message } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
 import { uniq } from "lodash-es";
@@ -14,6 +14,8 @@ import { swapRouterAbi } from "@/utils/contracts";
 import {
   useReadPoolManagerGetPairs,
   useReadIPoolManagerGetAllPools,
+  useWriteSwapRouterExactInput,
+  useWriteErc20Approve,
 } from "@/utils/contracts";
 import useTokenAddress from "@/hooks/useTokenAddress";
 import {
@@ -23,11 +25,11 @@ import {
   parseBigIntToAmount,
   computeSqrtPriceLimitX96,
 } from "@/utils/common";
-import { TickMath, encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
 
 const { Text } = Typography;
 
 function Swap() {
+  const [loading, setLoading] = useState(false);
   // 用户选择的两个代币
   const [tokenA, setTokenA] = useState<Token>();
   const [tokenB, setTokenB] = useState<Token>();
@@ -44,6 +46,7 @@ function Swap() {
   // 两个代币的数量
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
+  const { account } = useAccount();
 
   // 获取所有的交易对
   const { data: pairs = [] } = useReadPoolManagerGetPairs({
@@ -124,6 +127,9 @@ function Swap() {
     setAmountB(amountA);
   };
 
+  const { writeContractAsync } = useWriteSwapRouterExactInput();
+  const { writeContractAsync: writeApprove } = useWriteErc20Approve();
+
   return (
     <Card title="Swap" className={styles.swapCard}>
       <Card>
@@ -176,7 +182,37 @@ function Swap() {
         size="large"
         block
         className={styles.swapBtn}
-        onClick={() => {}}
+        disabled={!tokenAddressA || !tokenAddressB || !amountA || !amountB}
+        loading={loading}
+        onClick={async () => {
+          setLoading(true);
+          const swapParams = {
+            tokenIn: tokenAddressA!,
+            tokenOut: tokenAddressB!,
+            amountIn: parseAmountToBigInt(amountA, tokenA),
+            amountOutMinimum: parseAmountToBigInt(amountB, tokenB),
+            recipient: account?.address as `0x${string}`,
+            deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
+            sqrtPriceLimitX96,
+            indexPath: swapIndexPath,
+          };
+          console.log("swapParams", swapParams);
+          try {
+            await writeApprove({
+              address: tokenAddressA!,
+              args: [getContractAddress("SwapRouter"), swapParams.amountIn],
+            });
+            await writeContractAsync({
+              address: getContractAddress("SwapRouter"),
+              args: [swapParams],
+            });
+            message.success("Swap success");
+          } catch (e: any) {
+            message.error(e.message);
+          } finally {
+            setLoading(false);
+          }
+        }}
       >
         Swap
       </Button>
