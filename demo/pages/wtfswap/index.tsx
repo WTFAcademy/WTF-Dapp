@@ -66,8 +66,11 @@ function Swap() {
   });
   const swapIndexPath: number[] = swapPools
     .sort((a, b) => {
-      // 简单处理，按照价格排序，优先在价格低的池子中交易
-      return a.sqrtPriceX96 > b.sqrtPriceX96 ? 1 : -1;
+      // 简单处理，按照价格排序，再按照手续费排序，优先在价格低的池子中交易（按照 tick 判断），如果价格一样，就在手续费低的池子里面交易
+      if (a.tick !== b.tick) {
+        return a.tick > b.tick ? 1 : -1;
+      }
+      return a.fee - b.fee;
     })
     .map((pool) => pool.index);
 

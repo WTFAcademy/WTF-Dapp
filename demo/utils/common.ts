@@ -145,16 +145,16 @@ export const computeSqrtPriceLimitX96 = (
     // 先找到交易池的最小 tick
     const minTick =
       minBy(pools, (pool) => pool.tick)?.tick ?? TickMath.MIN_TICK;
-    // 价格限制为最小 tick - 100
-    const limitTick = Math.max(minTick - 100, TickMath.MIN_TICK);
+    // 价格限制为最小 tick - 10000，避免价格过低，在实际项目中应该按照用户设置的滑点来调整
+    const limitTick = Math.max(minTick - 10000, TickMath.MIN_TICK);
     return BigInt(TickMath.getSqrtRatioAtTick(limitTick).toString());
   } else {
     // 反之，设置一个最大的价格
     // 先找到交易池的最大 tick
     const maxTick =
       maxBy(pools, (pool) => pool.tick)?.tick ?? TickMath.MAX_TICK;
-    // 价格限制为最大 tick + 100
-    const limitTick = Math.min(maxTick + 100, TickMath.MAX_TICK);
+    // 价格限制为最大 tick + 10000，避免价格过高，在实际项目中应该按照用户设置的滑点来调整
+    const limitTick = Math.min(maxTick + 10000, TickMath.MAX_TICK);
     return BigInt(TickMath.getSqrtRatioAtTick(limitTick).toString());
   }
 };
