@@ -114,7 +114,10 @@ export const getTokenInfo = (address: string): Token => {
 
 // 把数字转化为大整数，支持 4 位小数
 export const parseAmountToBigInt = (amount: number, token?: Token): bigint => {
-  return BigInt(amount * 10000) * BigInt(10 ** ((token?.decimal || 18) - 4));
+  return (
+    BigInt(Math.floor(amount * 10000)) *
+    BigInt(10 ** ((token?.decimal || 18) - 4))
+  );
 };
 
 // 把大整数转化为数字，支持 4 位小数

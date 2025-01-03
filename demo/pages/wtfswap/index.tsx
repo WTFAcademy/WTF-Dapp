@@ -80,6 +80,10 @@ function Swap() {
     .sort((a, b) => {
       // 简单处理，按照价格排序，再按照手续费排序，优先在价格低的池子中交易（按照 tick 判断），如果价格一样，就在手续费低的池子里面交易
       if (a.tick !== b.tick) {
+        if (zeroForOne) {
+          // token0 交换 token1 时，tick 越大意味着 token0 价格越高，所以要把 tick 大的放前面
+          return b.tick > a.tick ? 1 : -1;
+        }
         return a.tick > b.tick ? 1 : -1;
       }
       return a.fee - b.fee;
@@ -92,7 +96,17 @@ function Swap() {
   const publicClient = usePublicClient();
 
   const updateAmountBWithAmountA = async (value: number) => {
-    if (!publicClient || !tokenAddressA || !tokenAddressB || isNaN(value)) {
+    if (
+      !publicClient ||
+      !tokenAddressA ||
+      !tokenAddressB ||
+      isNaN(value) ||
+      value === 0
+    ) {
+      return;
+    }
+    if (tokenAddressA === tokenAddressB) {
+      message.error("Please select different tokens");
       return;
     }
     try {
@@ -251,7 +265,7 @@ function Swap() {
                 tokenIn: tokenAddressA!,
                 tokenOut: tokenAddressB!,
                 amountOut: parseAmountToBigInt(amountB, tokenB),
-                amountInMaximum: parseAmountToBigInt(amountA, tokenA),
+                amountInMaximum: parseAmountToBigInt(10, tokenA),
                 recipient: account?.address as `0x${string}`,
                 deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
                 sqrtPriceLimitX96,
@@ -270,7 +284,6 @@ function Swap() {
                 args: [swapParams],
               });
             }
-
             message.success("Swap success");
           } catch (e: any) {
             message.error(e.message);
