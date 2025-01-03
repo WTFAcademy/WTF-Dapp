@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TokenSelect, useAccount, type Token } from "@ant-design/web3";
 import { Card, Input, Button, Space, Typography, message } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
-import { uniq } from "lodash-es";
+import { set, uniq } from "lodash-es";
 
 import WtfLayout from "@/components/WtfLayout";
 import Balance from "@/components/Balance";
@@ -15,6 +15,7 @@ import {
   useReadPoolManagerGetPairs,
   useReadIPoolManagerGetAllPools,
   useWriteSwapRouterExactInput,
+  useWriteSwapRouterQuoteExactOutput,
   useWriteErc20Approve,
 } from "@/utils/contracts";
 import useTokenAddress from "@/hooks/useTokenAddress";
@@ -30,6 +31,8 @@ const { Text } = Typography;
 
 function Swap() {
   const [loading, setLoading] = useState(false);
+  // 用户可以选择的代币
+  const [tokens, setTokens] = useState<Token[]>([]);
   // 用户选择的两个代币
   const [tokenA, setTokenA] = useState<Token>();
   const [tokenB, setTokenB] = useState<Token>();
@@ -43,6 +46,8 @@ function Swap() {
       : [tokenAddressB, tokenAddressA];
   // 是否是 token0 来交换 token1
   const zeroForOne = token0 === tokenAddressA;
+  // 是否是指定输入（否则就是指定输出）
+  const [isExactInput, setIsExactInput] = useState(true);
   // 两个代币的数量
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
@@ -53,10 +58,14 @@ function Swap() {
     address: getContractAddress("PoolManager"),
   });
 
-  // 获取所有的代币信息
-  const options: Token[] = uniq(
-    pairs.map((pair) => [pair.token0, pair.token1]).flat()
-  ).map(getTokenInfo);
+  useEffect(() => {
+    const options: Token[] = uniq(
+      pairs.map((pair) => [pair.token0, pair.token1]).flat()
+    ).map(getTokenInfo);
+    setTokens(options);
+    setTokenA(options[0]);
+    setTokenB(options[1]);
+  }, [pairs]);
 
   // 获取所有的交易池
   const { data: pools = [] } = useReadIPoolManagerGetAllPools({
@@ -83,7 +92,7 @@ function Swap() {
   const publicClient = usePublicClient();
 
   const updateAmountBWithAmountA = async (value: number) => {
-    if (!publicClient || !tokenAddressA || !tokenAddressB) {
+    if (!publicClient || !tokenAddressA || !tokenAddressB || isNaN(value)) {
       return;
     }
     try {
@@ -102,6 +111,33 @@ function Swap() {
         ],
       });
       setAmountB(parseBigIntToAmount(newAmountB.result, tokenB));
+      setIsExactInput(true);
+    } catch (e: any) {
+      message.error(e.message);
+    }
+  };
+
+  const updateAmountAWithAmountB = async (value: number) => {
+    if (!publicClient || !tokenAddressA || !tokenAddressB || isNaN(value)) {
+      return;
+    }
+    try {
+      const newAmountA = await publicClient.simulateContract({
+        address: getContractAddress("SwapRouter"),
+        abi: swapRouterAbi,
+        functionName: "quoteExactOutput",
+        args: [
+          {
+            tokenIn: tokenAddressA,
+            tokenOut: tokenAddressB,
+            indexPath: swapIndexPath,
+            amountOut: parseAmountToBigInt(value, tokenB),
+            sqrtPriceLimitX96,
+          },
+        ],
+      });
+      setAmountA(parseBigIntToAmount(newAmountA.result, tokenA));
+      setIsExactInput(false);
     } catch (e: any) {
       message.error(e.message);
     }
@@ -110,14 +146,13 @@ function Swap() {
   const handleAmountAChange = (e: any) => {
     const value = parseFloat(e.target.value);
     setAmountA(value);
-    if (!isNaN(value)) {
-      updateAmountBWithAmountA(value);
-    }
+    setIsExactInput(true);
   };
 
   const handleAmountBChange = (e: any) => {
     const value = parseFloat(e.target.value);
     setAmountB(value);
+    setIsExactInput(false);
   };
 
   const handleSwitch = () => {
@@ -127,7 +162,19 @@ function Swap() {
     setAmountB(amountA);
   };
 
-  const { writeContractAsync } = useWriteSwapRouterExactInput();
+  useEffect(() => {
+    // 当用户输入发生变化时，重新请求报价接口计算价格
+    if (isExactInput) {
+      updateAmountBWithAmountA(amountA);
+    } else {
+      updateAmountAWithAmountB(amountB);
+    }
+  }, [isExactInput, tokenAddressA, tokenAddressB, amountA, amountB]);
+
+  const { writeContractAsync: writeQuoteExactInput } =
+    useWriteSwapRouterExactInput();
+  const { writeContractAsync: writeQuoteExactOutput } =
+    useWriteSwapRouterQuoteExactOutput();
   const { writeContractAsync: writeApprove } = useWriteErc20Approve();
 
   return (
@@ -139,11 +186,7 @@ function Swap() {
           type="number"
           onChange={(e) => handleAmountAChange(e)}
           addonAfter={
-            <TokenSelect
-              value={tokenA}
-              onChange={setTokenA}
-              options={options}
-            />
+            <TokenSelect value={tokenA} onChange={setTokenA} options={tokens} />
           }
         />
         <Space className={styles.swapSpace}>
@@ -163,11 +206,7 @@ function Swap() {
           type="number"
           onChange={(e) => handleAmountBChange(e)}
           addonAfter={
-            <TokenSelect
-              value={tokenB}
-              onChange={setTokenB}
-              options={options}
-            />
+            <TokenSelect value={tokenB} onChange={setTokenB} options={tokens} />
           }
         />
         <Space className={styles.swapSpace}>
@@ -186,26 +225,52 @@ function Swap() {
         loading={loading}
         onClick={async () => {
           setLoading(true);
-          const swapParams = {
-            tokenIn: tokenAddressA!,
-            tokenOut: tokenAddressB!,
-            amountIn: parseAmountToBigInt(amountA, tokenA),
-            amountOutMinimum: parseAmountToBigInt(amountB, tokenB),
-            recipient: account?.address as `0x${string}`,
-            deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
-            sqrtPriceLimitX96,
-            indexPath: swapIndexPath,
-          };
-          console.log("swapParams", swapParams);
           try {
-            await writeApprove({
-              address: tokenAddressA!,
-              args: [getContractAddress("SwapRouter"), swapParams.amountIn],
-            });
-            await writeContractAsync({
-              address: getContractAddress("SwapRouter"),
-              args: [swapParams],
-            });
+            if (isExactInput) {
+              const swapParams = {
+                tokenIn: tokenAddressA!,
+                tokenOut: tokenAddressB!,
+                amountIn: parseAmountToBigInt(amountA, tokenA),
+                amountOutMinimum: parseAmountToBigInt(amountB, tokenB),
+                recipient: account?.address as `0x${string}`,
+                deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
+                sqrtPriceLimitX96,
+                indexPath: swapIndexPath,
+              };
+              console.log("swapParams", swapParams);
+              await writeApprove({
+                address: tokenAddressA!,
+                args: [getContractAddress("SwapRouter"), swapParams.amountIn],
+              });
+              await writeQuoteExactInput({
+                address: getContractAddress("SwapRouter"),
+                args: [swapParams],
+              });
+            } else {
+              const swapParams = {
+                tokenIn: tokenAddressA!,
+                tokenOut: tokenAddressB!,
+                amountOut: parseAmountToBigInt(amountB, tokenB),
+                amountInMaximum: parseAmountToBigInt(amountA, tokenA),
+                recipient: account?.address as `0x${string}`,
+                deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
+                sqrtPriceLimitX96,
+                indexPath: swapIndexPath,
+              };
+              console.log("swapParams", swapParams);
+              await writeApprove({
+                address: tokenAddressA!,
+                args: [
+                  getContractAddress("SwapRouter"),
+                  swapParams.amountInMaximum,
+                ],
+              });
+              await writeQuoteExactOutput({
+                address: getContractAddress("SwapRouter"),
+                args: [swapParams],
+              });
+            }
+
             message.success("Swap success");
           } catch (e: any) {
             message.error(e.message);
