@@ -10,7 +10,10 @@ interface Props {
 }
 
 // 使用 forwardRef 来接收 ref
-const Balance = forwardRef((props: Props, ref) => {
+const Balance = (
+  props: Props,
+  ref: React.ForwardedRef<{ refresh: () => void }>
+) => {
   const { address } = useAccount();
   const tokenAddress = useTokenAddress(props.token);
   const { data: balance, refetch } = useReadErc20BalanceOf({
@@ -36,6 +39,6 @@ const Balance = forwardRef((props: Props, ref) => {
       fixed={2}
     />
   );
-});
+};
 
-export default Balance;
+export default forwardRef(Balance);

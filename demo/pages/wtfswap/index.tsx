@@ -54,8 +54,8 @@ function Swap() {
   const { account } = useAccount();
 
   // 用于在交易完成后更新余额
-  const balanceARef = useRef<{ refresh: () => void }>();
-  const balanceBRef = useRef<{ refresh: () => void }>();
+  const balanceARef = useRef<{ refresh: () => void }>(null);
+  const balanceBRef = useRef<{ refresh: () => void }>(null);
 
   // 获取所有的交易对
   const { data: pairs = [] } = useReadPoolManagerGetPairs({
