@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { TokenSelect, useAccount, type Token } from "@ant-design/web3";
 import { Card, Input, Button, Space, Typography, message } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
@@ -52,6 +52,10 @@ function Swap() {
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
   const { account } = useAccount();
+
+  // 用于在交易完成后更新余额
+  const balanceARef = useRef<{ refresh: () => void }>();
+  const balanceBRef = useRef<{ refresh: () => void }>();
 
   // 获取所有的交易对
   const { data: pairs = [] } = useReadPoolManagerGetPairs({
@@ -206,7 +210,7 @@ function Swap() {
         <Space className={styles.swapSpace}>
           <Text type="secondary"></Text>
           <Text type="secondary">
-            Balance: <Balance token={tokenA} />
+            Balance: <Balance ref={balanceARef} token={tokenA} />
           </Text>
         </Space>
       </Card>
@@ -226,7 +230,7 @@ function Swap() {
         <Space className={styles.swapSpace}>
           <Text type="secondary"></Text>
           <Text type="secondary">
-            Balance: <Balance token={tokenB} />
+            Balance: <Balance ref={balanceBRef} token={tokenB} />
           </Text>
         </Space>
       </Card>
@@ -265,7 +269,7 @@ function Swap() {
                 tokenIn: tokenAddressA!,
                 tokenOut: tokenAddressB!,
                 amountOut: parseAmountToBigInt(amountB, tokenB),
-                amountInMaximum: parseAmountToBigInt(10, tokenA),
+                amountInMaximum: parseAmountToBigInt(amountA, tokenA),
                 recipient: account?.address as `0x${string}`,
                 deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
                 sqrtPriceLimitX96,
@@ -285,6 +289,8 @@ function Swap() {
               });
             }
             message.success("Swap success");
+            balanceARef.current?.refresh();
+            balanceBRef.current?.refresh();
           } catch (e: any) {
             message.error(e.message);
           } finally {
