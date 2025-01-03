@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { TokenSelect, useAccount, type Token } from "@ant-design/web3";
 import { Card, Input, Button, Space, Typography, message } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
-import { set, uniq } from "lodash-es";
+import { uniq } from "lodash-es";
 
 import WtfLayout from "@/components/WtfLayout";
 import Balance from "@/components/Balance";
@@ -15,7 +15,7 @@ import {
   useReadPoolManagerGetPairs,
   useReadIPoolManagerGetAllPools,
   useWriteSwapRouterExactInput,
-  useWriteSwapRouterQuoteExactOutput,
+  useWriteSwapRouterExactOutput,
   useWriteErc20Approve,
 } from "@/utils/contracts";
 import useTokenAddress from "@/hooks/useTokenAddress";
@@ -189,10 +189,10 @@ function Swap() {
     }
   }, [isExactInput, tokenAddressA, tokenAddressB, amountA, amountB]);
 
-  const { writeContractAsync: writeQuoteExactInput } =
+  const { writeContractAsync: writeExactInput } =
     useWriteSwapRouterExactInput();
-  const { writeContractAsync: writeQuoteExactOutput } =
-    useWriteSwapRouterQuoteExactOutput();
+  const { writeContractAsync: writeExactOutput } =
+    useWriteSwapRouterExactOutput();
   const { writeContractAsync: writeApprove } = useWriteErc20Approve();
 
   return (
@@ -260,7 +260,7 @@ function Swap() {
                 address: tokenAddressA!,
                 args: [getContractAddress("SwapRouter"), swapParams.amountIn],
               });
-              await writeQuoteExactInput({
+              await writeExactInput({
                 address: getContractAddress("SwapRouter"),
                 args: [swapParams],
               });
@@ -269,7 +269,10 @@ function Swap() {
                 tokenIn: tokenAddressA!,
                 tokenOut: tokenAddressB!,
                 amountOut: parseAmountToBigInt(amountB, tokenB),
-                amountInMaximum: parseAmountToBigInt(amountA, tokenA),
+                amountInMaximum: parseAmountToBigInt(
+                  Math.ceil(amountA),
+                  tokenA
+                ),
                 recipient: account?.address as `0x${string}`,
                 deadline: BigInt(Math.floor(Date.now() / 1000) + 1000),
                 sqrtPriceLimitX96,
@@ -283,7 +286,7 @@ function Swap() {
                   swapParams.amountInMaximum,
                 ],
               });
-              await writeQuoteExactOutput({
+              await writeExactOutput({
                 address: getContractAddress("SwapRouter"),
                 args: [swapParams],
               });
@@ -291,6 +294,8 @@ function Swap() {
             message.success("Swap success");
             balanceARef.current?.refresh();
             balanceBRef.current?.refresh();
+            setAmountA(NaN);
+            setAmountB(NaN);
           } catch (e: any) {
             message.error(e.message);
           } finally {
