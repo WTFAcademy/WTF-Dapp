@@ -43,7 +43,8 @@ contract PoolManager is Factory, IPoolManager {
                     tickLower: pool.tickLower(),
                     tickUpper: pool.tickUpper(),
                     tick: pool.tick(),
-                    sqrtPriceX96: pool.sqrtPriceX96()
+                    sqrtPriceX96: pool.sqrtPriceX96(),
+                    liquidity: pool.liquidity()
                 });
             }
         }

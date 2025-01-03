@@ -16,6 +16,7 @@ interface IPoolManager is IFactory {
         int24 tickUpper;
         int24 tick;
         uint160 sqrtPriceX96;
+        uint128 liquidity;
     }
 
     struct Pair {

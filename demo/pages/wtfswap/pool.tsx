@@ -26,14 +26,12 @@ const columns: TableProps["columns"] = [
     dataIndex: "token0",
     key: "token0",
     ellipsis: true,
-    fixed: "left",
   },
   {
     title: "Token 1",
     dataIndex: "token1",
     key: "token1",
     ellipsis: true,
-    fixed: "left",
   },
   {
     title: "Index",
@@ -59,6 +57,14 @@ const columns: TableProps["columns"] = [
     title: "Tick",
     dataIndex: "tick",
     key: "tick",
+  },
+  {
+    title: "Liquidity",
+    dataIndex: "liquidity",
+    render: (value: bigint) => {
+      return value.toString();
+    },
+    key: "liquidity",
   },
   {
     title: "Price",

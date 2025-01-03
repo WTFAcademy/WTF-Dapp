@@ -1941,6 +1941,7 @@ export const iPoolManagerAbi = [
           { name: 'tickUpper', internalType: 'int24', type: 'int24' },
           { name: 'tick', internalType: 'int24', type: 'int24' },
           { name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
+          { name: 'liquidity', internalType: 'uint128', type: 'uint128' },
         ],
       },
     ],
@@ -3260,6 +3261,7 @@ export const poolManagerAbi = [
           { name: 'tickUpper', internalType: 'int24', type: 'int24' },
           { name: 'tick', internalType: 'int24', type: 'int24' },
           { name: 'sqrtPriceX96', internalType: 'uint160', type: 'uint160' },
+          { name: 'liquidity', internalType: 'uint128', type: 'uint128' },
         ],
       },
     ],
@@ -3892,6 +3894,23 @@ export const swapRouterAbi = [
     ],
     name: 'swapCallback',
     outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'pool', internalType: 'contract IPool', type: 'address' },
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'zeroForOne', internalType: 'bool', type: 'bool' },
+      { name: 'amountSpecified', internalType: 'int256', type: 'int256' },
+      { name: 'sqrtPriceLimitX96', internalType: 'uint160', type: 'uint160' },
+      { name: 'data', internalType: 'bytes', type: 'bytes' },
+    ],
+    name: 'swapInPool',
+    outputs: [
+      { name: 'amount0', internalType: 'int256', type: 'int256' },
+      { name: 'amount1', internalType: 'int256', type: 'int256' },
+    ],
     stateMutability: 'nonpayable',
   },
 ] as const
@@ -7433,6 +7452,15 @@ export const useWriteSwapRouterSwapCallback =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"swapInPool"`
+ */
+export const useWriteSwapRouterSwapInPool =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: swapRouterAbi,
+    functionName: 'swapInPool',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link swapRouterAbi}__
  */
 export const useSimulateSwapRouter = /*#__PURE__*/ createUseSimulateContract({
@@ -7482,6 +7510,15 @@ export const useSimulateSwapRouterSwapCallback =
   /*#__PURE__*/ createUseSimulateContract({
     abi: swapRouterAbi,
     functionName: 'swapCallback',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link swapRouterAbi}__ and `functionName` set to `"swapInPool"`
+ */
+export const useSimulateSwapRouterSwapInPool =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: swapRouterAbi,
+    functionName: 'swapInPool',
   })
 
 /**

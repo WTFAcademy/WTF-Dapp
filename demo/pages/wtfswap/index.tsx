@@ -78,7 +78,9 @@ function Swap() {
 
   // 计算交易池的交易顺序
   const swapPools = pools.filter((pool) => {
-    return pool.token0 === token0 && pool.token1 === token1;
+    return (
+      pool.token0 === token0 && pool.token1 === token1 && pool.liquidity > 0
+    );
   });
   const swapIndexPath: number[] = swapPools
     .sort((a, b) => {
