@@ -1,5 +1,5 @@
-import { Modal, Form, Input, InputNumber, Select } from "antd";
-import { parsePriceToSqrtPriceX96 } from "@/utils/common";
+import { Modal, Form, Input, InputNumber, Select, message } from "antd";
+import { parsePriceToSqrtPriceX96, getContractAddress } from "@/utils/common";
 
 interface CreatePoolParams {
   token0: `0x${string}`;
@@ -28,6 +28,10 @@ export default function AddPoolModal(props: AddPoolModalProps) {
       okText="Create"
       onOk={async () => {
         const values = await form.validateFields().then((values) => {
+          if (values.token0 >= values.token1) {
+            message.error("Token0 should be less than Token1");
+            return false;
+          }
           onCreatePool({
             ...values,
             sqrtPriceX96: parsePriceToSqrtPriceX96(values.price),
@@ -39,9 +43,11 @@ export default function AddPoolModal(props: AddPoolModalProps) {
         layout="vertical"
         form={form}
         initialValues={{
+          token0: getContractAddress("DebugTokenA"),
+          token1: getContractAddress("DebugTokenB"),
           fee: 3000,
-          tickLower: -1000000,
-          tickUpper: 1000000,
+          tickLower: -887272,
+          tickUpper: 887272,
           price: 1,
         }}
       >

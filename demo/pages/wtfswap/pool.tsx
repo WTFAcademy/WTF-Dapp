@@ -15,6 +15,13 @@ import styles from "./pool.module.css";
 
 const columns: TableProps["columns"] = [
   {
+    title: "Pool",
+    dataIndex: "pool",
+    key: "pool",
+    ellipsis: true,
+    fixed: "left",
+  },
+  {
     title: "Token 0",
     dataIndex: "token0",
     key: "token0",
@@ -52,17 +59,27 @@ const columns: TableProps["columns"] = [
     key: "tick",
   },
   {
+    title: "Liquidity",
+    dataIndex: "liquidity",
+    render: (value: bigint) => {
+      return value.toString();
+    },
+    key: "liquidity",
+  },
+  {
     title: "Price",
     dataIndex: "sqrtPriceX96",
     key: "sqrtPriceX96",
     render: (value: bigint) => {
       return value.toString();
     },
+    fixed: "right",
   },
 ];
 
 const PoolListTable: React.FC = () => {
   const [openAddPoolModal, setOpenAddPoolModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const { data = [], refetch } = useReadPoolManagerGetAllPools({
     address: getContractAddress("PoolManager"),
   });
@@ -71,7 +88,8 @@ const PoolListTable: React.FC = () => {
   return (
     <>
       <Table
-        rowKey={(record) => `${record.token0}-${record.token1}-${record.index}`}
+        rowKey="pool"
+        scroll={{ x: "max-content" }}
         title={() => (
           <Flex justify="space-between">
             <div>Pool List</div>
@@ -81,6 +99,7 @@ const PoolListTable: React.FC = () => {
               </Link>
               <Button
                 type="primary"
+                loading={loading}
                 onClick={() => {
                   setOpenAddPoolModal(true);
                 }}
@@ -100,6 +119,8 @@ const PoolListTable: React.FC = () => {
         }}
         onCreatePool={async (createParams) => {
           console.log("get createParams", createParams);
+          setLoading(true);
+          setOpenAddPoolModal(false);
           try {
             await writeContractAsync({
               address: getContractAddress("PoolManager"),
@@ -114,13 +135,13 @@ const PoolListTable: React.FC = () => {
                 },
               ],
             });
-            message.success("Create Pool Success");
+            message.success("Create Pool Success If Necessary");
             refetch();
           } catch (error: any) {
             message.error(error.message);
+          } finally {
+            setLoading(false);
           }
-
-          setOpenAddPoolModal(false);
         }}
       />
     </>

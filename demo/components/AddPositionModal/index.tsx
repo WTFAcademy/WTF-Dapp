@@ -1,13 +1,14 @@
-import { Modal, Form, Input, InputNumber } from "antd";
+import { Modal, Form, Input, InputNumber, message } from "antd";
+import { getContractAddress } from "@/utils/common";
 
 interface CreatePositionParams {
-  token0: string;
-  token1: string;
+  token0: `0x${string}`;
+  token1: `0x${string}`;
   index: number;
-  amount0Desired: BigInt;
-  amount1Desired: BigInt;
+  amount0Desired: bigint;
+  amount1Desired: bigint;
   recipient: string;
-  deadline: BigInt;
+  deadline: bigint;
 }
 
 interface AddPositionModalProps {
@@ -28,6 +29,10 @@ export default function AddPositionModal(props: AddPositionModalProps) {
       okText="Create"
       onOk={() => {
         form.validateFields().then((values) => {
+          if (values.token0 >= values.token1) {
+            message.error("Token0 must be less than Token1");
+            return;
+          }
           onCreatePosition({
             ...values,
             amount0Desired: BigInt(values.amount0Desired),
@@ -37,7 +42,17 @@ export default function AddPositionModal(props: AddPositionModalProps) {
         });
       }}
     >
-      <Form layout="vertical" form={form}>
+      <Form
+        layout="vertical"
+        form={form}
+        initialValues={{
+          token0: getContractAddress("DebugTokenA"),
+          token1: getContractAddress("DebugTokenB"),
+          index: 0,
+          amount0Desired: "1000000000000000000",
+          amount1Desired: "1000000000000000000",
+        }}
+      >
         <Form.Item required label="Token 0" name="token0">
           <Input />
         </Form.Item>

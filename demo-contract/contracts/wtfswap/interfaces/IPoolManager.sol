@@ -6,6 +6,7 @@ import "./IFactory.sol";
 
 interface IPoolManager is IFactory {
     struct PoolInfo {
+        address pool;
         address token0;
         address token1;
         uint32 index;
@@ -15,6 +16,7 @@ interface IPoolManager is IFactory {
         int24 tickUpper;
         int24 tick;
         uint160 sqrtPriceX96;
+        uint128 liquidity;
     }
 
     struct Pair {

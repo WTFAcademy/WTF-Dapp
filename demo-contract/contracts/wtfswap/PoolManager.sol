@@ -34,6 +34,7 @@ contract PoolManager is Factory, IPoolManager {
             for (uint32 j = 0; j < addresses.length; j++) {
                 IPool pool = IPool(addresses[j]);
                 poolsInfo[i + j] = PoolInfo({
+                    pool: addresses[j],
                     token0: pool.token0(),
                     token1: pool.token1(),
                     index: j,
@@ -42,7 +43,8 @@ contract PoolManager is Factory, IPoolManager {
                     tickLower: pool.tickLower(),
                     tickUpper: pool.tickUpper(),
                     tick: pool.tick(),
-                    sqrtPriceX96: pool.sqrtPriceX96()
+                    sqrtPriceX96: pool.sqrtPriceX96(),
+                    liquidity: pool.liquidity()
                 });
             }
         }

@@ -18,15 +18,38 @@ contract SwapRouter is ISwapRouter {
     /// @dev Parses a revert reason that should contain the numeric quote
     function parseRevertReason(
         bytes memory reason
-    ) private pure returns (uint256) {
-        if (reason.length != 32) {
+    ) private pure returns (int256, int256) {
+        if (reason.length != 64) {
             if (reason.length < 68) revert("Unexpected error");
             assembly {
                 reason := add(reason, 0x04)
             }
             revert(abi.decode(reason, (string)));
         }
-        return abi.decode(reason, (uint256));
+        return abi.decode(reason, (int256, int256));
+    }
+
+    function swapInPool(
+        IPool pool,
+        address recipient,
+        bool zeroForOne,
+        int256 amountSpecified,
+        uint160 sqrtPriceLimitX96,
+        bytes calldata data
+    ) external returns (int256 amount0, int256 amount1) {
+        try
+            pool.swap(
+                recipient,
+                zeroForOne,
+                amountSpecified,
+                sqrtPriceLimitX96,
+                data
+            )
+        returns (int256 _amount0, int256 _amount1) {
+            return (_amount0, _amount1);
+        } catch (bytes memory reason) {
+            return parseRevertReason(reason);
+        }
     }
 
     function exactInput(
@@ -57,12 +80,12 @@ contract SwapRouter is ISwapRouter {
                 params.tokenIn,
                 params.tokenOut,
                 params.indexPath[i],
-                params.recipient == address(0) ? address(0) : msg.sender,
-                true
+                params.recipient == address(0) ? address(0) : msg.sender
             );
 
             // 调用 pool 的 swap 函数，进行交换，并拿到返回的 token0 和 token1 的数量
-            (int256 amount0, int256 amount1) = pool.swap(
+            (int256 amount0, int256 amount1) = this.swapInPool(
+                pool,
                 params.recipient,
                 zeroForOne,
                 int256(amountIn),
@@ -118,12 +141,12 @@ contract SwapRouter is ISwapRouter {
                 params.tokenIn,
                 params.tokenOut,
                 params.indexPath[i],
-                params.recipient == address(0) ? address(0) : msg.sender,
-                false
+                params.recipient == address(0) ? address(0) : msg.sender
             );
 
             // 调用 pool 的 swap 函数，进行交换，并拿到返回的 token0 和 token1 的数量
-            (int256 amount0, int256 amount1) = pool.swap(
+            (int256 amount0, int256 amount1) = this.swapInPool(
+                pool,
                 params.recipient,
                 zeroForOne,
                 -int256(amountOut),
@@ -162,7 +185,8 @@ contract SwapRouter is ISwapRouter {
         QuoteExactInputParams calldata params
     ) external override returns (uint256 amountOut) {
         // 因为没有实际 approve，所以这里交易会报错，我们捕获错误信息，解析需要多少 token
-        try
+
+        return
             this.exactInput(
                 ExactInputParams({
                     tokenIn: params.tokenIn,
@@ -174,17 +198,14 @@ contract SwapRouter is ISwapRouter {
                     amountOutMinimum: 0,
                     sqrtPriceLimitX96: params.sqrtPriceLimitX96
                 })
-            )
-        {} catch (bytes memory reason) {
-            return parseRevertReason(reason);
-        }
+            );
     }
 
     // 报价，指定 tokenOut 的数量和 tokenIn 的最大值，返回 tokenIn 的实际数量
     function quoteExactOutput(
         QuoteExactOutputParams calldata params
     ) external override returns (uint256 amountIn) {
-        try
+        return
             this.exactOutput(
                 ExactOutputParams({
                     tokenIn: params.tokenIn,
@@ -196,10 +217,7 @@ contract SwapRouter is ISwapRouter {
                     amountInMaximum: type(uint256).max,
                     sqrtPriceLimitX96: params.sqrtPriceLimitX96
                 })
-            )
-        {} catch (bytes memory reason) {
-            return parseRevertReason(reason);
-        }
+            );
     }
 
     function swapCallback(
@@ -208,38 +226,24 @@ contract SwapRouter is ISwapRouter {
         bytes calldata data
     ) external override {
         // transfer token
-        (
-            address tokenIn,
-            address tokenOut,
-            uint32 index,
-            address payer,
-            bool isExactInput
-        ) = abi.decode(data, (address, address, uint32, address, bool));
+        (address tokenIn, address tokenOut, uint32 index, address payer) = abi
+            .decode(data, (address, address, uint32, address));
         address _pool = poolManager.getPool(tokenIn, tokenOut, index);
 
         // 检查 callback 的合约地址是否是 Pool
         require(_pool == msg.sender, "Invalid callback caller");
 
-        (uint256 amountToPay, uint256 amountReceived) = amount0Delta > 0
-            ? (uint256(amount0Delta), uint256(-amount1Delta))
-            : (uint256(amount1Delta), uint256(-amount0Delta));
+        uint256 amountToPay = amount0Delta > 0
+            ? uint256(amount0Delta)
+            : uint256(amount1Delta);
         // payer 是 address(0)，这是一个用于预估 token 的请求（quoteExactInput or quoteExactOutput）
         // 参考代码 https://github.com/Uniswap/v3-periphery/blob/main/contracts/lens/Quoter.sol#L38
         if (payer == address(0)) {
-            if (isExactInput) {
-                // 指定输入情况下，抛出可以接收多少 token
-                assembly {
-                    let ptr := mload(0x40)
-                    mstore(ptr, amountReceived)
-                    revert(ptr, 32)
-                }
-            } else {
-                // 指定输出情况下，抛出需要转入多少 token
-                assembly {
-                    let ptr := mload(0x40)
-                    mstore(ptr, amountToPay)
-                    revert(ptr, 32)
-                }
+            assembly {
+                let ptr := mload(0x40)
+                mstore(ptr, amount0Delta)
+                mstore(add(ptr, 0x20), amount1Delta)
+                revert(ptr, 64)
             }
         }
 

@@ -27,11 +27,19 @@ contract PositionManager is IPositionManager, ERC721 {
     // 用一个 mapping 来存放所有 Position 的信息
     mapping(uint256 => PositionInfo) public positions;
 
-    // 通过 positionId 获取 Position 信息，positionId 就是 NFT 的 tokenId
-    // 如果要获得某个用户的所有的 Position 信息，需要自己遍历所有的 tokenId，可以通过 ZAN 的节点服务来获取
-    function getPositionInfo(
-        uint256[] memory positionId
-    ) external view override returns (PositionInfo[] memory positionInfo) {}
+    // 获取全部的 Position 信息
+    function getAllPositions()
+        external
+        view
+        override
+        returns (PositionInfo[] memory positionInfo)
+    {
+        positionInfo = new PositionInfo[](_nextId - 1);
+        for (uint32 i = 0; i < _nextId - 1; i++) {
+            positionInfo[i] = positions[i + 1];
+        }
+        return positionInfo;
+    }
 
     function getSender() public view returns (address) {
         return msg.sender;
@@ -72,6 +80,7 @@ contract PositionManager is IPositionManager, ERC721 {
         IPool pool = IPool(_pool);
 
         // 通过获取 pool 相关信息，结合 params.amount0Desired 和 params.amount1Desired 计算这次要注入的流动性
+
         uint160 sqrtPriceX96 = pool.sqrtPriceX96();
         uint160 sqrtRatioAX96 = TickMath.getSqrtPriceAtTick(pool.tickLower());
         uint160 sqrtRatioBX96 = TickMath.getSqrtPriceAtTick(pool.tickUpper());
@@ -92,6 +101,7 @@ contract PositionManager is IPositionManager, ERC721 {
             params.index,
             msg.sender
         );
+
         (amount0, amount1) = pool.mint(address(this), liquidity, data);
 
         _mint(params.recipient, (positionId = _nextId++));
@@ -105,6 +115,7 @@ contract PositionManager is IPositionManager, ERC721 {
         ) = pool.getPosition(address(this));
 
         positions[positionId] = PositionInfo({
+            id: positionId,
             owner: params.recipient,
             token0: params.token0,
             token1: params.token1,
@@ -196,19 +207,22 @@ contract PositionManager is IPositionManager, ERC721 {
     {
         // 通过 isAuthorizedForToken 检查 positionId 是否有权限
         // 调用 Pool 的方法给 LP 退流动性
+        PositionInfo storage position = positions[positionId];
         address _pool = poolManager.getPool(
-            positions[positionId].token0,
-            positions[positionId].token1,
-            positions[positionId].index
+            position.token0,
+            position.token1,
+            position.index
         );
         IPool pool = IPool(_pool);
         (amount0, amount1) = pool.collect(
             recipient,
-            positions[positionId].tokensOwed0,
-            positions[positionId].tokensOwed1
+            position.tokensOwed0,
+            position.tokensOwed1
         );
 
         // position 已经彻底没用了，销毁
+        position.tokensOwed0 = 0;
+        position.tokensOwed1 = 0;
         _burn(positionId);
     }
 
