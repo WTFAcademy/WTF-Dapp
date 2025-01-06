@@ -129,36 +129,40 @@ const PoolListTable: React.FC = () => {
         }
         return (
           <Space className={styles.actions}>
-            <a
-              onClick={async () => {
-                try {
-                  await writePositionManagerBurn({
-                    address: getContractAddress("PositionManager"),
-                    args: [item.id],
-                  });
-                  refetch();
-                } catch (error: any) {
-                  message.error(error.message);
-                }
-              }}
-            >
-              Remove
-            </a>
-            <a
-              onClick={async () => {
-                try {
-                  await writePositionManagerCollect({
-                    address: getContractAddress("PositionManager"),
-                    args: [item.id, account?.address as `0x${string}`],
-                  });
-                  refetch();
-                } catch (error: any) {
-                  message.error(error.message);
-                }
-              }}
-            >
-              Collect
-            </a>
+            {item.liquidity > 0 && (
+              <a
+                onClick={async () => {
+                  try {
+                    await writePositionManagerBurn({
+                      address: getContractAddress("PositionManager"),
+                      args: [item.id],
+                    });
+                    refetch();
+                  } catch (error: any) {
+                    message.error(error.message);
+                  }
+                }}
+              >
+                Remove
+              </a>
+            )}
+            {(item.tokensOwed0 > 0 || item.tokensOwed1 > 0) && (
+              <a
+                onClick={async () => {
+                  try {
+                    await writePositionManagerCollect({
+                      address: getContractAddress("PositionManager"),
+                      args: [item.id, account?.address as `0x${string}`],
+                    });
+                    refetch();
+                  } catch (error: any) {
+                    message.error(error.message);
+                  }
+                }}
+              >
+                Collect
+              </a>
+            )}
           </Space>
         );
       },
