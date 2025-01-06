@@ -212,4 +212,4 @@ const columns: TableProps["columns"] = [
 
 最后的效果如下：
 
-![position](./img/position.png)
+![positions](./img/positions.png)

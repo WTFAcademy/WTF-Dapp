@@ -110,11 +110,9 @@
 
 **第 P210 讲：支持查看和创建交易池**：[教程](./P210_DebugPool/readme.md) | [代码](./demo/pages/wtfswap/pool.tsx)
 
-**第 P211 讲：支持查看和添加流动性**：[教程](./P211_DebugPosition/readme.md) | [代码](./demo/pages/wtfswap/position.tsx)
+**第 P211 讲：支持管理流动性**：[教程](./P211_DebugPosition/readme.md) | [代码](./demo/pages/wtfswap/position.tsx)
 
-**第 P212 讲：支持提取流动性**
-
-**第 P213 讲：支持 Swap**
+**第 P212 讲：支持 Swap**
 
 ### 3. 部署和优化（开发中）
 
