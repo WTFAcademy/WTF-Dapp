@@ -88,7 +88,7 @@
 
 **第 P109 讲：SwapRouter 合约开发**：[教程](./P109_SwapRouter/readme.md) | [代码](./demo-contract/contracts/wtfswap/SwapRouter.sol)
 
-### 2. 前端开发（开发中）
+### 2. 前端开发
 
 **第 P201 讲：初始化前端代码和技术分析**：[教程](./P201_InitFrontend/readme.md) | [代码](./P201_InitFrontend/code/)
 
@@ -112,7 +112,7 @@
 
 **第 P211 讲：支持管理流动性**：[教程](./P211_DebugPosition/readme.md) | [代码](./demo/pages/wtfswap/position.tsx)
 
-**第 P212 讲：支持 Swap**
+**第 P212 讲：支持 Swap**：[教程](./P212_DebugSwap/readme.md) | [代码](./demo/pages/wtfswap/swap.tsx)
 
 ### 3. 部署和优化（开发中）
 
