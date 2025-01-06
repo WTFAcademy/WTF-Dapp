@@ -134,7 +134,4 @@ const PoolListTable: React.FC = () => {
 
 最后的效果如下：
 
-<video controls>  
-  <source src="img/pool.mp4" type="video/mp4">  
-  Your browser does not support the video tag.  
-</video>
+![pool](./img/pool.png)
