@@ -33,10 +33,14 @@
 
 ## Wtfswap 合约漏洞和优化案例收集
 
-当然，AI 来审计合约目前还无法完全的保证合约的安全性，很多逻辑尤其是涉及到具体的业务逻辑时，都需要安全专家来对合约进行审查。因为资源原因我们也无法对 Wtfswap 合约进行完整的审查，在此欢迎社区给我们的合约提交漏洞。
+当然，AI 来审计合约目前还无法完全的保证合约的安全性，很多逻辑尤其是涉及到具体的业务逻辑时，都需要类似 [ZAN Expert Audit](https://zan.top/home/expert-audit) 这样的服务来请求安全专家对合约进行审查。比如 [Bevmswap-20240328.pdf](https://mdn.alipayobjects.com/huamei_hsbbrh/afts/file/A*hU0NTIk3I-4AAAAAAAAAAAAADiOMAQ/Bevmswap-20240328.pdf) 就是一个专家审计的报告。
+
+因为资源原因我们也无法对 Wtfswap 合约进行完整的审查，在此欢迎社区给我们的合约提交漏洞。
 
 你可以直接提交 [Pull Request](https://github.com/WTFAcademy/WTF-Dapp/pulls) 来提交你发现的漏洞，新增漏洞文件到 [bugs](./bugs/) 帮助社区同学学习。
 
 漏洞列表：
 
 1. [《payable 可能导致资金被锁》](./bugs/001.md)
+
+上面是当前已经发现的 Wtfswap 合约的漏洞或者优化点，欢迎社区同学提交补充更多的案例。
