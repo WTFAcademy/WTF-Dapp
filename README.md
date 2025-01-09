@@ -114,11 +114,11 @@
 
 **第 P212 讲：支持 Swap**：[教程](./P212_DebugSwap/readme.md) | [代码](./demo/pages/wtfswap/swap.tsx)
 
-### 3. 部署和优化（开发中）
+### 3. 部署和优化
 
 **第 P301 讲：合约的优化和安全**：[教程](./P301_ContractOptimize/readme.md)
 
-**第 P302 讲：Wtfswap 部署**
+**第 P302 讲：Wtfswap 部署**：[教程](./P302_Deploy/readme.md)
 
 ## 经验手册（PR Welcome）
 
