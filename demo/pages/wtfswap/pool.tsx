@@ -83,6 +83,7 @@ const PoolListTable: React.FC = () => {
   const { data = [], refetch } = useReadPoolManagerGetAllPools({
     address: getContractAddress("PoolManager"),
   });
+
   const { writeContractAsync } =
     useWritePoolManagerCreateAndInitializePoolIfNecessary();
   return (

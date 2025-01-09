@@ -306,7 +306,7 @@ const builtInTokens: Record<string, Token> = {
 
 如上所示，我们会在生产环境下使用 Sepolia 测试网的合约地址，而在开发环境下使用本地测试网的合约地址。
 
-最后，我们还需要把 [demo/components/WtfLayout/index.tsx](../demo/components/WtfLayout/index.tsx) 中的 `Mainnet` 网络改为 `Sepolia` 网络：
+最后，我们还需要把 [demo/components/WtfLayout/index.tsx](../demo/components/WtfLayout/index.tsx) 中的 `Mainnet` 网络改为 `Sepolia` 网络，另外还需要添加 Sepolia 网络的 RPC，我们这里使用了 [ZAN](https://zan.top/) 的 RPC 服务。
 
 ```diff
 import React from "react";
@@ -350,6 +350,9 @@ const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
       }}
 -      chains={[Mainnet, Hardhat]}
 +      chains={[Sepolia, Hardhat]}
++      transports={{
++        [Sepolia.id]: http("https://api.zan.top/public/eth-sepolia"),
++      }}
       ens
       wallets={[
         MetaMask(),
