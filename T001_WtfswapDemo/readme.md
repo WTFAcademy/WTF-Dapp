@@ -8,7 +8,7 @@
 
 WTFSwap Demo 是部署在测试网 Sepolia 上的一个去中心化交易所课程 Demo。在体验之前，你需要领取一些测试网 Sepolia ETH 代币作为手续费 GAS。
 
-你可以通过 [ZAN 的水龙头](https://zan.top/faucet) 来领取测试网代币。
+你可以通过 [ZAN 的水龙头](https://zan.top/faucet?chInfo=wtf) 来领取测试网代币。
 
 ![faucet](./img/faucet.png)
 

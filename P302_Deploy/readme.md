@@ -37,7 +37,7 @@ export default config;
 
 在配置中你需要配置两个关键信息：
 
-1. 网络的 RPC 地址，这里使用的是 ZAN 的测试网地址，实际项目中需要替换为你的 RPC 地址。你可以在 [https://zan.top/service/apikeys](https://zan.top/service/apikeys) 找到各种可用网络的 RPC 地址，除了测试网，以太坊主网以及其他以太坊 L2 的网络上也都可以。
+1. 网络的 RPC 地址，这里使用的是 ZAN 的测试网地址，实际项目中需要替换为你的 RPC 地址。你可以在 [https://zan.top/service/apikeys](https://zan.top/service/apikeys?chInfo=wtf) 找到各种可用网络的 RPC 地址，除了测试网，以太坊主网以及其他以太坊 L2 的网络上也都可以。
 1. 钱包私钥，需要注意的是，要保护好你的钱包私钥。建议使用安全的电脑环境，以及使用专门的钱包来部署合约。另外，你也可以考虑通过 CloudIDE 来换起钱包来部署合约，那样更安全，也可以避免依赖链投毒（比如 Hardhat 依赖的某个包被投毒）。
 
 配置好之后执行 `npx hardhat ignition deploy ./ignition/modules/Wtfswap.ts --network sepolia` 就可以部署 Wtfswap 合约到测试网了。下面是课程开发是部署的日志：
@@ -306,7 +306,7 @@ const builtInTokens: Record<string, Token> = {
 
 如上所示，我们会在生产环境下使用 Sepolia 测试网的合约地址，而在开发环境下使用本地测试网的合约地址。
 
-最后，我们还需要把 [demo/components/WtfLayout/index.tsx](../demo/components/WtfLayout/index.tsx) 中的 `Mainnet` 网络改为 `Sepolia` 网络，另外还需要添加 Sepolia 网络的 RPC，我们这里使用了 [ZAN](https://zan.top/) 的 RPC 服务。
+最后，我们还需要把 [demo/components/WtfLayout/index.tsx](../demo/components/WtfLayout/index.tsx) 中的 `Mainnet` 网络改为 `Sepolia` 网络，另外还需要添加 Sepolia 网络的 RPC，我们这里使用了 [ZAN](https://zan.top/?chInfo=wtf) 的 RPC 服务。
 
 ```diff
 import React from "react";
