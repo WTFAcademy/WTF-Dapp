@@ -298,6 +298,10 @@ export const getContractAddress = (
   }
   throw new Error("Invalid contract");
 };
+
+const builtInTokens: Record<string, Token> = {
+  //... 内容太多，不在这里展开，请参考 ../demo/utils/common.ts 中的代码。
+};
 ```
 
 如上所示，我们会在生产环境下使用 Sepolia 测试网的合约地址，而在开发环境下使用本地测试网的合约地址。
