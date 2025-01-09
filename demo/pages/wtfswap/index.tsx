@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { TokenSelect, useAccount, type Token } from "@ant-design/web3";
 import { Card, Input, Button, Space, Typography, message } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
@@ -6,6 +6,7 @@ import { uniq } from "lodash-es";
 
 import WtfLayout from "@/components/WtfLayout";
 import Balance from "@/components/Balance";
+import Faucet from "@/components/Faucet";
 import styles from "./swap.module.css";
 
 import { usePublicClient } from "wagmi";
@@ -52,10 +53,6 @@ function Swap() {
   const [amountA, setAmountA] = useState(0);
   const [amountB, setAmountB] = useState(0);
   const { account } = useAccount();
-
-  // 用于在交易完成后更新余额
-  const balanceARef = useRef<{ refresh: () => void }>(null);
-  const balanceBRef = useRef<{ refresh: () => void }>(null);
 
   // 获取所有的交易对
   const { data: pairs = [] } = useReadPoolManagerGetPairs({
@@ -212,7 +209,7 @@ function Swap() {
         <Space className={styles.swapSpace}>
           <Text type="secondary"></Text>
           <Text type="secondary">
-            Balance: <Balance ref={balanceARef} token={tokenA} />
+            Balance: <Balance token={tokenA} />
           </Text>
         </Space>
       </Card>
@@ -232,7 +229,7 @@ function Swap() {
         <Space className={styles.swapSpace}>
           <Text type="secondary"></Text>
           <Text type="secondary">
-            Balance: <Balance ref={balanceBRef} token={tokenB} />
+            Balance: <Balance token={tokenB} />
           </Text>
         </Space>
       </Card>
@@ -294,8 +291,6 @@ function Swap() {
               });
             }
             message.success("Swap success");
-            balanceARef.current?.refresh();
-            balanceBRef.current?.refresh();
             setAmountA(NaN);
             setAmountB(NaN);
           } catch (e: any) {
@@ -307,6 +302,7 @@ function Swap() {
       >
         Swap
       </Button>
+      <Faucet />
     </Card>
   );
 }

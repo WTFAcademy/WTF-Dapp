@@ -1,6 +1,5 @@
 import React from "react";
 import { Button, message, Select, Card, Input, Space } from "antd";
-import type { TableProps } from "antd";
 import WtfLayout from "@/components/WtfLayout";
 import { getContractAddress } from "@/utils/common";
 import { useWriteDebugTokenMint } from "@/utils/contracts";

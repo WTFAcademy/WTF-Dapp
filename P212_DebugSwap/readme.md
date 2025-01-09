@@ -45,7 +45,7 @@ return (
 我们需要显示用户的余额，这里我们需要使用 `useReadErc20BalanceOf` Hook 来获取用户的余额。我们新增一个组件 [Balance.tsx](../demo/components/Balance.tsx)，用于显示余额：
 
 ```tsx
-import React, { forwardRef, useImperativeHandle } from "react";
+import React from "react";
 import type { Token } from "@ant-design/web3";
 import { CryptoPrice } from "@ant-design/web3";
 import { useReadErc20BalanceOf } from "@/utils/contracts";
@@ -56,25 +56,18 @@ interface Props {
   token?: Token;
 }
 
-// 使用 forwardRef 来接收 ref
-const Balance = (
-  props: Props,
-  ref: React.ForwardedRef<{ refresh: () => void }>
-) => {
+export default function Balance(props: Props) {
   const { address } = useAccount();
   const tokenAddress = useTokenAddress(props.token);
-  const { data: balance, refetch } = useReadErc20BalanceOf({
+  const { data: balance } = useReadErc20BalanceOf({
     address: tokenAddress,
     args: [address as `0x${string}`],
     query: {
       enabled: !!tokenAddress,
+      // 每 3 秒刷新一次
+      refetchInterval: 3000,
     },
   });
-
-  // 使用 useImperativeHandle 将 refetch 方法暴露给外部
-  useImperativeHandle(ref, () => ({
-    refresh: refetch,
-  }));
 
   return balance === undefined ? (
     "-"
@@ -86,14 +79,12 @@ const Balance = (
       fixed={2}
     />
   );
-};
-
-export default forwardRef(Balance);
+}
 ```
 
 组件接收一个 `token` 参数，它的类型是 `Token`，是 [Ant Design Web3](https://web3.ant.design/) 中定义的一个类型，定义包含了该 Token 的信息，我们使用 Ant Design Web3 的 [CryptoPrice](https://web3.ant.design/components/crypto-price) 组件来显示余额。
 
-另外组件对外暴露了一个 `refresh` 方法用于更新余额，我们在交易完成后需要手动调用一下。
+另外我们通过设置了 `refetchInterval` 为 `3000` 来自动更新余额。
 
 ## 报价
 
@@ -251,8 +242,6 @@ export const computeSqrtPriceLimitX96 = (
         });
       }
       message.success("Swap success");
-      balanceARef.current?.refresh();
-      balanceBRef.current?.refresh();
       setAmountA(NaN);
       setAmountB(NaN);
     } catch (e: any) {

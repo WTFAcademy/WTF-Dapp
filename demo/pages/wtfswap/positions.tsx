@@ -235,6 +235,7 @@ const PoolListTable: React.FC = () => {
                 },
               ],
             });
+            message.success("Add Position Success");
             refetch();
           } catch (error: any) {
             message.error(error.message);

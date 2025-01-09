@@ -10,7 +10,7 @@ import {
   Hardhat,
   Sepolia,
 } from "@ant-design/web3-wagmi";
-import { useAccount } from "wagmi";
+import { useAccount, http } from "wagmi";
 
 interface WtfLayoutProps {
   children: React.ReactNode;
@@ -37,6 +37,9 @@ const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
         autoAddInjectedWallets: true,
       }}
       chains={[Sepolia, Hardhat]}
+      transports={{
+        [Sepolia.id]: http("https://api.zan.top/public/eth-sepolia"),
+      }}
       ens
       wallets={[
         MetaMask(),

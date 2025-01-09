@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle } from "react";
+import React from "react";
 import type { Token } from "@ant-design/web3";
 import { CryptoPrice } from "@ant-design/web3";
 import { useReadErc20BalanceOf } from "@/utils/contracts";
@@ -9,25 +9,18 @@ interface Props {
   token?: Token;
 }
 
-// 使用 forwardRef 来接收 ref
-const Balance = (
-  props: Props,
-  ref: React.ForwardedRef<{ refresh: () => void }>
-) => {
+export default function Balance(props: Props) {
   const { address } = useAccount();
   const tokenAddress = useTokenAddress(props.token);
-  const { data: balance, refetch } = useReadErc20BalanceOf({
+  const { data: balance } = useReadErc20BalanceOf({
     address: tokenAddress,
     args: [address as `0x${string}`],
     query: {
       enabled: !!tokenAddress,
+      // 每 3 秒刷新一次
+      refetchInterval: 3000,
     },
   });
-
-  // 使用 useImperativeHandle 将 refetch 方法暴露给外部
-  useImperativeHandle(ref, () => ({
-    refresh: refetch,
-  }));
 
   return balance === undefined ? (
     "-"
@@ -39,6 +32,4 @@ const Balance = (
       fixed={2}
     />
   );
-};
-
-export default forwardRef(Balance);
+}
