@@ -29,6 +29,37 @@ Wtfswap#PositionManager - 0x59ebEa058E193B64f0E091220d5Db98288EFec57
 Wtfswap#SwapRouter - 0xA8b9Fa84A4Df935e768d3cC211E3d679027d0B31
 ```
 
+```
+npx hardhat ignition deploy ./ignition/modules/DebugToken.ts --network sepolia
+✔ Confirm deploy to network sepolia (11155111)? … yes
+Hardhat Ignition 🚀
+
+Resuming existing deployment from ./ignition/deployments/chain-11155111
+
+Deploying [ DebugToken ]
+
+Warning - previously executed futures are not in the module:
+ - Wtfswap#PoolManager
+ - Wtfswap#PositionManager
+ - Wtfswap#SwapRouter
+
+Batch #1
+  Executed DebugToken#DebugTokenA
+  Executed DebugToken#DebugTokenB
+  Executed DebugToken#DebugTokenC
+
+[ DebugToken ] successfully deployed 🚀
+
+Deployed Addresses
+
+Wtfswap#PoolManager - 0xF35DE8597A617cfA23de794BCBB4c2f8fc9bC896
+Wtfswap#PositionManager - 0x59ebEa058E193B64f0E091220d5Db98288EFec57
+Wtfswap#SwapRouter - 0xA8b9Fa84A4Df935e768d3cC211E3d679027d0B31
+DebugToken#DebugTokenA - 0x5AAB2806D12E380c24C640a8Cd94906d7fA59b16
+DebugToken#DebugTokenB - 0x00E6EC12a0Fc35d7064cD0d551Ac74A02bA8a5A5
+DebugToken#DebugTokenC - 0x1D46AD43cc80BFb66C1D574d2B0E4abab191d1E0
+```
+
 ## 合约认证
 
 ```

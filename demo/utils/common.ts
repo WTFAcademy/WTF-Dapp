@@ -20,32 +20,32 @@ export const getContractAddress = (
   const isProd = process.env.NODE_ENV === "production";
   if (contract === "PoolManager") {
     return isProd
-      ? "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      ? "0xF35DE8597A617cfA23de794BCBB4c2f8fc9bC896"
       : "0x5FbDB2315678afecb367f032d93F642f64180aa3";
   }
   if (contract === "PositionManager") {
     return isProd
-      ? "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+      ? "0x59ebEa058E193B64f0E091220d5Db98288EFec57"
       : "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
   }
   if (contract === "SwapRouter") {
     return isProd
-      ? "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0"
+      ? "0xA8b9Fa84A4Df935e768d3cC211E3d679027d0B31"
       : "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
   }
   if (contract === "DebugTokenA") {
     return isProd
-      ? "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
+      ? "0x5AAB2806D12E380c24C640a8Cd94906d7fA59b16"
       : "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
   }
   if (contract === "DebugTokenB") {
     return isProd
-      ? "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+      ? "0x00E6EC12a0Fc35d7064cD0d551Ac74A02bA8a5A5"
       : "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
   }
   if (contract === "DebugTokenC") {
     return isProd
-      ? "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
+      ? "0x1D46AD43cc80BFb66C1D574d2B0E4abab191d1E0"
       : "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
   }
   throw new Error("Invalid contract");
@@ -85,6 +85,43 @@ const builtInTokens: Record<string, Token> = {
       {
         chain: Hardhat,
         contract: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+      },
+    ],
+  },
+
+  "0x5AAB2806D12E380c24C640a8Cd94906d7fA59b16": {
+    icon: null,
+    symbol: "DTA",
+    decimal: 18,
+    name: "DebugTokenA",
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: "0x5AAB2806D12E380c24C640a8Cd94906d7fA59b16",
+      },
+    ],
+  },
+  "0x00E6EC12a0Fc35d7064cD0d551Ac74A02bA8a5A5": {
+    icon: null,
+    symbol: "DTB",
+    decimal: 18,
+    name: "DebugTokenB",
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: "0x00E6EC12a0Fc35d7064cD0d551Ac74A02bA8a5A5",
+      },
+    ],
+  },
+  "0x1D46AD43cc80BFb66C1D574d2B0E4abab191d1E0": {
+    icon: null,
+    symbol: "DTC",
+    decimal: 18,
+    name: "DebugTokenC",
+    availableChains: [
+      {
+        chain: Hardhat,
+        contract: "0x1D46AD43cc80BFb66C1D574d2B0E4abab191d1E0",
       },
     ],
   },
