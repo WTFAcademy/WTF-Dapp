@@ -88,7 +88,6 @@ const builtInTokens: Record<string, Token> = {
       },
     ],
   },
-
   "0x5AAB2806D12E380c24C640a8Cd94906d7fA59b16": {
     icon: null,
     symbol: "DTA",
@@ -96,7 +95,7 @@ const builtInTokens: Record<string, Token> = {
     name: "DebugTokenA",
     availableChains: [
       {
-        chain: Hardhat,
+        chain: Sepolia,
         contract: "0x5AAB2806D12E380c24C640a8Cd94906d7fA59b16",
       },
     ],
@@ -108,7 +107,7 @@ const builtInTokens: Record<string, Token> = {
     name: "DebugTokenB",
     availableChains: [
       {
-        chain: Hardhat,
+        chain: Sepolia,
         contract: "0x00E6EC12a0Fc35d7064cD0d551Ac74A02bA8a5A5",
       },
     ],
@@ -120,7 +119,7 @@ const builtInTokens: Record<string, Token> = {
     name: "DebugTokenC",
     availableChains: [
       {
-        chain: Hardhat,
+        chain: Sepolia,
         contract: "0x1D46AD43cc80BFb66C1D574d2B0E4abab191d1E0",
       },
     ],

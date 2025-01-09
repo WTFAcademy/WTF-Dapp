@@ -76,15 +76,15 @@ export default function Home() {
           </a>
 
           <a
-            href="/web3"
+            href="/wtfswap"
             className={styles.card}
             target="_blank"
             rel="noopener noreferrer"
           >
             <h2>
-              Demo <span>-&gt;</span>
+              Wtfswap <span>-&gt;</span>
             </h2>
-            <p>访问课程 Demo</p>
+            <p>访问课程 Wtfswap Demo</p>
           </a>
 
           <a
