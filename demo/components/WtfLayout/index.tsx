@@ -38,6 +38,7 @@ const WtfLayout: React.FC<WtfLayoutProps> = ({ children }) => {
       }}
       chains={[Sepolia, Hardhat]}
       transports={{
+        [Hardhat.id]: http("http://127.0.0.1:8545"),
         [Sepolia.id]: http("https://api.zan.top/public/eth-sepolia"),
       }}
       ens
