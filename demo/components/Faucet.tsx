@@ -43,26 +43,26 @@ export default function Faucet() {
             <a
               type="link"
               onClick={() => {
-                claim(getContractAddress("DebugTokenA"), "TBA");
+                claim(getContractAddress("DebugTokenA"), "DTA");
               }}
             >
-              TBA
+              DTA
             </a>
             <a
               type="link"
               onClick={() => {
-                claim(getContractAddress("DebugTokenB"), "TBB");
+                claim(getContractAddress("DebugTokenB"), "DTB");
               }}
             >
-              TBB
+              DTB
             </a>
             <a
               type="link"
               onClick={() => {
-                claim(getContractAddress("DebugTokenC"), "TBC");
+                claim(getContractAddress("DebugTokenC"), "DTC");
               }}
             >
-              TBC
+              DTC
             </a>
           </Space>
         )}
