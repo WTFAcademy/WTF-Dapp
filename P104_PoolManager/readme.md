@@ -1,4 +1,4 @@
-本节作者：[@yeezo](https://warpcast.com/yeezo) [@Ethan](https://x.com/SnowS39053)
+本节作者：[@yeezo](https://warpcast.com/yeezo)、[@Ethan](https://x.com/SnowS39053)
 
 这一讲我们将引导大家完成 `PoolManager.sol` 合约的开发。
 

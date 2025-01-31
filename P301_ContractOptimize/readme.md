@@ -1,5 +1,6 @@
 本节作者：[@愚指导](https://x.com/yudao1024)
-漏洞列表贡献：[@愚指导](https://x.com/yudao1024) [@Ethan](https://x.com/SnowS39053)
+
+漏洞列表贡献：[@愚指导](https://x.com/yudao1024)、[@Ethan](https://x.com/SnowS39053)
 
 这一讲会简单讲一下合约安全，也欢迎大家提交本课程的合约漏洞帮助完善该文档。
 
