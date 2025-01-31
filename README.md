@@ -112,7 +112,7 @@
 
 **第 P211 讲：支持管理流动性**：[教程](./P211_DebugPosition/readme.md) | [代码](./demo/pages/wtfswap/position.tsx)
 
-**第 P212 讲：支持 Swap**：[教程](./P212_DebugSwap/readme.md) | [代码](./demo/pages/wtfswap/swap.tsx)
+**第 P212 讲：支持 Swap**：[教程](./P212_DebugSwap/readme.md) | [代码](./demo/pages/wtfswap/index.tsx)
 
 ### 3. 部署和优化
 
