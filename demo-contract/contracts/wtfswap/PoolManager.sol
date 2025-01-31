@@ -27,13 +27,14 @@ contract PoolManager is Factory, IPoolManager {
 
         // 再填充数据
         poolsInfo = new PoolInfo[](length);
+        uint256 index;
         for (uint32 i = 0; i < pairs.length; i++) {
             address[] memory addresses = pools[pairs[i].token0][
                 pairs[i].token1
             ];
             for (uint32 j = 0; j < addresses.length; j++) {
                 IPool pool = IPool(addresses[j]);
-                poolsInfo[i + j] = PoolInfo({
+                poolsInfo[index] = PoolInfo({
                     pool: addresses[j],
                     token0: pool.token0(),
                     token1: pool.token1(),
@@ -46,6 +47,7 @@ contract PoolManager is Factory, IPoolManager {
                     sqrtPriceX96: pool.sqrtPriceX96(),
                     liquidity: pool.liquidity()
                 });
+                index++;
             }
         }
         return poolsInfo;

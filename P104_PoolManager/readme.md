@@ -1,4 +1,5 @@
 本节作者：[@yeezo](https://warpcast.com/yeezo)
+参与写作: [@Ethan](https://x.com/SnowS39053)
 
 这一讲我们将引导大家完成 `PoolManager.sol` 合约的开发。
 
@@ -168,13 +169,14 @@ contract PoolManager is Factory, IPoolManager {
 
     // 再填充数据
     poolsInfo = new PoolInfo[](length);
+    uint256 index
     for (uint32 i = 0; i < pairs.length; i++) {
       address[] memory addresses = pools[pairs[i].token0][
           pairs[i].token1
       ];
       for (uint32 j = 0; j < addresses.length; j++) {
         IPool pool = IPool(addresses[j]);
-        poolsInfo[i + j] = PoolInfo({
+        poolsInfo[index] = PoolInfo({
           token0: pool.token0(),
           token1: pool.token1(),
           index: j,
@@ -185,6 +187,7 @@ contract PoolManager is Factory, IPoolManager {
           tick: pool.tick(),
           sqrtPriceX96: pool.sqrtPriceX96()
         });
+        index++;
       }
     }
     return poolsInfo;
