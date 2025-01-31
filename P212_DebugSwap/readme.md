@@ -261,4 +261,4 @@ export const computeSqrtPriceLimitX96 = (
 
 ![swap](./img/swap.png)
 
-至此，我们的所有基础代码就开发完成了，后续我们会继续讲解如何部署和优化合约。
+完整的代码见[wtfswap/index.tsx](../demo/pages/wtfswap/index.tsx)。至此，我们的所有基础代码就开发完成了，后续我们会继续讲解如何部署和优化合约。
