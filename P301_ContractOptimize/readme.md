@@ -1,5 +1,5 @@
 本节作者：[@愚指导](https://x.com/yudao1024)
-参与写作: [@Ethan](https://x.com/SnowS39053)
+漏洞列表贡献：[@愚指导](https://x.com/yudao1024) [@Ethan](https://x.com/SnowS39053)
 
 这一讲会简单讲一下合约安全，也欢迎大家提交本课程的合约漏洞帮助完善该文档。
 
@@ -43,6 +43,6 @@
 漏洞列表：
 
 1. [《payable 可能导致资金被锁》](./bugs/001.md)
-2. [ 《getAllPools 方法存在数据覆盖的问题》](./bugs/002.md)
+2. [《getAllPools 方法存在数据覆盖的问题》](./bugs/002.md)
 
 上面是当前已经发现的 Wtfswap 合约的漏洞或者优化点，欢迎社区同学提交补充更多的案例。
