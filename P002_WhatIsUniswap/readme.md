@@ -210,7 +210,7 @@ getPool[token1][token0][fee] = pool;
 
 #### 初始化交易池
 
-初始化交易池调用的是 `UniswapV3Factory` 合约的 [initialize](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L271)，参数为当前价格 sqrtPriceX96，含义上面已经介绍过了。
+初始化交易池调用的是 `UniswapV3Pool` 合约的 [initialize](https://github.com/Uniswap/v3-core/blob/main/contracts/UniswapV3Pool.sol#L271)，参数为当前价格 sqrtPriceX96，含义上面已经介绍过了。
 
 代码如下：
 
