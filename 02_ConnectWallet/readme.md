@@ -34,6 +34,9 @@ import { http } from "wagmi";
 export default function Web3() {
   return (
     <WagmiWeb3ConfigProvider
+      eip6963={{
+        autoAddInjectedWallets: true,
+      }}
       chains={[Mainnet]}
       transports={{
         [Mainnet.id]: http(),
