@@ -1,12 +1,18 @@
 {
   "name": "hardhat-project",
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
-    "@uniswap/v3-sdk": "^3.17.1",
-    "hardhat": "^2.22.3"
+    "@nomicfoundation/hardhat-toolbox-viem": "5.0.7",
+    "@uniswap/v3-sdk": "3.31.11",
+    "hardhat": "3.22.0",
+    "typescript": "7.0.2",
+    "chai": "6.3.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
+    "@openzeppelin/contracts": "5.6.1"
   },
-  "repository": "git@github.com:WTFAcademy/WTF-Dapp.git"
+  "repository": "git@github.com:WTFAcademy/WTF-Dapp.git",
+  "type": "module",
+  "scripts": {
+    "test": "hardhat test"
+  }
 }

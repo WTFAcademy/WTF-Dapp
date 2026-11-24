@@ -1,4 +1,5 @@
 import React from "react";
+import useHydrated from "@/hooks/useHydrated";
 import Header from "./Header";
 import styles from "./styles.module.css";
 import {
@@ -18,13 +19,9 @@ interface WtfLayoutProps {
 
 const LayoutContent: React.FC<WtfLayoutProps> = ({ children }) => {
   const { address } = useAccount();
-  const [loading, setLoading] = React.useState(true);
+  const hydrated = useHydrated();
 
-  React.useEffect(() => {
-    setLoading(false);
-  }, []);
-
-  if (loading || !address) {
+  if (!hydrated || !address) {
     return <div className={styles.connectTip}>Please Connect First.</div>;
   }
   return children;

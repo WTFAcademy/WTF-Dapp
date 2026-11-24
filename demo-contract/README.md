@@ -1,13 +1,14 @@
-# Sample Hardhat Project
+# WTF Dapp contracts
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+Use Node.js 22.12 or newer. This project pins Hardhat 3.22.0, Solidity 0.8.39,
+and OpenZeppelin Contracts 5.6.1.
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
+```sh
+npm ci
+npm test
 npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.ts
 ```
+
+The Node.js test suite uses the Viem connection provided by
+`@nomicfoundation/hardhat-toolbox-viem`. The deployment modules are in
+[`ignition/modules/`](./ignition/modules/).

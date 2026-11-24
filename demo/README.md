@@ -2,7 +2,9 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+Use Node.js 22.12 or newer and run `npm ci` before starting the development
+server. The demo uses Next.js 16, React 19, Ant Design 6, and Viem 2.
+The Ant Design Web3 adapter requires Wagmi 2.
 
 ```bash
 npm run dev

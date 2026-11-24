@@ -1,10 +1,12 @@
-import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import { describe, it } from "node:test";
 import { expect } from "chai";
-import hre from "hardhat";
+import { network } from "hardhat";
+
+const { viem, networkHelpers } = await network.create();
 
 describe("MyToken", function () {
   async function deployFixture() {
-    const token = await hre.viem.deployContract("MyToken");
+    const token = await viem.deployContract("MyToken");
     return {
       token,
     };
@@ -13,7 +15,7 @@ describe("MyToken", function () {
   describe("ERC721", function () {
     describe("name", function () {
       it("Get NFT name", async function () {
-        const { token } = await loadFixture(deployFixture);
+        const { token } = await networkHelpers.loadFixture(deployFixture);
         expect(await token.read.name()).to.equal("MyToken");
       });
     });

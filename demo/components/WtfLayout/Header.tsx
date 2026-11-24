@@ -1,4 +1,5 @@
 import React from "react";
+import useHydrated from "@/hooks/useHydrated";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Connector, ConnectButton } from "@ant-design/web3";
@@ -7,11 +8,7 @@ import styles from "./styles.module.css";
 export default function WtfHeader() {
   const pathname = usePathname();
   const isSwapPage = pathname === "/wtfswap";
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    setLoading(false);
-  }, []);
+  const hydrated = useHydrated();
 
   return (
     <div className={styles.header}>
@@ -31,7 +28,7 @@ export default function WtfHeader() {
         </Link>
       </div>
       <div>
-        {loading ? null : (
+        {hydrated && (
           <Connector
             modalProps={{
               mode: "simple",

@@ -1,12 +1,15 @@
-import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { expect } from "chai";
-import hre from "hardhat";
+import { network } from "hardhat";
 import { TickMath, encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
+
+const { viem, networkHelpers } = await network.create();
 
 describe("PoolManager", function () {
   async function deployFixture() {
-    const manager = await hre.viem.deployContract("PoolManager");
-    const publicClient = await hre.viem.getPublicClient();
+    const manager = await viem.deployContract("PoolManager");
+    const publicClient = await viem.getPublicClient();
     return {
       manager,
       publicClient,
@@ -14,7 +17,7 @@ describe("PoolManager", function () {
   }
 
   it("getPairs & getAllPools", async function () {
-    const { manager } = await loadFixture(deployFixture);
+    const { manager } = await networkHelpers.loadFixture(deployFixture);
     const tokenA: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
     const tokenB: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
     const tokenC: `0x${string}` = "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599";
@@ -75,11 +78,11 @@ describe("PoolManager", function () {
   });
 
   it("require token0 < token1", async function () {
-    const { manager } = await loadFixture(deployFixture);
+    const { manager } = await networkHelpers.loadFixture(deployFixture);
     const tokenA: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
     const tokenB: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
 
-    await expect(
+    await assert.rejects(
       manager.write.createAndInitializePoolIfNecessary([
         {
           token0: tokenB,
@@ -90,6 +93,6 @@ describe("PoolManager", function () {
           sqrtPriceX96: BigInt(encodeSqrtRatioX96(100, 1).toString()),
         },
       ])
-    ).to.be.rejected;
+    );
   });
 });

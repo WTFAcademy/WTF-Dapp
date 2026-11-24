@@ -1,11 +1,14 @@
-import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import { expect } from "chai";
-import hre from "hardhat";
+import { network } from "hardhat";
+
+const { viem, networkHelpers } = await network.create();
 
 describe("Factory", function () {
   async function deployFixture() {
-    const factory = await hre.viem.deployContract("Factory");
-    const publicClient = await hre.viem.getPublicClient();
+    const factory = await viem.deployContract("Factory");
+    const publicClient = await viem.getPublicClient();
     return {
       factory,
       publicClient,
@@ -13,7 +16,7 @@ describe("Factory", function () {
   }
 
   it("createPool", async function () {
-    const { factory, publicClient } = await loadFixture(deployFixture);
+    const { factory, publicClient } = await networkHelpers.loadFixture(deployFixture);
     const tokenA: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
     const tokenB: `0x${string}` = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984";
 
@@ -47,15 +50,11 @@ describe("Factory", function () {
   });
 
   it("createPool with same token", async function () {
-    const { factory } = await loadFixture(deployFixture);
+    const { factory } = await networkHelpers.loadFixture(deployFixture);
     const tokenA: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
     const tokenB: `0x${string}` = "0xEcd0D12E21805803f70de03B72B1C162dB0898d9";
-    await expect(
-      factory.write.createPool([tokenA, tokenB, 1, 100000, 3000])
-    ).to.be.rejectedWith("IDENTICAL_ADDRESSES");
+    await assert.rejects(factory.write.createPool([tokenA, tokenB, 1, 100000, 3000]), /IDENTICAL_ADDRESSES/);
 
-    await expect(factory.read.getPool([tokenA, tokenB, 3])).to.be.rejectedWith(
-      "IDENTICAL_ADDRESSES"
-    );
+    await assert.rejects(factory.read.getPool([tokenA, tokenB, 3]), /IDENTICAL_ADDRESSES/);
   });
 });

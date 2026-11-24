@@ -8,23 +8,14 @@
 
 以太坊的生态有着丰富的开发工具，比如 [Hardhat](https://hardhat.org/)、[Foundry](https://getfoundry.sh/) 等。这里我们将使用 Hardhat 来搭建本地开发环境，将本课程之前开发的合约迁移到本地环境中。
 
-我们参考 [hardhat 的快速开始文档](https://hardhat.org/hardhat-runner/docs/getting-started) 执行如下命令快速初始化一个项目：
+本章配套项目 [demo-contract](../demo-contract/) 使用 Node.js 22.12 或更新版本、Hardhat 3.22.0、Viem 及 Solidity 0.8.39。从仓库根目录运行下面的命令，按锁文件安装项目依赖。
 
 ```bash
-mkdir demo-contract
 cd demo-contract
-npx hardhat@2.22.3 init
+npm ci
 ```
 
-和[第一章](../01_QuickStart/readme.md)初始化 Next.js 项目类似，`npx` 是安装完成 Node.js 后自带的命令，如上命令会自动下载 [hardhat npm 包](https://www.npmjs.com/package/hardhat) 并执行 `init` 命令。使用 `2.22.3` 版本是因为它是本课程编写时的最新版本，这样可以保证你的环境和本课程一致。当然你也可以去掉版本号使用最新版。
-
-我们选择第三项，使用 Typescript + viem，和我们之前课程的技术栈保持一致。
-
-![hardhat](./img/hardhat.png)
-
-创建完成后你会得到如下的目录结构：
-
-![initfiles](./img/initfiles.png)
+如果要创建新项目，运行 `npx hardhat@3.22.0 --init`，选择使用 TypeScript 和 Viem 的模板。配置示例见 [hardhat.config.ts](../demo-contract/hardhat.config.ts)。
 
 每一部分文件的作用如下：
 
@@ -35,7 +26,7 @@ npx hardhat@2.22.3 init
 
 ## 本地开发和调试
 
-初始化项目时会自动安装依赖，如果没有安装，可以执行 `npm i` 重试。安装完成后执行下面命令即可编译合约：
+安装完成后执行下面的命令来编译合约：
 
 ```bash
 npx hardhat compile

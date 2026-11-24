@@ -1,21 +1,23 @@
-import { loadFixture } from "@nomicfoundation/hardhat-toolbox-viem/network-helpers";
+import { describe, it } from "node:test";
 import { expect } from "chai";
-import hre from "hardhat";
+import { network } from "hardhat";
 import { TickMath, encodeSqrtRatioX96 } from "@uniswap/v3-sdk";
+
+const { viem, networkHelpers } = await network.create();
 
 describe("PositionManager", function () {
   async function deployFixture() {
     // 初始化一个池子，价格上限是 40000，下限是 1，初始化价格是 10000，费率是 0.3%
-    const poolManager = await hre.viem.deployContract("PoolManager");
-    const tokenA = await hre.viem.deployContract("TestToken");
-    const tokenB = await hre.viem.deployContract("TestToken");
+    const poolManager = await viem.deployContract("PoolManager");
+    const tokenA = await viem.deployContract("TestToken");
+    const tokenB = await viem.deployContract("TestToken");
     const token0 = tokenA.address < tokenB.address ? tokenA : tokenB;
     const token1 = tokenA.address < tokenB.address ? tokenB : tokenA;
     const tickLower = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(1, 1));
     const tickUpper = TickMath.getTickAtSqrtRatio(encodeSqrtRatioX96(40000, 1));
     const fee = 3000;
 
-    const [owner] = await hre.viem.getWalletClients();
+    const [owner] = await viem.getWalletClients();
     const [sender] = await owner.getAddresses();
 
     await poolManager.write.createAndInitializePoolIfNecessary([
@@ -31,12 +33,12 @@ describe("PositionManager", function () {
 
     const createEvents = await poolManager.getEvents.PoolCreated();
     const poolAddress: `0x${string}` = createEvents[0].args.pool || "0x";
-    const pool = await hre.viem.getContractAt("Pool" as string, poolAddress);
+    const pool = await viem.getContractAt("Pool" as string, poolAddress);
 
-    const manager = await hre.viem.deployContract("PositionManager", [
+    const manager = await viem.deployContract("PositionManager", [
       poolManager.address,
     ]);
-    const publicClient = await hre.viem.getPublicClient();
+    const publicClient = await viem.getPublicClient();
     return {
       token0,
       token1,
@@ -49,7 +51,7 @@ describe("PositionManager", function () {
   }
 
   it("mint && burn && collect", async function () {
-    const { manager, sender, token0, token1, pool } = await loadFixture(
+    const { manager, sender, token0, token1, pool } = await networkHelpers.loadFixture(
       deployFixture
     );
 
@@ -98,7 +100,7 @@ describe("PositionManager", function () {
   });
 
   it("collet with fee", async function () {
-    const { pool, token0, token1, manager, sender } = await loadFixture(
+    const { pool, token0, token1, manager, sender } = await networkHelpers.loadFixture(
       deployFixture
     );
 
@@ -137,7 +139,7 @@ describe("PositionManager", function () {
     ]);
 
     // 通过 TestSwap 合约交易
-    const testSwap = await hre.viem.deployContract("TestSwap");
+    const testSwap = await viem.deployContract("TestSwap");
     const minPrice = 1000;
     const minSqrtPriceX96: bigint = BigInt(
       encodeSqrtRatioX96(minPrice, 1).toString()

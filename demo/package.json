@@ -4,32 +4,35 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ant-design/web3": "^1.20.0",
-    "@ant-design/web3-wagmi": "^2.10.0",
-    "@tanstack/react-query": "^5.28.4",
-    "@uniswap/v3-sdk": "^3.17.1",
-    "antd": "^5.21.1",
-    "lodash-es": "^4.17.21",
-    "next": "^14.0.4",
-    "react": "^18",
-    "react-dom": "^18",
-    "viem": "^2.21.15",
-    "wagmi": "^2.14.6"
+    "@ant-design/icons": "6.3.4",
+    "@ant-design/web3": "1.26.1",
+    "@ant-design/web3-wagmi": "2.13.1",
+    "@tanstack/react-query": "5.108.4",
+    "@uniswap/v3-sdk": "3.31.11",
+    "antd": "6.7.2",
+    "lodash-es": "4.18.1",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "viem": "2.58.6",
+    "wagmi": "2.19.5"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.12",
-    "@types/node": "20.16.9",
-    "@types/react": "18.3.9",
-    "@types/react-dom": "^18",
-    "@wagmi/cli": "^2.1.15",
-    "eslint": "^8",
-    "eslint-config-next": "^14.0.4",
-    "typescript": "5.6.2"
+    "@types/lodash-es": "4.17.12",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@wagmi/cli": "2.10.1",
+    "eslint": "10.15.0",
+    "eslint-config-next": "16.4.6",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "@typescript/native": "npm:typescript@7.0.2"
   },
   "repository": "git@github.com:WTFAcademy/WTF-Dapp.git"
 }

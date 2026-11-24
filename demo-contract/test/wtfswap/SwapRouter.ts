@@ -1,13 +1,16 @@
+import { describe, it } from "node:test";
 import { expect } from "chai";
 import { viem } from "hardhat";
-import hre from "hardhat";
+import { network } from "hardhat";
 import { encodeSqrtRatioX96, TickMath } from "@uniswap/v3-sdk";
+
+const { viem, networkHelpers } = await network.create();
 
 describe("SwapRouter", function () {
   async function deployFixture() {
     // 部署两个测试代币
-    const tokenA = await hre.viem.deployContract("TestToken");
-    const tokenB = await hre.viem.deployContract("TestToken");
+    const tokenA = await viem.deployContract("TestToken");
+    const tokenB = await viem.deployContract("TestToken");
     const token0 = tokenA.address < tokenB.address ? tokenA : tokenB;
     const token1 = tokenA.address < tokenB.address ? tokenB : tokenA;
 
@@ -90,7 +93,7 @@ describe("SwapRouter", function () {
       token1.address,
     ]);
 
-    const [owner] = await hre.viem.getWalletClients();
+    const [owner] = await viem.getWalletClients();
     const [sender] = await owner.getAddresses();
 
     return {

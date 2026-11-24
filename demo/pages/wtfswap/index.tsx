@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { TokenSelect, useAccount, type Token } from "@ant-design/web3";
 import { Card, Input, Button, Space, Typography, message } from "antd";
 import { SwapOutlined } from "@ant-design/icons";
@@ -32,11 +32,17 @@ const { Text } = Typography;
 
 function Swap() {
   const [loading, setLoading] = useState(false);
-  // 用户可以选择的代币
-  const [tokens, setTokens] = useState<Token[]>([]);
-  // 用户选择的两个代币
-  const [tokenA, setTokenA] = useState<Token>();
-  const [tokenB, setTokenB] = useState<Token>();
+  const { data: pairs } = useReadPoolManagerGetPairs({
+    address: getContractAddress("PoolManager"),
+  });
+  const tokens = useMemo(
+    () => uniq((pairs ?? []).flatMap(({ token0, token1 }) => [token0, token1])).map(getTokenInfo),
+    [pairs],
+  );
+  const [selectedTokenA, setTokenA] = useState<Token>();
+  const [selectedTokenB, setTokenB] = useState<Token>();
+  const tokenA = selectedTokenA ?? tokens[0];
+  const tokenB = selectedTokenB ?? tokens[1];
   // 两个代币的地址
   const tokenAddressA = useTokenAddress(tokenA);
   const tokenAddressB = useTokenAddress(tokenB);
@@ -54,112 +60,24 @@ function Swap() {
   const [amountB, setAmountB] = useState(0);
   const { account } = useAccount();
 
-  // 获取所有的交易对
-  const { data: pairs = [] } = useReadPoolManagerGetPairs({
+  const { data: pools } = useReadIPoolManagerGetAllPools({
     address: getContractAddress("PoolManager"),
   });
-
-  useEffect(() => {
-    const options: Token[] = uniq(
-      pairs.map((pair) => [pair.token0, pair.token1]).flat()
-    ).map(getTokenInfo);
-    setTokens(options);
-    setTokenA(options[0]);
-    setTokenB(options[1]);
-  }, [pairs]);
-
-  // 获取所有的交易池
-  const { data: pools = [] } = useReadIPoolManagerGetAllPools({
-    address: getContractAddress("PoolManager"),
-  });
-
-  // 计算交易池的交易顺序
-  const swapPools = pools.filter((pool) => {
-    return (
-      pool.token0 === token0 && pool.token1 === token1 && pool.liquidity > 0
+  const swapPools = useMemo(() => {
+    const matching = (pools ?? []).filter(
+      (pool) => pool.token0 === token0 && pool.token1 === token1 && pool.liquidity > 0,
     );
-  });
-  const swapIndexPath: number[] = swapPools
-    .sort((a, b) => {
-      // 简单处理，按照价格排序，再按照手续费排序，优先在价格低的池子中交易（按照 tick 判断），如果价格一样，就在手续费低的池子里面交易
+    return matching.sort((a, b) => {
       if (a.tick !== b.tick) {
-        if (zeroForOne) {
-          // token0 交换 token1 时，tick 越大意味着 token0 价格越高，所以要把 tick 大的放前面
-          return b.tick > a.tick ? 1 : -1;
-        }
-        return a.tick > b.tick ? 1 : -1;
+        return zeroForOne ? Number(b.tick - a.tick) : Number(a.tick - b.tick);
       }
       return a.fee - b.fee;
-    })
-    .map((pool) => pool.index);
-
-  // 计算本次交易的价格限制
+    });
+  }, [pools, token0, token1, zeroForOne]);
+  const swapIndexPath = useMemo(() => swapPools.map((pool) => pool.index), [swapPools]);
   const sqrtPriceLimitX96 = computeSqrtPriceLimitX96(swapPools, zeroForOne);
-
   const publicClient = usePublicClient();
-
-  const updateAmountBWithAmountA = async (value: number) => {
-    if (
-      !publicClient ||
-      !tokenAddressA ||
-      !tokenAddressB ||
-      isNaN(value) ||
-      value === 0
-    ) {
-      return;
-    }
-    if (tokenAddressA === tokenAddressB) {
-      message.error("Please select different tokens");
-      return;
-    }
-    try {
-      const newAmountB = await publicClient.simulateContract({
-        address: getContractAddress("SwapRouter"),
-        abi: swapRouterAbi,
-        functionName: "quoteExactInput",
-        args: [
-          {
-            tokenIn: tokenAddressA,
-            tokenOut: tokenAddressB,
-            indexPath: swapIndexPath,
-            amountIn: parseAmountToBigInt(value, tokenA),
-            sqrtPriceLimitX96,
-          },
-        ],
-      });
-      setAmountB(parseBigIntToAmount(newAmountB.result, tokenB));
-      setIsExactInput(true);
-    } catch (e: any) {
-      message.error(e.message);
-    }
-  };
-
-  const updateAmountAWithAmountB = async (value: number) => {
-    if (!publicClient || !tokenAddressA || !tokenAddressB || isNaN(value)) {
-      return;
-    }
-    try {
-      const newAmountA = await publicClient.simulateContract({
-        address: getContractAddress("SwapRouter"),
-        abi: swapRouterAbi,
-        functionName: "quoteExactOutput",
-        args: [
-          {
-            tokenIn: tokenAddressA,
-            tokenOut: tokenAddressB,
-            indexPath: swapIndexPath,
-            amountOut: parseAmountToBigInt(value, tokenB),
-            sqrtPriceLimitX96,
-          },
-        ],
-      });
-      setAmountA(parseBigIntToAmount(newAmountA.result, tokenA));
-      setIsExactInput(false);
-    } catch (e: any) {
-      message.error(e.message);
-    }
-  };
-
+  const sourceAmount = isExactInput ? amountA : amountB;
   const handleAmountAChange = (e: any) => {
     const value = parseFloat(e.target.value);
     setAmountA(value);
@@ -180,14 +98,53 @@ function Swap() {
   };
 
   useEffect(() => {
-    // 当用户输入发生变化时，重新请求报价接口计算价格
-    if (isExactInput) {
-      updateAmountBWithAmountA(amountA);
-    } else {
-      updateAmountAWithAmountB(amountB);
+    if (!publicClient || !tokenAddressA || !tokenAddressB || !sourceAmount) {
+      return;
     }
-  }, [isExactInput, tokenAddressA, tokenAddressB, amountA, amountB]);
+    if (tokenAddressA === tokenAddressB) {
+      message.error("Please select different tokens");
+      return;
+    }
 
+    let current = true;
+    const route = {
+      tokenIn: tokenAddressA,
+      tokenOut: tokenAddressB,
+      indexPath: swapIndexPath,
+      sqrtPriceLimitX96,
+    };
+    const quote = isExactInput
+      ? publicClient.simulateContract({
+          address: getContractAddress("SwapRouter"),
+          abi: swapRouterAbi,
+          functionName: "quoteExactInput",
+          args: [{ ...route, amountIn: parseAmountToBigInt(sourceAmount, tokenA) }],
+        })
+      : publicClient.simulateContract({
+          address: getContractAddress("SwapRouter"),
+          abi: swapRouterAbi,
+          functionName: "quoteExactOutput",
+          args: [{ ...route, amountOut: parseAmountToBigInt(sourceAmount, tokenB) }],
+        });
+
+    void quote.then(({ result }) => {
+      if (!current) return;
+      if (isExactInput) {
+        setAmountB(parseBigIntToAmount(result, tokenB));
+      } else {
+        setAmountA(parseBigIntToAmount(result, tokenA));
+      }
+    }).catch((error: Error) => {
+      if (current) message.error(error.message);
+    });
+
+    return () => {
+      current = false;
+    };
+  }, [
+    publicClient, tokenAddressA, tokenAddressB, swapIndexPath,
+    sqrtPriceLimitX96, isExactInput, sourceAmount, tokenA, tokenB,
+  ]);
   const { writeContractAsync: writeExactInput } =
     useWriteSwapRouterExactInput();
   const { writeContractAsync: writeExactOutput } =
