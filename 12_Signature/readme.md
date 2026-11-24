@@ -20,7 +20,7 @@
 
 ### 实现前端签名
 
-我们先来实现前端部分逻辑，我们基于之前的课程先快速实现[连接钱包](../03_ConnectWallet/readme.md)。
+我们先来实现前端部分逻辑，我们基于之前的课程先快速实现[连接钱包](../02_ConnectWallet/readme.md)。
 
 新建一个 `pages/sign/index.tsx` 文件，复制之前的代码，然后做下修改，新建一个 `components/SignDemo` 的组件：
 

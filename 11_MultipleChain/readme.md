@@ -22,7 +22,7 @@ DApp 支持多链是指能够在多个区块链平台上运行或与之交互。
 4. 多链智能合约：某些 NFT 项目开发了能在多个区块链上运行的智能合约。这些合约确保即便 NFT 在不同的区块链上，其属性和所有权记录仍然是一致的。
 5. 分散式身份和元数据存储服務：例如使用 IPFS（InterPlanetary File System）等分散式文件存储系统来存储 NFT 的元数据或内容。这样可以确保尽管 NFT 代币本身可能在不同的区块链上存在，其链接的内容却是统一和持久的。
 
-在前边的 [第四讲](./04_CallContract/readme.md) 和 [第五讲](./05_Events/readme.md) 中我们已经学习过了合约的调用和事件监听，那我们就在这个基础上继续学习支持多链，改造代码如下：
+在前边的 [第四讲](../04_CallContract/readme.md) 和 [第五讲](../05_Events/readme.md) 中我们已经学习过了合约的调用和事件监听，那我们就在这个基础上继续学习支持多链，改造代码如下：
 
 ```diff
 import { createConfig, http, useReadContract, useWriteContract } from "wagmi";
@@ -67,7 +67,7 @@ const config = createConfig({
 +    name: "Ethereum",
 +    contractAddress: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9"
 +  }, {
-+    id:5,
++    id: sepolia.id,
 +    name: "Sepolia",
 +    contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c"
 +  }, {

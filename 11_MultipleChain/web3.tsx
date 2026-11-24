@@ -39,7 +39,7 @@ const contractInfo = [
     contractAddress: "0xEcd0D12E21805803f70de03B72B1C162dB0898d9",
   },
   {
-    id: 5,
+    id: sepolia.id,
     name: "Sepolia",
     contractAddress: "0x418325c3979b7f8a17678ec2463a74355bdbe72c",
   },
